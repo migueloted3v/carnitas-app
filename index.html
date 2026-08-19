@@ -427,6 +427,7 @@ function agregarMonto(producto){
   document.getElementById('qtypanel').innerHTML='';
   renderTicket();
 }
+function agregarPieza(producto){
   const q = parseInt(document.getElementById('qInput').value);
   if(!q || q<=0){ alert('Captura la cantidad'); return; }
   const precio = precioDe(producto);
