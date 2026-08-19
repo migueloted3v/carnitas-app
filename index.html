@@ -8,13 +8,13 @@
 <link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#140D09">
+<meta name="theme-color" content="#153243">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root{
-    --bg:#140D09; --card:#1E1410; --card2:#241A13;
-    --border:#3E2E1E; --accent:#D9942A; --accent-light:#FDC022; --accent-dark:#7F5226;
-    --text:#F3E9DD; --muted:#B8A38A;
+    --bg:#153243; --card:#1D3F53; --card2:#415A77;
+    --border:#2C4A61; --accent:#F85E00; --accent-light:#FF8A42; --accent-dark:#C94900;
+    --text:#FFFFFF; --muted:#9FB6C4;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
@@ -25,7 +25,7 @@
   #main{flex:1;min-width:0}
   .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px 0 14px}
   .chip{flex:1 1 auto;min-width:0;border:1px solid var(--border);background:transparent;border-radius:20px;padding:8px 10px;font-size:13px;color:var(--text);white-space:nowrap;text-align:center}
-  .chip.active{background:var(--accent);color:#140D09;border-color:var(--accent);font-weight:500}
+  .chip.active{background:var(--accent);color:#FFFFFF;border-color:var(--accent);font-weight:500}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
   .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:15px;font-weight:500}
   .prod .sub{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:3px}
@@ -37,14 +37,14 @@
   .rowline a{color:var(--muted);text-decoration:none}
   .qtybtns{display:flex;gap:8px;margin-bottom:10px}
   .qtybtns button{flex:1;padding:11px 0;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px;font-size:13px}
-  .qtybtns button.sel{background:var(--accent);color:#140D09;border-color:var(--accent);font-weight:500}
+  .qtybtns button.sel{background:var(--accent);color:#FFFFFF;border-color:var(--accent);font-weight:500}
   input[type=number]{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text)}
-  .addbtn{width:100%;padding:11px;background:var(--accent);color:#140D09;border:none;border-radius:8px;font-size:14px;font-weight:500;margin-top:10px}
+  .addbtn{width:100%;padding:11px;background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:14px;font-weight:500;margin-top:10px}
   #ticket{flex:0 0 300px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;position:sticky;top:76px}
   #ticket h3{font-size:13px;color:var(--accent-light);margin:0 0 8px;font-weight:500}
   #ticket .total{display:flex;justify-content:space-between;font-weight:500;font-size:18px;margin-bottom:10px;padding-top:8px;border-top:1px solid var(--border)}
   #ticket .items{max-height:110px;overflow-y:auto;font-size:13px;color:var(--muted);margin-bottom:4px}
-  #cobrar{width:100%;padding:14px;background:var(--accent);color:#140D09;border:none;border-radius:8px;font-size:15px;font-weight:500}
+  #cobrar{width:100%;padding:14px;background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:15px;font-weight:500}
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:20}
   .sheet{background:var(--card2);width:100%;max-width:480px;margin:0 auto;border-radius:16px 16px 0 0;padding:20px;max-height:80vh;overflow-y:auto;border:1px solid var(--border);border-bottom:none}
   .sheet h2{font-size:16px;margin:0 0 14px;font-weight:500}
@@ -164,7 +164,7 @@ function abrirCantidad(producto){
           <button onclick="agregarKilo('${producto}',1,this)">1 kg</button>
         </div>
         <label>O gramos exactos</label>
-        <input type="number" id="gInput" placeholder="Ej. 350">
+        <input type="number" id="gInput" placeholder="Ej. 350" oninput="calcGramosPreview('${producto}')">
         <button class="addbtn" onclick="agregarGramos('${producto}')">Agregar</button>
       </div>`;
   } else if(tipo==='gramos'){

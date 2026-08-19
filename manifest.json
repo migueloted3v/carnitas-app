@@ -3,8 +3,8 @@
   "short_name": "Carnitas",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#140D09",
-  "theme_color": "#140D09",
+  "background_color": "#153243",
+  "theme_color": "#153243",
   "icons": [
     { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
   ]
