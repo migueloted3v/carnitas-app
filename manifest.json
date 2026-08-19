@@ -1,0 +1,11 @@
+{
+  "name": "Carnitas App",
+  "short_name": "Carnitas",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FAECE7",
+  "theme_color": "#D85A30",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

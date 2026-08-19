@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Carnitas App</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#D85A30">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    --accent:#D85A30; --accent-dark:#993C1D; --bg:#FAECE7; --card:#FFFFFF;
+    --border:#e6dcd4; --text:#2C2C2A; --muted:#5F5E5A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:var(--accent);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+  header h1{font-size:16px;margin:0;font-weight:600}
+  header button{background:none;border:none;color:#fff;font-size:20px}
+  #app{max-width:480px;margin:0 auto;padding:12px 12px 100px}
+  .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px}
+  .chip{flex:none;border:1px solid var(--border);background:#fff;border-radius:20px;padding:7px 14px;font-size:13px;color:var(--text)}
+  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:14px;font-weight:500}
+  .prod:active{background:#f3e6df}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+  .panel h3{font-size:13px;color:var(--muted);margin:0 0 10px;font-weight:500}
+  .rowline{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px solid var(--border)}
+  .rowline:last-child{border-bottom:none}
+  .qtybtns{display:flex;gap:6px;margin-bottom:8px}
+  .qtybtns button{flex:1;padding:10px 0;border:1px solid var(--border);background:#fff;border-radius:8px;font-size:13px}
+  .qtybtns button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+  input[type=number]{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:15px}
+  .addbtn{width:100%;padding:10px;background:var(--accent-dark);color:#fff;border:none;border-radius:8px;font-size:14px;margin-top:8px}
+  #ticket{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:10px 14px;max-width:480px;margin:0 auto}
+  #ticket .total{display:flex;justify-content:space-between;font-weight:600;font-size:17px;margin-bottom:8px}
+  #ticket .items{max-height:100px;overflow-y:auto;font-size:12px;color:var(--muted);margin-bottom:8px}
+  #cobrar{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:20}
+  .sheet{background:#fff;width:100%;max-width:480px;margin:0 auto;border-radius:16px 16px 0 0;padding:18px;max-height:80vh;overflow-y:auto}
+  .sheet h2{font-size:16px;margin:0 0 12px}
+  .payopt{display:block;width:100%;padding:12px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;background:#fff;font-size:14px}
+  label{font-size:12px;color:var(--muted);display:block;margin:10px 0 4px}
+  input[type=text]{width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;font-size:14px}
+  .badge{position:fixed;top:56px;right:12px;background:var(--accent-dark);color:#fff;font-size:11px;padding:4px 8px;border-radius:10px;z-index:6}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="hstate">Carnitas App</h1>
+  <button onclick="openSettings()">⚙</button>
+</header>
+
+<div id="pendbadge" class="badge hidden"></div>
+
+<div id="app">
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div>
+  <div id="qtypanel"></div>
+</div>
+
+<div id="ticket">
+  <div class="items" id="ticketitems">Sin productos aún</div>
+  <div class="total"><span>Total</span><span id="ticketTotal">$0</span></div>
+  <button id="cobrar" onclick="abrirCobro()">Cobrar</button>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+const CATS = {
+  "Carne": {tipo:"kilo", productos:["Maciza","Pierna","Chamorro","Buche","Aldilla","Nuca","Costilla","Cuerito"]},
+  "Chicharrón": {tipo:"gramos", productos:["Durito botanero","Chicharron de cachete","Chicharrón de lonja","Chicharron crakelyn"]},
+  "Tortillas": {tipo:"kilo", productos:["Tortilla"]},
+  "Bebida": {tipo:"pieza", productos:["Refresco","Agua de sabor"]},
+  "Gorditas": {tipo:"pieza", productos:["Gorda normal","Gorda rellena"]},
+  "Tacos": {tipo:"pieza", productos:["Taco"]},
+  "Frijoles charros": {tipo:"pieza", productos:["Litro","Medio","Vaso"]},
+  "Torta": {tipo:"pieza", productos:["Torta"]}
+};
+
+let cfg = JSON.parse(localStorage.getItem('carnitas_cfg')||'{}');
+let precios = JSON.parse(localStorage.getItem('carnitas_precios')||'{}');
+let pendientes = JSON.parse(localStorage.getItem('carnitas_pendientes')||'[]');
+let ticket = [];
+let catActiva = Object.keys(CATS)[0];
+let accessToken = null;
+let tokenClient = null;
+
+function fmt(n){ return '$' + Math.round(n).toLocaleString('es-MX'); }
+
+function renderChips(){
+  const c = document.getElementById('chips');
+  c.innerHTML = '';
+  Object.keys(CATS).forEach(cat=>{
+    const b = document.createElement('button');
+    b.className = 'chip' + (cat===catActiva ? ' active':'');
+    b.textContent = cat;
+    b.onclick = ()=>{ catActiva = cat; document.getElementById('qtypanel').innerHTML=''; renderChips(); renderGrid(); };
+    c.appendChild(b);
+  });
+}
+
+function renderGrid(){
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
+  CATS[catActiva].productos.forEach(p=>{
+    const d = document.createElement('div');
+    d.className = 'prod';
+    d.textContent = p;
+    d.onclick = ()=> abrirCantidad(p);
+    g.appendChild(d);
+  });
+}
+
+function precioDe(p){ return precios[p] || 0; }
+
+function abrirCantidad(producto){
+  const tipo = CATS[catActiva].tipo;
+  const panel = document.getElementById('qtypanel');
+  if(tipo==='kilo'){
+    panel.innerHTML = `
+      <div class="panel">
+        <h3>${producto} · fracción de kilo</h3>
+        <div class="qtybtns">
+          <button onclick="agregarKilo('${producto}',0.25,this)">1/4 kg</button>
+          <button onclick="agregarKilo('${producto}',0.5,this)">1/2 kg</button>
+          <button onclick="agregarKilo('${producto}',0.75,this)">3/4 kg</button>
+          <button onclick="agregarKilo('${producto}',1,this)">1 kg</button>
+        </div>
+        <label>O gramos exactos</label>
+        <input type="number" id="gInput" placeholder="Ej. 350" oninput="calcGramosPreview('${producto}')">
+        <button class="addbtn" onclick="agregarGramos('${producto}')">Agregar</button>
+      </div>`;
+  } else if(tipo==='gramos'){
+    panel.innerHTML = `
+      <div class="panel">
+        <h3>${producto} · gramos</h3>
+        <input type="number" id="gInput2" placeholder="Ej. 200">
+        <button class="addbtn" onclick="agregarGramosDirecto('${producto}')">Agregar</button>
+      </div>`;
+  } else {
+    panel.innerHTML = `
+      <div class="panel">
+        <h3>${producto} · cantidad</h3>
+        <input type="number" id="qInput" value="1" min="1">
+        <button class="addbtn" onclick="agregarPieza('${producto}')">Agregar</button>
+      </div>`;
+  }
+}
+
+function agregarKilo(producto, frac, btn){
+  const precio = precioDe(producto);
+  ticket.push({categoria:catActiva, producto, modo:'Fracción', cantidad:frac, precioUnit:precio, total:precio*frac});
+  document.getElementById('qtypanel').innerHTML='';
+  renderTicket();
+}
+function agregarGramos(producto){
+  const g = parseFloat(document.getElementById('gInput').value);
+  if(!g || g<=0){ alert('Captura los gramos'); return; }
+  const precio = precioDe(producto);
+  const kg = g/1000;
+  ticket.push({categoria:catActiva, producto, modo:'Gramos', cantidad:Math.round(g), precioUnit:precio, total:precio*kg});
+  document.getElementById('qtypanel').innerHTML='';
+  renderTicket();
+}
+function agregarGramosDirecto(producto){
+  const g = parseFloat(document.getElementById('gInput2').value);
+  if(!g || g<=0){ alert('Captura los gramos'); return; }
+  const precio = precioDe(producto);
+  const kg = g/1000;
+  ticket.push({categoria:catActiva, producto, modo:'Gramos', cantidad:Math.round(g), precioUnit:precio, total:precio*kg});
+  document.getElementById('qtypanel').innerHTML='';
+  renderTicket();
+}
+function agregarPieza(producto){
+  const q = parseInt(document.getElementById('qInput').value);
+  if(!q || q<=0){ alert('Captura la cantidad'); return; }
+  const precio = precioDe(producto);
+  ticket.push({categoria:catActiva, producto, modo:'Piezas', cantidad:q, precioUnit:precio, total:precio*q});
+  document.getElementById('qtypanel').innerHTML='';
+  renderTicket();
+}
+
+function renderTicket(){
+  const items = document.getElementById('ticketitems');
+  if(ticket.length===0){ items.innerHTML = 'Sin productos aún'; }
+  else {
+    items.innerHTML = ticket.map((it,i)=>`<div class="rowline"><span>${it.cantidad}${it.modo==='Fracción'?' kg':it.modo==='Gramos'?' g':'x'} ${it.producto}</span><span>${fmt(it.total)} <a href="#" onclick="quitar(${i});return false;">✕</a></span></div>`).join('');
+  }
+  const total = ticket.reduce((s,i)=>s+i.total,0);
+  document.getElementById('ticketTotal').textContent = fmt(total);
+}
+function quitar(i){ ticket.splice(i,1); renderTicket(); }
+
+function abrirCobro(){
+  if(ticket.length===0){ alert('Agrega al menos un producto'); return; }
+  const total = ticket.reduce((s,i)=>s+i.total,0);
+  document.getElementById('modalRoot').innerHTML = `
+    <div class="overlay" onclick="if(event.target===this)cerrarModal()">
+      <div class="sheet">
+        <h2>Cobrar ${fmt(total)}</h2>
+        <button class="payopt" onclick="finalizarVenta('Efectivo')">💵 Efectivo</button>
+        <button class="payopt" onclick="finalizarVenta('Tarjeta')">💳 Tarjeta</button>
+        <button class="payopt" onclick="finalizarVenta('Transferencia')">🏦 Transferencia</button>
+      </div>
+    </div>`;
+}
+function cerrarModal(){ document.getElementById('modalRoot').innerHTML=''; }
+
+async function finalizarVenta(metodo){
+  const ticketId = 'T' + Date.now();
+  const fecha = new Date().toISOString();
+  const rows = ticket.map(it=>[fecha, ticketId, it.categoria, it.producto, it.modo, it.cantidad, Math.round(it.precioUnit), Math.round(it.total), metodo]);
+  cerrarModal();
+  const ok = await enviarASheets(rows);
+  if(!ok){
+    pendientes.push(...rows);
+    localStorage.setItem('carnitas_pendientes', JSON.stringify(pendientes));
+    updateBadge();
+  }
+  ticket = [];
+  renderTicket();
+}
+
+async function enviarASheets(rows){
+  if(!cfg.spreadsheetId || !accessToken) return false;
+  try{
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/Ventas!A1:append?valueInputOption=USER_ENTERED`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body: JSON.stringify({values: rows})
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+
+async function sincronizarPendientes(){
+  if(pendientes.length===0) return;
+  const ok = await enviarASheets(pendientes);
+  if(ok){ pendientes=[]; localStorage.setItem('carnitas_pendientes','[]'); updateBadge(); }
+}
+
+function updateBadge(){
+  const b = document.getElementById('pendbadge');
+  if(pendientes.length>0){ b.textContent = pendientes.length+' pendientes de guardar'; b.classList.remove('hidden'); }
+  else b.classList.add('hidden');
+}
+
+function openSettings(){
+  document.getElementById('modalRoot').innerHTML = `
+    <div class="overlay" onclick="if(event.target===this)cerrarModal()">
+      <div class="sheet">
+        <h2>Ajustes</h2>
+        <label>Google Client ID</label>
+        <input type="text" id="cid" value="${cfg.clientId||''}" placeholder="xxxx.apps.googleusercontent.com">
+        <label>ID de la hoja de cálculo (Spreadsheet ID)</label>
+        <input type="text" id="sid" value="${cfg.spreadsheetId||''}" placeholder="Pégalo o crea una nueva abajo">
+        <button class="addbtn" onclick="guardarAjustes()">Guardar</button>
+        <button class="addbtn" style="background:#5F5E5A;margin-top:8px" onclick="conectarGoogle()">Iniciar sesión con Google</button>
+        <button class="addbtn" style="background:#3B6D11;margin-top:8px" onclick="crearHoja()">Crear hoja nueva en mi Drive</button>
+        <p style="font-size:12px;color:var(--muted)">Precios: toca un producto abajo para editar su precio.</p>
+        <div id="listaPrecios"></div>
+      </div>
+    </div>`;
+  renderListaPrecios();
+}
+function renderListaPrecios(){
+  const el = document.getElementById('listaPrecios');
+  let html = '';
+  Object.values(CATS).forEach(c=> c.productos.forEach(p=>{
+    html += `<label>${p} (precio por ${c.tipo==='pieza'?'pieza':'kg'})</label><input type="number" value="${precios[p]||0}" onchange="precios['${p}']=parseFloat(this.value)||0; localStorage.setItem('carnitas_precios',JSON.stringify(precios));">`;
+  }));
+  el.innerHTML = html;
+}
+function guardarAjustes(){
+  cfg.clientId = document.getElementById('cid').value.trim();
+  cfg.spreadsheetId = document.getElementById('sid').value.trim();
+  localStorage.setItem('carnitas_cfg', JSON.stringify(cfg));
+  initGoogle();
+  alert('Guardado');
+}
+
+function initGoogle(){
+  if(!cfg.clientId || !window.google) return;
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: cfg.clientId,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    callback: (resp)=>{
+      accessToken = resp.access_token;
+      document.getElementById('hstate').textContent = 'Carnitas App ✓';
+      sincronizarPendientes();
+    }
+  });
+}
+function conectarGoogle(){
+  if(!tokenClient){ initGoogle(); }
+  if(tokenClient) tokenClient.requestAccessToken();
+}
+async function crearHoja(){
+  if(!accessToken){ alert('Primero inicia sesión con Google'); return; }
+  const res = await fetch('https://sheets.googleapis.com/v4/spreadsheets',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+    body: JSON.stringify({
+      properties:{title:'Carnitas Ventas'},
+      sheets:[{properties:{title:'Ventas'}}]
+    })
+  });
+  const data = await res.json();
+  if(data.spreadsheetId){
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${data.spreadsheetId}/values/Ventas!A1:append?valueInputOption=USER_ENTERED`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body: JSON.stringify({values:[['Fecha','Ticket','Categoría','Producto','Modo','Cantidad','Precio unitario','Total','Método de pago']]})
+    });
+    cfg.spreadsheetId = data.spreadsheetId;
+    localStorage.setItem('carnitas_cfg', JSON.stringify(cfg));
+    document.getElementById('sid').value = data.spreadsheetId;
+    alert('Hoja creada en tu Drive: Carnitas Ventas');
+  } else {
+    alert('No se pudo crear la hoja. Revisa el Client ID.');
+  }
+}
+
+window.addEventListener('online', sincronizarPendientes);
+window.onload = ()=>{
+  renderChips(); renderGrid(); renderTicket(); updateBadge();
+  setTimeout(initGoogle, 500);
+};
+</script>
+</body>
+</html>
