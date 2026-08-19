@@ -19,39 +19,39 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
   header{background:var(--bg);color:var(--text);padding:16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
-  header h1{font-size:16px;margin:0;font-weight:500}
-  header button{background:none;border:none;color:var(--muted);font-size:20px}
-  #backbtn{font-size:22px;padding:0 4px}
+  header h1{font-size:clamp(15px,1.8vw,21px);margin:0;font-weight:500}
+  header button{background:none;border:none;color:var(--muted);font-size:clamp(18px,2vw,24px)}
+  #backbtn{font-size:clamp(20px,2.4vw,26px);padding:0 4px}
   #hspacer{flex:1}
-  #app{max-width:1100px;margin:0 auto;padding:16px}
-  .navgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:520px;margin:20px auto}
-  .navcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px 16px;text-align:center;font-size:16px;font-weight:500}
-  .navcard .ic{font-size:30px;display:block;margin-bottom:10px}
+  #app{max-width:1300px;margin:0 auto;padding:clamp(12px,2vw,26px)}
+  .navgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,20px);max-width:600px;margin:clamp(16px,3vw,40px) auto}
+  .navcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:clamp(24px,4vw,46px) 16px;text-align:center;font-size:clamp(15px,1.8vw,20px);font-weight:500}
+  .navcard .ic{font-size:clamp(26px,3.4vw,42px);display:block;margin-bottom:10px}
   .navcard:active{border-color:var(--accent)}
-  .row2{display:flex;gap:16px;align-items:flex-start}
+  .row2{display:flex;gap:clamp(12px,1.6vw,20px);align-items:flex-start}
   .colmain{flex:1;min-width:0}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px 0 14px}
-  .chip{flex:1 1 auto;min-width:0;border:1px solid var(--border);background:transparent;border-radius:20px;padding:8px 10px;font-size:13px;color:var(--text);white-space:nowrap;text-align:center}
+  .chips{display:flex;gap:clamp(6px,0.8vw,10px);flex-wrap:wrap;padding:2px 0 clamp(12px,1.6vw,18px)}
+  .chip{flex:1 1 auto;min-width:0;border:1px solid var(--border);background:transparent;border-radius:20px;padding:clamp(8px,1vw,12px) clamp(10px,1.4vw,18px);font-size:clamp(12px,1.2vw,15px);color:var(--text);white-space:nowrap;text-align:center}
   .chip.active{background:var(--accent);color:#FFFFFF;border-color:var(--accent);font-weight:500}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-  .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:15px;font-weight:500}
-  .prod .sub{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:3px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.2vw,16px);margin-bottom:clamp(10px,1.6vw,18px)}
+  .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:clamp(14px,2.2vw,24px) 8px;text-align:center;font-size:clamp(14px,1.6vw,18px);font-weight:500}
+  .prod .sub{display:block;font-size:clamp(10px,1vw,13px);color:var(--muted);font-weight:400;margin-top:3px}
   .prod:active{border-color:var(--accent)}
   .prod.selected{border:1px solid var(--accent-light)}
-  .panel{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
-  .panel h3{font-size:13px;color:var(--text);margin:0 0 12px;font-weight:500}
-  .rowline{display:flex;justify-content:space-between;font-size:14px;padding:6px 0}
+  .panel{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:clamp(14px,2vw,22px);margin-bottom:clamp(10px,1.6vw,18px)}
+  .panel h3{font-size:clamp(13px,1.4vw,16px);color:var(--text);margin:0 0 12px;font-weight:500}
+  .rowline{display:flex;justify-content:space-between;font-size:clamp(13px,1.3vw,15px);padding:6px 0}
   .rowline a{color:var(--muted);text-decoration:none}
-  .qtybtns{display:flex;gap:8px;margin-bottom:10px}
-  .qtybtns button{flex:1;padding:11px 0;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px;font-size:13px}
+  .qtybtns{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .qtybtns button{flex:1 1 calc(25% - 6px);min-width:70px;padding:clamp(10px,1.4vw,14px) 4px;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px;font-size:clamp(12px,1.2vw,15px)}
   .qtybtns button.sel{background:var(--accent);color:#FFFFFF;border-color:var(--accent);font-weight:500}
   input[type=number],input[type=date],select{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text)}
-  .addbtn{width:100%;padding:11px;background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:14px;font-weight:500;margin-top:10px}
-  #ticket{flex:0 0 300px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;position:sticky;top:76px}
-  #ticket h3{font-size:13px;color:var(--accent-light);margin:0 0 8px;font-weight:500}
-  #ticket .total{display:flex;justify-content:space-between;font-weight:500;font-size:18px;margin-bottom:10px;padding-top:8px;border-top:1px solid var(--border)}
-  #ticket .items{max-height:110px;overflow-y:auto;font-size:13px;color:var(--muted);margin-bottom:4px}
-  #cobrar{width:100%;padding:14px;background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:15px;font-weight:500}
+  .addbtn{width:100%;padding:clamp(10px,1.4vw,15px);background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:clamp(13px,1.3vw,16px);font-weight:500;margin-top:10px}
+  #ticket{flex:0 0 clamp(280px,26vw,360px);background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:clamp(14px,2vw,22px);position:sticky;top:76px}
+  #ticket h3{font-size:clamp(13px,1.4vw,16px);color:var(--accent-light);margin:0 0 8px;font-weight:500}
+  #ticket .total{display:flex;justify-content:space-between;font-weight:500;font-size:clamp(17px,1.8vw,21px);margin-bottom:10px;padding-top:8px;border-top:1px solid var(--border)}
+  #ticket .items{max-height:110px;overflow-y:auto;font-size:clamp(12px,1.2vw,15px);color:var(--muted);margin-bottom:4px}
+  #cobrar{width:100%;padding:clamp(13px,1.8vw,18px);background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:clamp(14px,1.5vw,18px);font-weight:500}
   .formcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;max-width:420px}
   .formcard label{font-size:12px;color:var(--muted);display:block;margin:10px 0 4px}
   .listcard{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:16px;max-width:420px}
@@ -361,15 +361,21 @@ function abrirCantidad(producto){
     panel.innerHTML = `
       <div class="panel">
         <h3>${producto} · fracción de kilo</h3>
-        <div class="qtybtns">
+        <div class="qtybtns" style="flex-wrap:wrap">
           <button onclick="agregarKilo('${producto}',0.25,this)">1/4 kg</button>
           <button onclick="agregarKilo('${producto}',0.5,this)">1/2 kg</button>
           <button onclick="agregarKilo('${producto}',0.75,this)">3/4 kg</button>
           <button onclick="agregarKilo('${producto}',1,this)">1 kg</button>
+          <button onclick="agregarKilo('${producto}',1.25,this)">1¼ kg</button>
+          <button onclick="agregarKilo('${producto}',1.5,this)">1½ kg</button>
+          <button onclick="agregarKilo('${producto}',2,this)">2 kg</button>
         </div>
         <label>O gramos exactos</label>
         <input type="number" id="gInput" placeholder="Ej. 350">
-        <button class="addbtn" onclick="agregarGramos('${producto}')">Agregar</button>
+        <button class="addbtn" onclick="agregarGramos('${producto}')">Agregar por gramos</button>
+        <label>O por monto ($)</label>
+        <input type="number" id="mInput" placeholder="Ej. 200">
+        <button class="addbtn" style="background:var(--accent-dark)" onclick="agregarMonto('${producto}')">Agregar por monto</button>
       </div>`;
   } else if(tipo==='gramos'){
     panel.innerHTML = `
@@ -412,7 +418,15 @@ function agregarGramosDirecto(producto){
   document.getElementById('qtypanel').innerHTML='';
   renderTicket();
 }
-function agregarPieza(producto){
+function agregarMonto(producto){
+  const m = parseFloat(document.getElementById('mInput').value);
+  if(!m || m<=0){ alert('Captura el monto'); return; }
+  const precio = precioDe(producto);
+  const kg = precio>0 ? m/precio : 0;
+  ticket.push({categoria:catActiva, producto, modo:'Monto', cantidad: m, kgEquivalente: Math.round(kg*1000)/1000, precioUnit:precio, total:m});
+  document.getElementById('qtypanel').innerHTML='';
+  renderTicket();
+}
   const q = parseInt(document.getElementById('qInput').value);
   if(!q || q<=0){ alert('Captura la cantidad'); return; }
   const precio = precioDe(producto);
@@ -425,7 +439,12 @@ function renderTicket(){
   const items = document.getElementById('ticketitems');
   if(ticket.length===0){ items.innerHTML = 'Sin productos aún'; }
   else {
-    items.innerHTML = ticket.map((it,i)=>`<div class="rowline"><span>${it.cantidad}${it.modo==='Fracción'?' kg':it.modo==='Gramos'?' g':'x'} ${it.producto}</span><span>${fmt(it.total)} <a href="#" onclick="quitar(${i});return false;">✕</a></span></div>`).join('');
+    items.innerHTML = ticket.map((it,i)=>{
+      let label;
+      if(it.modo==='Monto') label = `${fmt(it.cantidad)} de ${it.producto} (~${it.kgEquivalente}kg)`;
+      else label = `${it.cantidad}${it.modo==='Fracción'?' kg':it.modo==='Gramos'?' g':'x'} ${it.producto}`;
+      return `<div class="rowline"><span>${label}</span><span>${fmt(it.total)} <a href="#" onclick="quitar(${i});return false;">✕</a></span></div>`;
+    }).join('');
   }
   const total = ticket.reduce((s,i)=>s+i.total,0);
   document.getElementById('ticketTotal').textContent = fmt(total);
