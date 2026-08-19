@@ -18,11 +18,18 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
-  header{background:var(--bg);color:var(--text);padding:16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
+  header{background:var(--bg);color:var(--text);padding:16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
   header h1{font-size:16px;margin:0;font-weight:500}
   header button{background:none;border:none;color:var(--muted);font-size:20px}
-  #app{max-width:1100px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
-  #main{flex:1;min-width:0}
+  #backbtn{font-size:22px;padding:0 4px}
+  #hspacer{flex:1}
+  #app{max-width:1100px;margin:0 auto;padding:16px}
+  .navgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:520px;margin:20px auto}
+  .navcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px 16px;text-align:center;font-size:16px;font-weight:500}
+  .navcard .ic{font-size:30px;display:block;margin-bottom:10px}
+  .navcard:active{border-color:var(--accent)}
+  .row2{display:flex;gap:16px;align-items:flex-start}
+  .colmain{flex:1;min-width:0}
   .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px 0 14px}
   .chip{flex:1 1 auto;min-width:0;border:1px solid var(--border);background:transparent;border-radius:20px;padding:8px 10px;font-size:13px;color:var(--text);white-space:nowrap;text-align:center}
   .chip.active{background:var(--accent);color:#FFFFFF;border-color:var(--accent);font-weight:500}
@@ -38,13 +45,17 @@
   .qtybtns{display:flex;gap:8px;margin-bottom:10px}
   .qtybtns button{flex:1;padding:11px 0;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px;font-size:13px}
   .qtybtns button.sel{background:var(--accent);color:#FFFFFF;border-color:var(--accent);font-weight:500}
-  input[type=number]{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text)}
+  input[type=number],input[type=date],select{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text)}
   .addbtn{width:100%;padding:11px;background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:14px;font-weight:500;margin-top:10px}
   #ticket{flex:0 0 300px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;position:sticky;top:76px}
   #ticket h3{font-size:13px;color:var(--accent-light);margin:0 0 8px;font-weight:500}
   #ticket .total{display:flex;justify-content:space-between;font-weight:500;font-size:18px;margin-bottom:10px;padding-top:8px;border-top:1px solid var(--border)}
   #ticket .items{max-height:110px;overflow-y:auto;font-size:13px;color:var(--muted);margin-bottom:4px}
   #cobrar{width:100%;padding:14px;background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;font-size:15px;font-weight:500}
+  .formcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;max-width:420px}
+  .formcard label{font-size:12px;color:var(--muted);display:block;margin:10px 0 4px}
+  .listcard{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:16px;max-width:420px}
+  .listcard h3{font-size:13px;color:var(--accent-light);margin:0 0 8px;font-weight:500}
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:20}
   .sheet{background:var(--card2);width:100%;max-width:480px;margin:0 auto;border-radius:16px 16px 0 0;padding:20px;max-height:80vh;overflow-y:auto;border:1px solid var(--border);border-bottom:none}
   .sheet h2{font-size:16px;margin:0 0 14px;font-weight:500}
@@ -52,35 +63,110 @@
   .payopt:active{border-color:var(--accent)}
   label{font-size:12px;color:var(--muted);display:block;margin:10px 0 4px}
   input[type=text]{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text)}
-  .badge{position:fixed;top:60px;right:12px;background:var(--accent-dark);color:#F3E9DD;font-size:11px;padding:5px 10px;border-radius:10px;z-index:6}
+  .badge{position:fixed;top:60px;right:12px;background:var(--accent-dark);color:#FFFFFF;font-size:11px;padding:5px 10px;border-radius:10px;z-index:6}
   .hidden{display:none !important}
 </style>
 </head>
 <body>
 
 <header>
+  <button id="backbtn" class="hidden" onclick="irInicio()">‹</button>
   <div>
-    <h1 id="hstate">Nueva venta</h1>
-    <p style="font-size:12px;color:var(--muted);margin:2px 0 0">Sábado y domingo</p>
+    <h1 id="hstate">Carnitas App</h1>
+    <p id="hsub" style="font-size:12px;color:var(--muted);margin:2px 0 0">Sábado y domingo</p>
   </div>
+  <div id="hspacer"></div>
   <button onclick="openSettings()">⚙</button>
 </header>
 
 <div id="pendbadge" class="badge hidden"></div>
 
 <div id="app">
-  <div id="main">
-    <div class="chips" id="chips"></div>
-    <div class="grid" id="grid"></div>
-    <div id="qtypanel"></div>
+
+  <div id="view-inicio">
+    <div class="navgrid">
+      <div class="navcard" onclick="irVista('ventas')"><span class="ic">🥩</span>Ventas</div>
+      <div class="navcard" onclick="irVista('insumos')"><span class="ic">🛒</span>Insumos</div>
+      <div class="navcard" onclick="irVista('gastos')"><span class="ic">🧾</span>Gastos</div>
+      <div class="navcard" onclick="irVista('sueldos')"><span class="ic">👷</span>Sueldos</div>
+    </div>
   </div>
 
-  <div id="ticket">
-    <h3>Ticket actual</h3>
-    <div class="items" id="ticketitems">Sin productos aún</div>
-    <div class="total"><span>Total</span><span id="ticketTotal">$0</span></div>
-    <button id="cobrar" onclick="abrirCobro()">Cobrar</button>
+  <div id="view-ventas" class="hidden">
+    <div class="row2">
+      <div class="colmain">
+        <div class="chips" id="chips"></div>
+        <div class="grid" id="grid"></div>
+        <div id="qtypanel"></div>
+      </div>
+      <div id="ticket">
+        <h3>Ticket actual</h3>
+        <div class="items" id="ticketitems">Sin productos aún</div>
+        <div class="total"><span>Total</span><span id="ticketTotal">$0</span></div>
+        <button id="cobrar" onclick="abrirCobro()">Cobrar</button>
+      </div>
+    </div>
   </div>
+
+  <div id="view-insumos" class="hidden">
+    <div class="formcard">
+      <label>Fecha</label>
+      <input type="date" id="ins_fecha">
+      <label>Producto</label>
+      <select id="ins_producto">
+        <option>Pierna</option><option>Buche</option><option>Nuca</option><option>Costilla</option>
+        <option>Aldilla</option><option>Pellet</option><option>Crakelyn</option><option>Cuero</option>
+        <option>Manteca</option><option>Cachete</option><option>Cuero con lonja</option><option>Codillo</option>
+        <option>Otro</option>
+      </select>
+      <label>Cantidad (kg)</label>
+      <input type="number" id="ins_cantidad" placeholder="Ej. 25.5">
+      <label>Precio por kilo</label>
+      <input type="number" id="ins_precio" placeholder="Ej. 85">
+      <label>Proveedor / lugar</label>
+      <input type="text" id="ins_proveedor" placeholder="Ej. Guadalupano">
+      <button class="addbtn" onclick="guardarInsumo()">Guardar insumo</button>
+    </div>
+    <div class="listcard"><h3>Capturados hoy</h3><div id="ins_lista">Sin registros aún</div></div>
+  </div>
+
+  <div id="view-gastos" class="hidden">
+    <div class="formcard">
+      <label>Fecha</label>
+      <input type="date" id="ga_fecha">
+      <label>Categoría</label>
+      <select id="ga_categoria">
+        <option>Tortillas</option><option>Verdura/Salsa</option><option>Bebidas</option>
+        <option>Desechables</option><option>Gas</option><option>Otros</option>
+      </select>
+      <label>Descripción</label>
+      <input type="text" id="ga_desc" placeholder="Ej. Cervezas, tanque de gas...">
+      <label>Monto</label>
+      <input type="number" id="ga_monto" placeholder="Ej. 402">
+      <label>Proveedor / lugar</label>
+      <input type="text" id="ga_proveedor" placeholder="Ej. Gas Imperial">
+      <button class="addbtn" onclick="guardarGasto()">Guardar gasto</button>
+    </div>
+    <div class="listcard"><h3>Capturados hoy</h3><div id="ga_lista">Sin registros aún</div></div>
+  </div>
+
+  <div id="view-sueldos" class="hidden">
+    <div class="formcard">
+      <label>Fecha</label>
+      <input type="date" id="su_fecha">
+      <label>Nombre del ayudante</label>
+      <input type="text" id="su_nombre" placeholder="Ej. Juan">
+      <label>Puesto / rol</label>
+      <input type="text" id="su_puesto" placeholder="Ej. Ayudante de cocina">
+      <label>Días trabajados</label>
+      <input type="number" id="su_dias" placeholder="Ej. 2">
+      <label>Monto pagado</label>
+      <input type="number" id="su_monto" placeholder="Ej. 700">
+      <button class="addbtn" onclick="guardarSueldo()">Guardar pago</button>
+    </div>
+    <div class="listcard"><h3>Capturados hoy</h3><div id="su_lista">Sin registros aún</div></div>
+  </div>
+
 </div>
 
 <div id="modalRoot"></div>
@@ -108,6 +194,14 @@ const PRECIOS_DEFAULT = {
   "Torta":55
 };
 
+const TITULOS = {
+  inicio:['Carnitas App','Sábado y domingo'],
+  ventas:['Nueva venta','Toca un producto para agregarlo'],
+  insumos:['Insumos','Compras de carne y materia prima'],
+  gastos:['Gastos','Otros gastos del negocio'],
+  sueldos:['Sueldos','Pagos a ayudantes']
+};
+
 let cfg = JSON.parse(localStorage.getItem('carnitas_cfg')||'{}');
 let precios = JSON.parse(localStorage.getItem('carnitas_precios')||'null') || {...PRECIOS_DEFAULT};
 let pendientes = JSON.parse(localStorage.getItem('carnitas_pendientes')||'[]');
@@ -115,8 +209,113 @@ let ticket = [];
 let catActiva = Object.keys(CATS)[0];
 let accessToken = null;
 let tokenClient = null;
+let vistaActual = 'inicio';
+let capturasHoy = {insumos:[], gastos:[], sueldos:[]};
 
 function fmt(n){ return '$' + Math.round(n).toLocaleString('es-MX'); }
+function hoy(){ return new Date().toISOString().slice(0,10); }
+
+function irVista(v){
+  vistaActual = v;
+  ['inicio','ventas','insumos','gastos','sueldos'].forEach(id=>{
+    document.getElementById('view-'+id).classList.toggle('hidden', id!==v);
+  });
+  document.getElementById('backbtn').classList.toggle('hidden', v==='inicio');
+  document.getElementById('hstate').textContent = TITULOS[v][0];
+  document.getElementById('hsub').textContent = TITULOS[v][1];
+  if(v==='insumos'){ document.getElementById('ins_fecha').value = hoy(); renderLista('insumos'); }
+  if(v==='gastos'){ document.getElementById('ga_fecha').value = hoy(); renderLista('gastos'); }
+  if(v==='sueldos'){ document.getElementById('su_fecha').value = hoy(); renderLista('sueldos'); }
+}
+function irInicio(){ irVista('inicio'); }
+
+function renderLista(tipo){
+  const el = document.getElementById(tipo==='insumos'?'ins_lista':tipo==='gastos'?'ga_lista':'su_lista');
+  const items = capturasHoy[tipo];
+  if(items.length===0){ el.innerHTML = 'Sin registros aún'; return; }
+  el.innerHTML = items.map(it=>`<div class="rowline"><span>${it.label}</span><span>${fmt(it.monto)}</span></div>`).join('');
+}
+
+async function guardarFila(hojaNombre, headerRow, fila){
+  if(!cfg.spreadsheetId || !accessToken) return false;
+  await crearHojaSiNoExiste(hojaNombre, headerRow);
+  try{
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/${hojaNombre}!A1:append?valueInputOption=USER_ENTERED`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body: JSON.stringify({values:[fila]})
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+
+async function crearHojaSiNoExiste(nombre, headerRow){
+  if(!accessToken || !cfg.spreadsheetId) return;
+  const meta = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}`,{headers:{'Authorization':'Bearer '+accessToken}})).json();
+  const yaExiste = (meta.sheets||[]).some(s=>s.properties.title===nombre);
+  if(!yaExiste){
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}:batchUpdate`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body: JSON.stringify({requests:[{addSheet:{properties:{title:nombre}}}]})
+    });
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/${nombre}!A1:append?valueInputOption=USER_ENTERED`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body: JSON.stringify({values:[headerRow]})
+    });
+  }
+}
+
+async function guardarInsumo(){
+  const fecha = document.getElementById('ins_fecha').value;
+  const producto = document.getElementById('ins_producto').value;
+  const cant = parseFloat(document.getElementById('ins_cantidad').value);
+  const precio = parseFloat(document.getElementById('ins_precio').value);
+  const prov = document.getElementById('ins_proveedor').value;
+  if(!cant || !precio){ alert('Captura cantidad y precio'); return; }
+  const total = cant*precio;
+  const fila = [fecha, 'Carne', producto, cant, 'Kilogramo', precio, Math.round(total), prov];
+  const ok = await guardarFila('Insumos', ['Fecha','Categoría','Producto','Cantidad','Tipo','Precio unitario','Costo total','Proveedor'], fila);
+  if(!ok) alertPendiente();
+  capturasHoy.insumos.unshift({label:`${cant}kg ${producto}`, monto: total});
+  renderLista('insumos');
+  document.getElementById('ins_cantidad').value=''; document.getElementById('ins_precio').value=''; document.getElementById('ins_proveedor').value='';
+}
+
+async function guardarGasto(){
+  const fecha = document.getElementById('ga_fecha').value;
+  const cat = document.getElementById('ga_categoria').value;
+  const desc = document.getElementById('ga_desc').value;
+  const monto = parseFloat(document.getElementById('ga_monto').value);
+  const prov = document.getElementById('ga_proveedor').value;
+  if(!monto){ alert('Captura el monto'); return; }
+  const fila = [fecha, cat, desc, Math.round(monto), prov];
+  const ok = await guardarFila('Gastos', ['Fecha','Categoría','Descripción','Monto','Proveedor'], fila);
+  if(!ok) alertPendiente();
+  capturasHoy.gastos.unshift({label:`${cat}: ${desc||'-'}`, monto});
+  renderLista('gastos');
+  document.getElementById('ga_desc').value=''; document.getElementById('ga_monto').value=''; document.getElementById('ga_proveedor').value='';
+}
+
+async function guardarSueldo(){
+  const fecha = document.getElementById('su_fecha').value;
+  const nombre = document.getElementById('su_nombre').value;
+  const puesto = document.getElementById('su_puesto').value;
+  const dias = document.getElementById('su_dias').value;
+  const monto = parseFloat(document.getElementById('su_monto').value);
+  if(!nombre || !monto){ alert('Captura nombre y monto'); return; }
+  const fila = [fecha, nombre, puesto, dias, Math.round(monto)];
+  const ok = await guardarFila('Sueldos', ['Fecha','Nombre','Puesto','Días trabajados','Monto pagado'], fila);
+  if(!ok) alertPendiente();
+  capturasHoy.sueldos.unshift({label:`${nombre} (${puesto||'-'})`, monto});
+  renderLista('sueldos');
+  document.getElementById('su_nombre').value=''; document.getElementById('su_puesto').value=''; document.getElementById('su_dias').value=''; document.getElementById('su_monto').value='';
+}
+
+function alertPendiente(){
+  alert('No se pudo guardar en Google (revisa tu conexión o sesión). Vuelve a intentar cuando tengas señal.');
+}
 
 function renderChips(){
   const c = document.getElementById('chips');
@@ -164,7 +363,7 @@ function abrirCantidad(producto){
           <button onclick="agregarKilo('${producto}',1,this)">1 kg</button>
         </div>
         <label>O gramos exactos</label>
-        <input type="number" id="gInput" placeholder="Ej. 350" oninput="calcGramosPreview('${producto}')">
+        <input type="number" id="gInput" placeholder="Ej. 350">
         <button class="addbtn" onclick="agregarGramos('${producto}')">Agregar</button>
       </div>`;
   } else if(tipo==='gramos'){
@@ -296,23 +495,19 @@ async function cargarPrecios(){
 
 async function agregarHojaPrecios(){
   if(!accessToken || !cfg.spreadsheetId){ alert('Primero inicia sesión y crea o vincula tu hoja'); return; }
-  const meta = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}`,{headers:{'Authorization':'Bearer '+accessToken}})).json();
-  const yaExiste = (meta.sheets||[]).some(s=>s.properties.title==='Precios');
-  if(!yaExiste){
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}:batchUpdate`,{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
-      body: JSON.stringify({requests:[{addSheet:{properties:{title:'Precios'}}}]})
-    });
-    const filas = [['Producto','Precio']];
-    Object.keys(PRECIOS_DEFAULT).forEach(p=> filas.push([p, PRECIOS_DEFAULT[p]]));
+  await crearHojaSiNoExiste('Precios', ['Producto','Precio']);
+  const filas = [];
+  Object.keys(PRECIOS_DEFAULT).forEach(p=> filas.push([p, PRECIOS_DEFAULT[p]]));
+  const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/Precios!A2`,{headers:{'Authorization':'Bearer '+accessToken}});
+  const data = await res.json();
+  if(!data.values || data.values.length===0){
     await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/Precios!A1:append?valueInputOption=USER_ENTERED`,{
       method:'POST',
       headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
       body: JSON.stringify({values: filas})
     });
-    alert('Pestaña "Precios" creada en tu hoja con los precios actuales. Ábrela en Drive para editarlos cuando quieras.');
   }
+  alert('Pestaña "Precios" lista. Ábrela en Drive para editarlos cuando quieras.');
   cargarPrecios();
 }
 
@@ -334,7 +529,7 @@ function openSettings(){
         <button class="addbtn" onclick="guardarAjustes()">Guardar</button>
         <button class="addbtn" style="background:#5F5E5A;margin-top:8px" onclick="conectarGoogle()">Iniciar sesión con Google</button>
         <button class="addbtn" style="background:#3B6D11;margin-top:8px" onclick="crearHoja()">Crear hoja nueva en mi Drive</button>
-        <p style="font-size:12px;color:var(--muted);margin-top:14px">Los precios viven en la pestaña "Precios" de tu hoja de Google, no aquí. Ábrela desde Drive para cambiarlos cuando quieras — las ventas ya hechas conservan su precio original.</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:14px">Los precios viven en la pestaña "Precios" de tu hoja de Google. Ventas, Insumos, Gastos y Sueldos se crean solos la primera vez que captures algo en cada sección.</p>
         <button class="addbtn" style="background:var(--accent-dark)" onclick="agregarHojaPrecios()">Crear/actualizar pestaña Precios</button>
         <button class="addbtn" style="background:var(--accent-dark);margin-top:8px" onclick="cargarPrecios().then(()=>alert('Precios actualizados desde tu hoja'))">Sincronizar precios ahora</button>
       </div>
@@ -356,7 +551,6 @@ function initGoogle(){
     scope: 'https://www.googleapis.com/auth/spreadsheets',
     callback: (resp)=>{
       accessToken = resp.access_token;
-      document.getElementById('hstate').textContent = 'Nueva venta ✓';
       sincronizarPendientes();
       cargarPrecios();
     }
@@ -387,7 +581,7 @@ async function crearHoja(){
     localStorage.setItem('carnitas_cfg', JSON.stringify(cfg));
     document.getElementById('sid').value = data.spreadsheetId;
     await agregarHojaPrecios();
-    alert('Hoja creada en tu Drive: Carnitas Ventas (con pestañas Ventas y Precios)');
+    alert('Hoja creada en tu Drive: Carnitas Ventas (con pestañas Ventas y Precios). Insumos, Gastos y Sueldos se crean solos al capturar el primer registro.');
   } else {
     alert('No se pudo crear la hoja. Revisa el Client ID.');
   }
