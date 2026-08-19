@@ -8,52 +8,60 @@
 <link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#D85A30">
+<meta name="theme-color" content="#140D09">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root{
-    --accent:#D85A30; --accent-dark:#993C1D; --bg:#FAECE7; --card:#FFFFFF;
-    --border:#e6dcd4; --text:#2C2C2A; --muted:#5F5E5A;
+    --bg:#140D09; --card:#1E1410; --card2:#241A13;
+    --border:#3E2E1E; --accent:#D9942A; --accent-light:#FDC022; --accent-dark:#7F5226;
+    --text:#F3E9DD; --muted:#B8A38A;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
-  header{background:var(--accent);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
-  header h1{font-size:16px;margin:0;font-weight:600}
-  header button{background:none;border:none;color:#fff;font-size:20px}
-  #app{max-width:480px;margin:0 auto;padding:12px 12px 100px}
-  .chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px}
-  .chip{flex:none;border:1px solid var(--border);background:#fff;border-radius:20px;padding:7px 14px;font-size:13px;color:var(--text)}
-  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-  .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:14px;font-weight:500}
-  .prod:active{background:#f3e6df}
-  .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
-  .panel h3{font-size:13px;color:var(--muted);margin:0 0 10px;font-weight:500}
-  .rowline{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px solid var(--border)}
-  .rowline:last-child{border-bottom:none}
-  .qtybtns{display:flex;gap:6px;margin-bottom:8px}
-  .qtybtns button{flex:1;padding:10px 0;border:1px solid var(--border);background:#fff;border-radius:8px;font-size:13px}
-  .qtybtns button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
-  input[type=number]{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:15px}
-  .addbtn{width:100%;padding:10px;background:var(--accent-dark);color:#fff;border:none;border-radius:8px;font-size:14px;margin-top:8px}
-  #ticket{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:10px 14px;max-width:480px;margin:0 auto}
-  #ticket .total{display:flex;justify-content:space-between;font-weight:600;font-size:17px;margin-bottom:8px}
-  #ticket .items{max-height:100px;overflow-y:auto;font-size:12px;color:var(--muted);margin-bottom:8px}
-  #cobrar{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600}
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:20}
-  .sheet{background:#fff;width:100%;max-width:480px;margin:0 auto;border-radius:16px 16px 0 0;padding:18px;max-height:80vh;overflow-y:auto}
-  .sheet h2{font-size:16px;margin:0 0 12px}
-  .payopt{display:block;width:100%;padding:12px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;background:#fff;font-size:14px}
+  header{background:var(--bg);color:var(--text);padding:16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
+  header h1{font-size:16px;margin:0;font-weight:500}
+  header button{background:none;border:none;color:var(--muted);font-size:20px}
+  #app{max-width:480px;margin:0 auto;padding:14px 14px 110px}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px}
+  .chip{flex:none;border:1px solid var(--border);background:transparent;border-radius:20px;padding:8px 16px;font-size:13px;color:var(--text)}
+  .chip.active{background:var(--accent);color:#140D09;border-color:var(--accent);font-weight:500}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:15px;font-weight:500}
+  .prod .sub{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:3px}
+  .prod:active{border-color:var(--accent)}
+  .prod.selected{border:1px solid var(--accent-light)}
+  .panel{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+  .panel h3{font-size:13px;color:var(--text);margin:0 0 12px;font-weight:500}
+  .rowline{display:flex;justify-content:space-between;font-size:14px;padding:6px 0}
+  .rowline a{color:var(--muted);text-decoration:none}
+  .qtybtns{display:flex;gap:8px;margin-bottom:10px}
+  .qtybtns button{flex:1;padding:11px 0;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px;font-size:13px}
+  .qtybtns button.sel{background:var(--accent);color:#140D09;border-color:var(--accent);font-weight:500}
+  input[type=number]{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text)}
+  .addbtn{width:100%;padding:11px;background:var(--accent);color:#140D09;border:none;border-radius:8px;font-size:14px;font-weight:500;margin-top:10px}
+  #ticket{position:fixed;bottom:0;left:0;right:0;background:var(--card2);border-top:1px solid var(--border);padding:14px;max-width:480px;margin:0 auto}
+  #ticket h3{font-size:13px;color:var(--accent-light);margin:0 0 8px;font-weight:500}
+  #ticket .total{display:flex;justify-content:space-between;font-weight:500;font-size:18px;margin-bottom:10px;padding-top:8px;border-top:1px solid var(--border)}
+  #ticket .items{max-height:110px;overflow-y:auto;font-size:13px;color:var(--muted);margin-bottom:4px}
+  #cobrar{width:100%;padding:14px;background:var(--accent);color:#140D09;border:none;border-radius:8px;font-size:15px;font-weight:500}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:20}
+  .sheet{background:var(--card2);width:100%;max-width:480px;margin:0 auto;border-radius:16px 16px 0 0;padding:20px;max-height:80vh;overflow-y:auto;border:1px solid var(--border);border-bottom:none}
+  .sheet h2{font-size:16px;margin:0 0 14px;font-weight:500}
+  .payopt{display:block;width:100%;padding:13px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-size:14px}
+  .payopt:active{border-color:var(--accent)}
   label{font-size:12px;color:var(--muted);display:block;margin:10px 0 4px}
-  input[type=text]{width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;font-size:14px}
-  .badge{position:fixed;top:56px;right:12px;background:var(--accent-dark);color:#fff;font-size:11px;padding:4px 8px;border-radius:10px;z-index:6}
+  input[type=text]{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text)}
+  .badge{position:fixed;top:60px;right:12px;background:var(--accent-dark);color:#F3E9DD;font-size:11px;padding:5px 10px;border-radius:10px;z-index:6}
   .hidden{display:none !important}
 </style>
 </head>
 <body>
 
 <header>
-  <h1 id="hstate">Carnitas App</h1>
+  <div>
+    <h1 id="hstate">Nueva venta</h1>
+    <p style="font-size:12px;color:var(--muted);margin:2px 0 0">Sábado y domingo</p>
+  </div>
   <button onclick="openSettings()">⚙</button>
 </header>
 
@@ -66,6 +74,7 @@
 </div>
 
 <div id="ticket">
+  <h3>Ticket actual</h3>
   <div class="items" id="ticketitems">Sin productos aún</div>
   <div class="total"><span>Total</span><span id="ticketTotal">$0</span></div>
   <button id="cobrar" onclick="abrirCobro()">Cobrar</button>
@@ -110,11 +119,17 @@ function renderChips(){
 function renderGrid(){
   const g = document.getElementById('grid');
   g.innerHTML = '';
+  const tipo = CATS[catActiva].tipo;
+  const sub = tipo==='pieza' ? 'Por pieza' : (tipo==='gramos' ? 'Por gramos' : 'Por kilo');
   CATS[catActiva].productos.forEach(p=>{
     const d = document.createElement('div');
     d.className = 'prod';
-    d.textContent = p;
-    d.onclick = ()=> abrirCantidad(p);
+    d.innerHTML = `${p}<span class="sub">${sub}</span>`;
+    d.onclick = ()=>{
+      document.querySelectorAll('.prod').forEach(el=>el.classList.remove('selected'));
+      d.classList.add('selected');
+      abrirCantidad(p);
+    };
     g.appendChild(d);
   });
 }
