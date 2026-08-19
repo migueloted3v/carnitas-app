@@ -21,11 +21,12 @@
   header{background:var(--bg);color:var(--text);padding:16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
   header h1{font-size:16px;margin:0;font-weight:500}
   header button{background:none;border:none;color:var(--muted);font-size:20px}
-  #app{max-width:480px;margin:0 auto;padding:14px 14px 110px}
-  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px}
-  .chip{flex:none;border:1px solid var(--border);background:transparent;border-radius:20px;padding:8px 16px;font-size:13px;color:var(--text)}
+  #app{max-width:1100px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+  #main{flex:1;min-width:0}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px 0 14px}
+  .chip{flex:1 1 auto;min-width:0;border:1px solid var(--border);background:transparent;border-radius:20px;padding:8px 10px;font-size:13px;color:var(--text);white-space:nowrap;text-align:center}
   .chip.active{background:var(--accent);color:#140D09;border-color:var(--accent);font-weight:500}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
   .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:15px;font-weight:500}
   .prod .sub{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:3px}
   .prod:active{border-color:var(--accent)}
@@ -39,7 +40,7 @@
   .qtybtns button.sel{background:var(--accent);color:#140D09;border-color:var(--accent);font-weight:500}
   input[type=number]{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text)}
   .addbtn{width:100%;padding:11px;background:var(--accent);color:#140D09;border:none;border-radius:8px;font-size:14px;font-weight:500;margin-top:10px}
-  #ticket{position:fixed;bottom:0;left:0;right:0;background:var(--card2);border-top:1px solid var(--border);padding:14px;max-width:480px;margin:0 auto}
+  #ticket{flex:0 0 300px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;position:sticky;top:76px}
   #ticket h3{font-size:13px;color:var(--accent-light);margin:0 0 8px;font-weight:500}
   #ticket .total{display:flex;justify-content:space-between;font-weight:500;font-size:18px;margin-bottom:10px;padding-top:8px;border-top:1px solid var(--border)}
   #ticket .items{max-height:110px;overflow-y:auto;font-size:13px;color:var(--muted);margin-bottom:4px}
@@ -68,16 +69,18 @@
 <div id="pendbadge" class="badge hidden"></div>
 
 <div id="app">
-  <div class="chips" id="chips"></div>
-  <div class="grid" id="grid"></div>
-  <div id="qtypanel"></div>
-</div>
+  <div id="main">
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+    <div id="qtypanel"></div>
+  </div>
 
-<div id="ticket">
-  <h3>Ticket actual</h3>
-  <div class="items" id="ticketitems">Sin productos aún</div>
-  <div class="total"><span>Total</span><span id="ticketTotal">$0</span></div>
-  <button id="cobrar" onclick="abrirCobro()">Cobrar</button>
+  <div id="ticket">
+    <h3>Ticket actual</h3>
+    <div class="items" id="ticketitems">Sin productos aún</div>
+    <div class="total"><span>Total</span><span id="ticketTotal">$0</span></div>
+    <button id="cobrar" onclick="abrirCobro()">Cobrar</button>
+  </div>
 </div>
 
 <div id="modalRoot"></div>
@@ -94,8 +97,19 @@ const CATS = {
   "Torta": {tipo:"pieza", productos:["Torta"]}
 };
 
+const PRECIOS_DEFAULT = {
+  "Maciza":380,"Pierna":380,"Chamorro":380,"Buche":380,"Aldilla":380,"Nuca":380,"Costilla":380,"Cuerito":200,
+  "Durito botanero":300,"Chicharron de cachete":300,"Chicharrón de lonja":250,"Chicharron crakelyn":300,
+  "Tortilla":30,
+  "Refresco":30,"Agua de sabor":50,
+  "Gorda normal":20,"Gorda rellena":35,
+  "Taco":17,
+  "Litro":70,"Medio":35,"Vaso":20,
+  "Torta":55
+};
+
 let cfg = JSON.parse(localStorage.getItem('carnitas_cfg')||'{}');
-let precios = JSON.parse(localStorage.getItem('carnitas_precios')||'{}');
+let precios = JSON.parse(localStorage.getItem('carnitas_precios')||'null') || {...PRECIOS_DEFAULT};
 let pendientes = JSON.parse(localStorage.getItem('carnitas_pendientes')||'[]');
 let ticket = [];
 let catActiva = Object.keys(CATS)[0];
@@ -150,7 +164,7 @@ function abrirCantidad(producto){
           <button onclick="agregarKilo('${producto}',1,this)">1 kg</button>
         </div>
         <label>O gramos exactos</label>
-        <input type="number" id="gInput" placeholder="Ej. 350" oninput="calcGramosPreview('${producto}')">
+        <input type="number" id="gInput" placeholder="Ej. 350">
         <button class="addbtn" onclick="agregarGramos('${producto}')">Agregar</button>
       </div>`;
   } else if(tipo==='gramos'){
@@ -262,6 +276,46 @@ async function sincronizarPendientes(){
   if(ok){ pendientes=[]; localStorage.setItem('carnitas_pendientes','[]'); updateBadge(); }
 }
 
+async function cargarPrecios(){
+  if(!cfg.spreadsheetId || !accessToken) return;
+  try{
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/Precios!A2:B100`,{
+      headers:{'Authorization':'Bearer '+accessToken}
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    if(!data.values) return;
+    data.values.forEach(row=>{
+      const [nombre, precio] = row;
+      if(nombre && precio!==undefined) precios[nombre.trim()] = parseFloat(precio)||0;
+    });
+    localStorage.setItem('carnitas_precios', JSON.stringify(precios));
+    renderTicket();
+  }catch(e){}
+}
+
+async function agregarHojaPrecios(){
+  if(!accessToken || !cfg.spreadsheetId){ alert('Primero inicia sesión y crea o vincula tu hoja'); return; }
+  const meta = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}`,{headers:{'Authorization':'Bearer '+accessToken}})).json();
+  const yaExiste = (meta.sheets||[]).some(s=>s.properties.title==='Precios');
+  if(!yaExiste){
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}:batchUpdate`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body: JSON.stringify({requests:[{addSheet:{properties:{title:'Precios'}}}]})
+    });
+    const filas = [['Producto','Precio']];
+    Object.keys(PRECIOS_DEFAULT).forEach(p=> filas.push([p, PRECIOS_DEFAULT[p]]));
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/Precios!A1:append?valueInputOption=USER_ENTERED`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body: JSON.stringify({values: filas})
+    });
+    alert('Pestaña "Precios" creada en tu hoja con los precios actuales. Ábrela en Drive para editarlos cuando quieras.');
+  }
+  cargarPrecios();
+}
+
 function updateBadge(){
   const b = document.getElementById('pendbadge');
   if(pendientes.length>0){ b.textContent = pendientes.length+' pendientes de guardar'; b.classList.remove('hidden'); }
@@ -280,25 +334,18 @@ function openSettings(){
         <button class="addbtn" onclick="guardarAjustes()">Guardar</button>
         <button class="addbtn" style="background:#5F5E5A;margin-top:8px" onclick="conectarGoogle()">Iniciar sesión con Google</button>
         <button class="addbtn" style="background:#3B6D11;margin-top:8px" onclick="crearHoja()">Crear hoja nueva en mi Drive</button>
-        <p style="font-size:12px;color:var(--muted)">Precios: toca un producto abajo para editar su precio.</p>
-        <div id="listaPrecios"></div>
+        <p style="font-size:12px;color:var(--muted);margin-top:14px">Los precios viven en la pestaña "Precios" de tu hoja de Google, no aquí. Ábrela desde Drive para cambiarlos cuando quieras — las ventas ya hechas conservan su precio original.</p>
+        <button class="addbtn" style="background:var(--accent-dark)" onclick="agregarHojaPrecios()">Crear/actualizar pestaña Precios</button>
+        <button class="addbtn" style="background:var(--accent-dark);margin-top:8px" onclick="cargarPrecios().then(()=>alert('Precios actualizados desde tu hoja'))">Sincronizar precios ahora</button>
       </div>
     </div>`;
-  renderListaPrecios();
-}
-function renderListaPrecios(){
-  const el = document.getElementById('listaPrecios');
-  let html = '';
-  Object.values(CATS).forEach(c=> c.productos.forEach(p=>{
-    html += `<label>${p} (precio por ${c.tipo==='pieza'?'pieza':'kg'})</label><input type="number" value="${precios[p]||0}" onchange="precios['${p}']=parseFloat(this.value)||0; localStorage.setItem('carnitas_precios',JSON.stringify(precios));">`;
-  }));
-  el.innerHTML = html;
 }
 function guardarAjustes(){
   cfg.clientId = document.getElementById('cid').value.trim();
   cfg.spreadsheetId = document.getElementById('sid').value.trim();
   localStorage.setItem('carnitas_cfg', JSON.stringify(cfg));
   initGoogle();
+  cargarPrecios();
   alert('Guardado');
 }
 
@@ -309,8 +356,9 @@ function initGoogle(){
     scope: 'https://www.googleapis.com/auth/spreadsheets',
     callback: (resp)=>{
       accessToken = resp.access_token;
-      document.getElementById('hstate').textContent = 'Carnitas App ✓';
+      document.getElementById('hstate').textContent = 'Nueva venta ✓';
       sincronizarPendientes();
+      cargarPrecios();
     }
   });
 }
@@ -338,7 +386,8 @@ async function crearHoja(){
     cfg.spreadsheetId = data.spreadsheetId;
     localStorage.setItem('carnitas_cfg', JSON.stringify(cfg));
     document.getElementById('sid').value = data.spreadsheetId;
-    alert('Hoja creada en tu Drive: Carnitas Ventas');
+    await agregarHojaPrecios();
+    alert('Hoja creada en tu Drive: Carnitas Ventas (con pestañas Ventas y Precios)');
   } else {
     alert('No se pudo crear la hoja. Revisa el Client ID.');
   }
