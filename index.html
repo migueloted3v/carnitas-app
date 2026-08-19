@@ -214,6 +214,11 @@ let capturasHoy = {insumos:[], gastos:[], sueldos:[]};
 
 function fmt(n){ return '$' + Math.round(n).toLocaleString('es-MX'); }
 function hoy(){ return new Date().toISOString().slice(0,10); }
+function fechaHoraSheets(){
+  const d = new Date();
+  const pad = n=> String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
 
 function irVista(v){
   vistaActual = v;
@@ -444,7 +449,7 @@ function cerrarModal(){ document.getElementById('modalRoot').innerHTML=''; }
 
 async function finalizarVenta(metodo){
   const ticketId = 'T' + Date.now();
-  const fecha = new Date().toISOString();
+  const fecha = fechaHoraSheets();
   const rows = ticket.map(it=>[fecha, ticketId, it.categoria, it.producto, it.modo, it.cantidad, Math.round(it.precioUnit), Math.round(it.total), metodo]);
   cerrarModal();
   const ok = await enviarASheets(rows);
