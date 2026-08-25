@@ -112,17 +112,35 @@
     <div class="formcard">
       <label>Fecha</label>
       <input type="date" id="ins_fecha">
-      <label>Producto</label>
-      <select id="ins_producto">
-        <option>Pierna</option><option>Buche</option><option>Nuca</option><option>Costilla</option>
-        <option>Aldilla</option><option>Pellet</option><option>Crakelyn</option><option>Cuero</option>
-        <option>Manteca</option><option>Cachete</option><option>Cuero con lonja</option><option>Codillo</option>
-        <option>Otro</option>
+      <label>Categoría</label>
+      <select id="ins_categoria" onchange="toggleInsumoCategoria()">
+        <option>Carne</option><option>Verdura/Salsa</option><option>Bebidas</option><option>Cerveza</option>
+        <option>Desechables</option><option>Oxxo</option><option>Masa</option><option>Tortillas</option>
+        <option>Gas</option><option>Luz</option><option>Renta</option><option>Agua</option>
+        <option>Internet</option><option>Super</option><option>Otros</option>
       </select>
-      <label>Cantidad (kg)</label>
-      <input type="number" id="ins_cantidad" placeholder="Ej. 25.5">
-      <label>Precio por kilo</label>
-      <input type="number" id="ins_precio" placeholder="Ej. 85">
+
+      <div id="ins_carne_fields">
+        <label>Producto</label>
+        <select id="ins_producto">
+          <option>Pierna</option><option>Buche</option><option>Nuca</option><option>Costilla</option>
+          <option>Aldilla</option><option>Pellet</option><option>Crakelyn</option><option>Cuero</option>
+          <option>Manteca</option><option>Cachete</option><option>Cuero con lonja</option><option>Codillo</option>
+          <option>Otro</option>
+        </select>
+        <label>Cantidad (kg)</label>
+        <input type="number" id="ins_cantidad" placeholder="Ej. 25.5">
+        <label>Precio por kilo</label>
+        <input type="number" id="ins_precio" placeholder="Ej. 85">
+      </div>
+
+      <div id="ins_otro_fields" class="hidden">
+        <label>Descripción</label>
+        <input type="text" id="ins_desc" placeholder="Ej. Cilantro, cebolla y limón">
+        <label>Monto</label>
+        <input type="number" id="ins_monto" placeholder="Ej. 250">
+      </div>
+
       <label>Proveedor / lugar</label>
       <input type="text" id="ins_proveedor" placeholder="Ej. Guadalupano">
       <button class="addbtn" onclick="guardarInsumo()">Guardar insumo</button>
@@ -136,8 +154,7 @@
       <input type="date" id="ga_fecha">
       <label>Categoría</label>
       <select id="ga_categoria">
-        <option>Tortillas</option><option>Verdura/Salsa</option><option>Bebidas</option>
-        <option>Desechables</option><option>Gas</option><option>Otros</option>
+        <option>Oxxo</option><option>Comida</option><option>Postres</option><option>Otros</option>
       </select>
       <label>Descripción</label>
       <input type="text" id="ga_desc" placeholder="Ej. Cervezas, tanque de gas...">
@@ -228,7 +245,7 @@ function irVista(v){
   document.getElementById('backbtn').classList.toggle('hidden', v==='inicio');
   document.getElementById('hstate').textContent = TITULOS[v][0];
   document.getElementById('hsub').textContent = TITULOS[v][1];
-  if(v==='insumos'){ document.getElementById('ins_fecha').value = hoy(); renderLista('insumos'); }
+  if(v==='insumos'){ document.getElementById('ins_fecha').value = hoy(); toggleInsumoCategoria(); renderLista('insumos'); }
   if(v==='gastos'){ document.getElementById('ga_fecha').value = hoy(); renderLista('gastos'); }
   if(v==='sueldos'){ document.getElementById('su_fecha').value = hoy(); renderLista('sueldos'); }
 }
@@ -272,20 +289,45 @@ async function crearHojaSiNoExiste(nombre, headerRow){
   }
 }
 
+function toggleInsumoCategoria(){
+  const cat = document.getElementById('ins_categoria').value;
+  const esCarne = cat === 'Carne';
+  document.getElementById('ins_carne_fields').classList.toggle('hidden', !esCarne);
+  document.getElementById('ins_otro_fields').classList.toggle('hidden', esCarne);
+}
+
 async function guardarInsumo(){
   const fecha = document.getElementById('ins_fecha').value;
-  const producto = document.getElementById('ins_producto').value;
-  const cant = parseFloat(document.getElementById('ins_cantidad').value);
-  const precio = parseFloat(document.getElementById('ins_precio').value);
+  const cat = document.getElementById('ins_categoria').value;
   const prov = document.getElementById('ins_proveedor').value;
-  if(!cant || !precio){ alert('Captura cantidad y precio'); return; }
-  const total = cant*precio;
-  const fila = [fecha, 'Carne', producto, cant, 'Kilogramo', precio, Math.round(total), prov];
+  let producto, cantidad, tipo, precioUnit, total, label;
+
+  if(cat === 'Carne'){
+    producto = document.getElementById('ins_producto').value;
+    cantidad = parseFloat(document.getElementById('ins_cantidad').value);
+    precioUnit = parseFloat(document.getElementById('ins_precio').value);
+    if(!cantidad || !precioUnit){ alert('Captura cantidad y precio'); return; }
+    tipo = 'Kilogramo';
+    total = cantidad * precioUnit;
+    label = `${cantidad}kg ${producto}`;
+  } else {
+    producto = document.getElementById('ins_desc').value;
+    total = parseFloat(document.getElementById('ins_monto').value);
+    if(!total){ alert('Captura el monto'); return; }
+    cantidad = 1;
+    tipo = 'Monto';
+    precioUnit = total;
+    label = `${cat}: ${producto || '-'}`;
+  }
+
+  const fila = [fecha, cat, producto, cantidad, tipo, precioUnit, Math.round(total), prov];
   const ok = await guardarFila('Insumos', ['Fecha','Categoría','Producto','Cantidad','Tipo','Precio unitario','Costo total','Proveedor'], fila);
   if(!ok) alertPendiente();
-  capturasHoy.insumos.unshift({label:`${cant}kg ${producto}`, monto: total});
+  capturasHoy.insumos.unshift({label, monto: total});
   renderLista('insumos');
-  document.getElementById('ins_cantidad').value=''; document.getElementById('ins_precio').value=''; document.getElementById('ins_proveedor').value='';
+  document.getElementById('ins_cantidad').value=''; document.getElementById('ins_precio').value='';
+  document.getElementById('ins_desc').value=''; document.getElementById('ins_monto').value='';
+  document.getElementById('ins_proveedor').value='';
 }
 
 async function guardarGasto(){
