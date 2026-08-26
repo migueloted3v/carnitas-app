@@ -30,8 +30,8 @@
   .navcard:active{border-color:var(--accent)}
   .row2{display:flex;gap:clamp(12px,1.6vw,20px);align-items:flex-start}
   .colmain{flex:1;min-width:0}
-  .chips{display:flex;gap:clamp(6px,0.8vw,10px);flex-wrap:wrap;padding:2px 0 clamp(12px,1.6vw,18px)}
-  .chip{flex:1 1 auto;min-width:0;border:1px solid var(--border);background:transparent;border-radius:20px;padding:clamp(8px,1vw,12px) clamp(10px,1.4vw,18px);font-size:clamp(12px,1.2vw,15px);color:var(--text);white-space:nowrap;text-align:center}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(6px,0.8vw,10px);padding:2px 0 clamp(12px,1.6vw,18px)}
+  .chip{min-width:0;border:1px solid var(--border);background:transparent;border-radius:20px;padding:clamp(8px,1vw,12px) clamp(6px,1vw,14px);font-size:clamp(11px,1.1vw,14px);color:var(--text);white-space:nowrap;text-align:center;overflow:hidden;text-overflow:ellipsis}
   .chip.active{background:var(--accent);color:#FFFFFF;border-color:var(--accent);font-weight:500}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.2vw,16px);margin-bottom:clamp(10px,1.6vw,18px)}
   .prod{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:clamp(14px,2.2vw,24px) 8px;text-align:center;font-size:clamp(14px,1.6vw,18px);font-weight:500}
@@ -96,6 +96,7 @@
     <div class="row2">
       <div class="colmain">
         <div class="chips" id="chips"></div>
+        <button onclick="abrirVentaPerdida()" style="grid-column:1/-1;display:block;width:100%;background:none;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:11px 14px;font-size:13px;margin-bottom:14px">📉 ¿Se te fue un cliente? Registrar venta perdida</button>
         <div class="grid" id="grid"></div>
         <div id="qtypanel"></div>
       </div>
@@ -190,18 +191,18 @@
 
 <script>
 const CATS = {
-  "Carne": {tipo:"kilo", productos:["Maciza","Pierna","Chamorro","Buche","Aldilla","Nuca","Costilla","Cuerito"]},
-  "Chicharrón": {tipo:"gramos", productos:["Durito botanero","Chicharron de cachete","Chicharrón de lonja","Chicharron crakelyn"]},
-  "Tortillas": {tipo:"kilo", productos:["Tortilla"]},
-  "Bebida": {tipo:"pieza", productos:["Refresco","Agua de sabor"]},
+  "Carne": {tipo:"kilo", productos:["Surtido","Maciza","Pierna","Chamorro","Buche","Aldilla","Nuca","Costilla","Cuerito"]},
   "Gorditas": {tipo:"pieza", productos:["Gorda normal","Gorda rellena"]},
   "Tacos": {tipo:"pieza", productos:["Taco"]},
   "Frijoles charros": {tipo:"pieza", productos:["Litro","Medio","Vaso"]},
+  "Chicharrón": {tipo:"gramos", productos:["Durito botanero","Chicharron de cachete","Chicharrón de lonja","Chicharron crakelyn"]},
+  "Bebida": {tipo:"pieza", productos:["Refresco","Agua de sabor"]},
+  "Tortillas": {tipo:"kilo", productos:["Tortilla"]},
   "Torta": {tipo:"pieza", productos:["Torta"]}
 };
 
 const PRECIOS_DEFAULT = {
-  "Maciza":380,"Pierna":380,"Chamorro":380,"Buche":380,"Aldilla":380,"Nuca":380,"Costilla":380,"Cuerito":200,
+  "Maciza":380,"Pierna":380,"Chamorro":380,"Buche":380,"Aldilla":380,"Nuca":380,"Costilla":380,"Cuerito":200,"Surtido":380,
   "Durito botanero":300,"Chicharron de cachete":300,"Chicharrón de lonja":250,"Chicharron crakelyn":300,
   "Tortilla":30,
   "Refresco":30,"Agua de sabor":50,
@@ -210,6 +211,10 @@ const PRECIOS_DEFAULT = {
   "Litro":70,"Medio":35,"Vaso":20,
   "Torta":55
 };
+
+// Cortes que se promedian para armar "Surtido", en base a lo comprado en Insumos
+const CORTES_SURTIDO = ["Pierna","Buche","Nuca","Aldilla","Costilla"];
+const VENTANA_SURTIDO_DIAS = 56; // 8 semanas
 
 const TITULOS = {
   inicio:['Carnitas App','Sábado y domingo'],
@@ -228,6 +233,7 @@ let accessToken = null;
 let tokenClient = null;
 let vistaActual = 'inicio';
 let capturasHoy = {insumos:[], gastos:[], sueldos:[]};
+let distribucionSurtidoActual = null; // {Pierna:0.23, Buche:0.20, ...} calculada desde histórico de Insumos
 
 function fmt(n){ return '$' + Math.round(n).toLocaleString('es-MX'); }
 function hoy(){ return new Date().toISOString().slice(0,10); }
@@ -360,6 +366,41 @@ async function guardarSueldo(){
   document.getElementById('su_nombre').value=''; document.getElementById('su_puesto').value=''; document.getElementById('su_dias').value=''; document.getElementById('su_monto').value='';
 }
 
+function abrirVentaPerdida(){
+  document.getElementById('modalRoot').innerHTML = `
+    <div class="overlay" onclick="if(event.target===this)cerrarModal()">
+      <div class="sheet">
+        <h2>Venta perdida</h2>
+        <label>Fecha</label>
+        <input type="date" id="vp_fecha" value="${hoy()}">
+        <label>¿Qué corte quería el cliente?</label>
+        <select id="vp_corte">
+          <option>Surtido</option><option>Maciza</option><option>Pierna</option><option>Chamorro</option>
+          <option>Buche</option><option>Aldilla</option><option>Nuca</option><option>Costilla</option>
+          <option>No especificó</option>
+        </select>
+        <label>¿Cuántos kilos aproximadamente?</label>
+        <input type="number" id="vp_kilos" placeholder="Ej. 1.5" step="0.1" min="0">
+        <label>Motivo (opcional)</label>
+        <input type="text" id="vp_motivo" placeholder="Ej. Se acabó la carne, mucha fila...">
+        <button class="addbtn" onclick="guardarVentaPerdida()">Guardar</button>
+      </div>
+    </div>`;
+}
+
+async function guardarVentaPerdida(){
+  const fecha = document.getElementById('vp_fecha').value;
+  const corte = document.getElementById('vp_corte').value;
+  const kilos = parseFloat(document.getElementById('vp_kilos').value);
+  const motivo = document.getElementById('vp_motivo').value;
+  if(!kilos || kilos<=0){ alert('Captura cuántos kilos se estima que se perdieron'); return; }
+  const fila = [fecha, corte, kilos, motivo];
+  const ok = await guardarFila('VentasPerdidas', ['Fecha','Corte deseado','Kilos estimados','Motivo'], fila);
+  if(!ok) alertPendiente();
+  cerrarModal();
+  alert('Venta perdida registrada');
+}
+
 function alertPendiente(){
   alert('No se pudo guardar en Google (revisa tu conexión o sesión). Vuelve a intentar cuando tengas señal.');
 }
@@ -385,24 +426,86 @@ function renderGrid(){
     const d = document.createElement('div');
     d.className = 'prod';
     d.innerHTML = `${p}<span class="sub">${sub}</span>`;
-    d.onclick = ()=>{
+    d.onclick = async ()=>{
       document.querySelectorAll('.prod').forEach(el=>el.classList.remove('selected'));
       d.classList.add('selected');
+      if(p === 'Surtido'){
+        document.getElementById('qtypanel').innerHTML = `<div class="panel"><h3>Calculando mezcla de Surtido…</h3></div>`;
+        await calcularDistribucionSurtido();
+      }
       abrirCantidad(p);
     };
     g.appendChild(d);
   });
 }
 
-function precioDe(p){ return precios[p] || 0; }
+function precioDe(p){
+  if(precios[p] !== undefined && precios[p] !== null && precios[p] !== '') return precios[p];
+  return PRECIOS_DEFAULT[p] || 0;
+}
+
+// Calcula qué % de "Surtido" corresponde a cada corte, según lo comprado
+// en Insumos (categoría Carne) en las últimas 8 semanas. Si hay menos de
+// 8 semanas de historial, usa todo lo que exista. Se cachea por día.
+async function calcularDistribucionSurtido(forzar){
+  const cache = JSON.parse(localStorage.getItem('carnitas_surtido_dist')||'null');
+  if(!forzar && cache && cache.calculadoEn === hoy()){
+    distribucionSurtidoActual = cache.distribucion;
+    return cache.distribucion;
+  }
+  const fallbackIgual = Object.fromEntries(CORTES_SURTIDO.map(c=>[c, 1/CORTES_SURTIDO.length]));
+  if(!accessToken || !cfg.spreadsheetId){
+    distribucionSurtidoActual = (cache && cache.distribucion) || fallbackIgual;
+    return distribucionSurtidoActual;
+  }
+  try{
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.spreadsheetId}/values/Insumos!A2:H5000`,{
+      headers:{'Authorization':'Bearer '+accessToken}
+    });
+    if(!res.ok) throw new Error('sin respuesta');
+    const data = await res.json();
+    const filas = data.values || [];
+    const limite = new Date();
+    limite.setDate(limite.getDate() - VENTANA_SURTIDO_DIAS);
+    const limiteStr = limite.toISOString().slice(0,10);
+
+    const sumas = Object.fromEntries(CORTES_SURTIDO.map(c=>[c,0]));
+    filas.forEach(row=>{
+      const [fecha, categoria, producto, cantidad] = row;
+      if(categoria==='Carne' && CORTES_SURTIDO.includes(producto) && fecha >= limiteStr){
+        sumas[producto] += parseFloat(cantidad)||0;
+      }
+    });
+    const total = Object.values(sumas).reduce((a,b)=>a+b,0);
+    const distribucion = total>0
+      ? Object.fromEntries(CORTES_SURTIDO.map(c=>[c, sumas[c]/total]))
+      : fallbackIgual;
+
+    localStorage.setItem('carnitas_surtido_dist', JSON.stringify({calculadoEn: hoy(), distribucion}));
+    distribucionSurtidoActual = distribucion;
+    return distribucion;
+  }catch(e){
+    distribucionSurtidoActual = (cache && cache.distribucion) || fallbackIgual;
+    return distribucionSurtidoActual;
+  }
+}
+
+function textoDistribucionSurtido(dist){
+  if(!dist) return '';
+  return CORTES_SURTIDO.map(c=>`${c} ${Math.round(dist[c]*100)}%`).join(' · ');
+}
 
 function abrirCantidad(producto){
   const tipo = CATS[catActiva].tipo;
   const panel = document.getElementById('qtypanel');
+  const notaSurtido = producto==='Surtido'
+    ? `<p style="font-size:11px;color:var(--muted);margin:-6px 0 12px">${textoDistribucionSurtido(distribucionSurtidoActual)}</p>`
+    : '';
   if(tipo==='kilo'){
     panel.innerHTML = `
       <div class="panel">
         <h3>${producto} · fracción de kilo</h3>
+        ${notaSurtido}
         <div class="qtybtns" style="flex-wrap:wrap">
           <button onclick="agregarKilo('${producto}',0.25,this)">1/4 kg</button>
           <button onclick="agregarKilo('${producto}',0.5,this)">1/2 kg</button>
@@ -438,7 +541,9 @@ function abrirCantidad(producto){
 
 function agregarKilo(producto, frac, btn){
   const precio = precioDe(producto);
-  ticket.push({categoria:catActiva, producto, modo:'Fracción', cantidad:frac, precioUnit:precio, total:precio*frac});
+  if(!precio){ alert('Este producto no tiene precio configurado. Ve a Ajustes → Sincronizar precios.'); return; }
+  const dist = producto==='Surtido' ? distribucionSurtidoActual : null;
+  ticket.push({categoria:catActiva, producto, modo:'Fracción', cantidad:frac, precioUnit:precio, total:precio*frac, distribucion:dist});
   document.getElementById('qtypanel').innerHTML='';
   renderTicket();
 }
@@ -446,8 +551,10 @@ function agregarGramos(producto){
   const g = parseFloat(document.getElementById('gInput').value);
   if(!g || g<=0){ alert('Captura los gramos'); return; }
   const precio = precioDe(producto);
+  if(!precio){ alert('Este producto no tiene precio configurado. Ve a Ajustes → Sincronizar precios.'); return; }
   const kg = g/1000;
-  ticket.push({categoria:catActiva, producto, modo:'Gramos', cantidad:Math.round(g), precioUnit:precio, total:precio*kg});
+  const dist = producto==='Surtido' ? distribucionSurtidoActual : null;
+  ticket.push({categoria:catActiva, producto, modo:'Gramos', cantidad:Math.round(g), precioUnit:precio, total:precio*kg, distribucion:dist});
   document.getElementById('qtypanel').innerHTML='';
   renderTicket();
 }
@@ -455,6 +562,7 @@ function agregarGramosDirecto(producto){
   const g = parseFloat(document.getElementById('gInput2').value);
   if(!g || g<=0){ alert('Captura los gramos'); return; }
   const precio = precioDe(producto);
+  if(!precio){ alert('Este producto no tiene precio configurado. Ve a Ajustes → Sincronizar precios.'); return; }
   const kg = g/1000;
   ticket.push({categoria:catActiva, producto, modo:'Gramos', cantidad:Math.round(g), precioUnit:precio, total:precio*kg});
   document.getElementById('qtypanel').innerHTML='';
@@ -464,8 +572,10 @@ function agregarMonto(producto){
   const m = parseFloat(document.getElementById('mInput').value);
   if(!m || m<=0){ alert('Captura el monto'); return; }
   const precio = precioDe(producto);
+  if(!precio){ alert('Este producto no tiene precio configurado. Ve a Ajustes → Sincronizar precios.'); return; }
   const kg = precio>0 ? m/precio : 0;
-  ticket.push({categoria:catActiva, producto, modo:'Monto', cantidad: m, kgEquivalente: Math.round(kg*1000)/1000, precioUnit:precio, total:m});
+  const dist = producto==='Surtido' ? distribucionSurtidoActual : null;
+  ticket.push({categoria:catActiva, producto, modo:'Monto', cantidad: m, kgEquivalente: Math.round(kg*1000)/1000, precioUnit:precio, total:m, distribucion:dist});
   document.getElementById('qtypanel').innerHTML='';
   renderTicket();
 }
@@ -473,6 +583,7 @@ function agregarPieza(producto){
   const q = parseInt(document.getElementById('qInput').value);
   if(!q || q<=0){ alert('Captura la cantidad'); return; }
   const precio = precioDe(producto);
+  if(!precio){ alert('Este producto no tiene precio configurado. Ve a Ajustes → Sincronizar precios.'); return; }
   ticket.push({categoria:catActiva, producto, modo:'Piezas', cantidad:q, precioUnit:precio, total:precio*q});
   document.getElementById('qtypanel').innerHTML='';
   renderTicket();
@@ -496,12 +607,19 @@ function quitar(i){ ticket.splice(i,1); renderTicket(); }
 
 function abrirCobro(){
   if(ticket.length===0){ alert('Agrega al menos un producto'); return; }
+  const itemInvalido = ticket.find(it => !it.cantidad || it.cantidad<=0 || !it.total || it.total<=0);
+  if(itemInvalido){
+    alert(`"${itemInvalido.producto}" no tiene cantidad o precio válido. Quítalo del ticket y agrégalo de nuevo.`);
+    return;
+  }
   const total = ticket.reduce((s,i)=>s+i.total,0);
   document.getElementById('modalRoot').innerHTML = `
     <div class="overlay" onclick="if(event.target===this)cerrarModal()">
       <div class="sheet">
         <h2>Cobrar ${fmt(total)}</h2>
-        <button class="payopt" onclick="finalizarVenta('Efectivo')">💵 Efectivo</button>
+        <label>¿Cuántos tacos se regalaron en este ticket?</label>
+        <input type="number" id="regaloInput" value="0" min="0">
+        <button class="payopt" style="margin-top:14px" onclick="finalizarVenta('Efectivo')">💵 Efectivo</button>
         <button class="payopt" onclick="finalizarVenta('Tarjeta')">💳 Tarjeta</button>
         <button class="payopt" onclick="finalizarVenta('Transferencia')">🏦 Transferencia</button>
       </div>
@@ -512,7 +630,29 @@ function cerrarModal(){ document.getElementById('modalRoot').innerHTML=''; }
 async function finalizarVenta(metodo){
   const ticketId = 'T' + Date.now();
   const fecha = fechaHoraSheets();
-  const rows = ticket.map(it=>[fecha, ticketId, it.categoria, it.producto, it.modo, it.cantidad, Math.round(it.precioUnit), Math.round(it.total), metodo]);
+  const rows = [];
+
+  ticket.forEach(it=>{
+    if(it.producto === 'Surtido' && it.distribucion){
+      const kgTotal = it.modo==='Monto' ? it.kgEquivalente : (it.modo==='Gramos' ? it.cantidad/1000 : it.cantidad);
+      CORTES_SURTIDO.forEach(corte=>{
+        const pct = it.distribucion[corte] || 0;
+        if(pct<=0) return;
+        const kgCorte = Math.round(kgTotal*pct*1000)/1000;
+        const totalCorte = it.total*pct;
+        rows.push([fecha, ticketId, it.categoria, corte, 'Surtido', kgCorte, Math.round(it.precioUnit), Math.round(totalCorte), metodo]);
+      });
+    } else {
+      rows.push([fecha, ticketId, it.categoria, it.producto, it.modo, it.cantidad, Math.round(it.precioUnit), Math.round(it.total), metodo]);
+    }
+  });
+
+  const regalados = parseInt(document.getElementById('regaloInput')?.value)||0;
+  if(regalados>0){
+    const precioTaco = precioDe('Taco');
+    rows.push([fecha, ticketId, 'Regalo', 'Taco', 'Regalo', regalados, precioTaco, Math.round(regalados*precioTaco), metodo]);
+  }
+
   cerrarModal();
   const ok = await enviarASheets(rows);
   if(!ok){
