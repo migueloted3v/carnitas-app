@@ -6,7 +6,7 @@
 
 Captura ventas, insumos, gastos y sueldos desde el celular, sin servidor ni costos de hosting, sincronizado directo a Google Sheets.
 
-[![Versión](https://img.shields.io/badge/versión-2.1.0-F85E00)]()
+[![Versión](https://img.shields.io/badge/versión-2.1.1-F85E00)]()
 [![Static Site](https://img.shields.io/badge/hosting-GitHub%20Pages-24292e?logo=github)](https://pages.github.com/)
 [![No Build](https://img.shields.io/badge/build-none-brightgreen)]()
 [![Backend](https://img.shields.io/badge/backend-Google%20Sheets%20%2B%20Apps%20Script-34A853?logo=googlesheets&logoColor=white)]()
@@ -48,8 +48,8 @@ Además incluye un **tablero ejecutivo** (`carnitasdashboard.html`) para revisar
 - **Cobro según el método de pago**
   - *Efectivo*: "¿con cuánto paga?" con billetes sugeridos y cálculo del cambio; no deja registrar si el pago no cubre el total
   - *Tarjeta*: se registra al tocarla
-  - *Transferencia*: muestra los datos de la cuenta y un **código QR**; se registra hasta confirmar que llegó
-- **Botón 🏦 Datos para transferencia** para mostrar la cuenta y el QR en cualquier momento, sin perder el ticket en curso
+  - *Transferencia*: muestra los datos de la cuenta con la CLABE en grande y agrupada para dictarla fácil; se registra hasta confirmar que llegó
+- **Botón 🏦 Datos para transferencia** para mostrar la cuenta en cualquier momento, sin perder el ticket en curso
 
 **Diseño**
 - Funciona en **horizontal y vertical**: en horizontal el ticket va a un lado; en vertical baja a una barra fija con total y botón Cobrar, que se despliega al tocarla
@@ -133,7 +133,7 @@ carnitas-app/
 - **Sin frameworks, sin npm, sin build**: se edita y se sube directo
 - **Google Apps Script** como servicio web: escribe y lee la hoja con permisos del dueño, así que la app no necesita iniciar sesión
 - La clave vive en las propiedades del script, **nunca en el código** del repositorio
-- Los datos bancarios viven en la pestaña `Cuenta` de la hoja, **nunca en el código**; el QR se genera dentro de la app, sin internet (librería [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator), MIT)
+- Los datos bancarios viven en la pestaña `Cuenta` de la hoja, **nunca en el código**
 - Las pestañas se crean solas la primera vez que se captura algo en cada una; si una pestaña existente tiene menos columnas, se agregan al final sin mover las actuales
 
 ### Hojas de Google
@@ -177,7 +177,8 @@ Todo vive en **tu** Google Drive. La app no tiene servidor propio ni guarda tus 
 
 | Versión | Cambios |
 |---|---|
-| **2.1.0** | Categoría Pollo (entero o medio) · precios por kilo, medio y cuarto desde la hoja, visibles en cada botón · cobro en efectivo con cálculo de cambio · cobro por transferencia con datos de cuenta y QR · botón 🏦 para mostrar la cuenta sin perder el ticket · pestaña `Cuenta` · categorías en cuadrícula de 3 (vertical) y 5 (horizontal) |
+| **2.1.1** | Se quita el código QR (las cámaras no copian texto simple); la CLABE se muestra más grande y agrupada en bloques · el aviso de versiones distintas solo compara MAYOR.MENOR |
+| **2.1.0** | Categoría Pollo (entero o medio) · precios por kilo, medio y cuarto desde la hoja, visibles en cada botón · cobro en efectivo con cálculo de cambio · cobro por transferencia con datos de cuenta · botón 🏦 para mostrar la cuenta sin perder el ticket · pestaña `Cuenta` · categorías en cuadrícula de 3 (vertical) y 5 (horizontal) |
 | **2.0.0** | Servicio de Apps Script en lugar de inicio de sesión con Google · cola de envío con reintento y sin duplicados · selector Kilos/Gramos/Monto · chicharrón por monto · piezas sin valor precargado · venta perdida por categoría · diseño horizontal y vertical con barra de ticket · vista *Venta del día* · tablero ejecutivo nuevo · corrección de fecha después de las 6 p. m. · el Surtido cuadra exacto con lo cobrado |
 | 1.x | Captura de ventas, insumos, gastos y sueldos; Surtido; tacos regalados; ventas perdidas por corte |
 
