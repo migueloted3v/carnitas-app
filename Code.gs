@@ -1,6 +1,6 @@
 /**
  * Carnitas App — servicio web (Google Apps Script)
- * Versión: 2.1.0
+ * Versión: 2.2.0
  *
  * Vive pegado a la hoja "Carnitas Ventas" (Extensiones → Apps Script).
  * La app y el tablero le mandan y le piden datos con una clave; así la app
@@ -14,7 +14,7 @@
  *   4. Pega la URL /exec y la clave en ⚙ Ajustes de la app.
  */
 
-const SCRIPT_VERSION = '2.1.0';
+const SCRIPT_VERSION = '2.2.0';
 const TZ = 'America/Mexico_City';
 
 // Pestañas que se pueden escribir y leer desde la app, con su encabezado oficial.
@@ -64,6 +64,7 @@ function doGet(e) {
       case 'precios':  return responder({ ok: true, filas: leer('Precios') });
       case 'insumos':  return responder({ ok: true, filas: leer('Insumos') });
       case 'cuenta':   return responder({ ok: true, filas: leer('Cuenta') });
+      case 'rango':    return responder({ ok: true, datos: porRango(p.desde, p.hasta) });
       case 'ventas':   return responder({ ok: true, filas: ventasPorFechas(p.fechas) });
       case 'todo':     return responder({ ok: true, version: SCRIPT_VERSION, datos: leerTodo() });
       default:         return responder({ ok: false, error: 'Acción no reconocida' });
@@ -213,6 +214,17 @@ function ventasPorFechas(fechasTxt) {
   const set = {};
   fechas.forEach(f => set[f] = true);
   return leer('Ventas').filter(r => set[String(r[0]).slice(0, 10)]);
+}
+
+/** Ventas, insumos, gastos y sueldos entre dos fechas (aaaa-mm-dd, ambas incluidas). */
+function porRango(desde, hasta) {
+  const ok = /^\d{4}-\d{2}-\d{2}$/;
+  if (!ok.test(String(desde)) || !ok.test(String(hasta))) throw new Error('Fechas inválidas');
+  const out = {};
+  ['Ventas', 'Insumos', 'Gastos', 'Sueldos'].forEach(n => {
+    out[n] = leer(n).filter(r => { const d = String(r[0]).slice(0, 10); return d >= desde && d <= hasta; });
+  });
+  return out;
 }
 
 function leerTodo() {

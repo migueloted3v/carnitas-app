@@ -6,7 +6,7 @@
 
 Captura ventas, insumos, gastos y sueldos desde el celular, sin servidor ni costos de hosting, sincronizado directo a Google Sheets.
 
-[![Versión](https://img.shields.io/badge/versión-2.1.1-F85E00)]()
+[![Versión](https://img.shields.io/badge/versión-2.2.0-F85E00)]()
 [![Static Site](https://img.shields.io/badge/hosting-GitHub%20Pages-24292e?logo=github)](https://pages.github.com/)
 [![No Build](https://img.shields.io/badge/build-none-brightgreen)]()
 [![Backend](https://img.shields.io/badge/backend-Google%20Sheets%20%2B%20Apps%20Script-34A853?logo=googlesheets&logoColor=white)]()
@@ -26,7 +26,7 @@ Carnitas App reemplazó una hoja de cálculo manual y una app de terceros como s
 <td width="20%" align="center">🛒<br><b>Insumos</b><br><sub>Compras de carne y materia prima, por categoría</sub></td>
 <td width="20%" align="center">🧾<br><b>Gastos</b><br><sub>Gastos del día a día</sub></td>
 <td width="20%" align="center">👷<br><b>Sueldos</b><br><sub>Pagos a ayudantes por turno</sub></td>
-<td width="20%" align="center">📊<br><b>Venta del día</b><br><sub>Resumen en vivo de cualquier fecha</sub></td>
+<td width="20%" align="center">📊<br><b>Ventas</b><br><sub>Por día o por semana, con margen</sub></td>
 </tr>
 </table>
 
@@ -61,18 +61,21 @@ Además incluye un **tablero ejecutivo** (`carnitasdashboard.html`) para revisar
 - **Sin esperas infinitas**: toda consulta tiene tiempo límite; si el servicio no responde, la app sigue funcionando con los últimos datos guardados
 - **Sin inicio de sesión con Google**: la app habla con la hoja a través de un servicio de Apps Script protegido con clave
 
-**Venta del día**
-- Venta total, tickets, ticket promedio y kilos de carne vendidos
-- Comparación contra el mismo día de la semana anterior
-- Venta por hora, mezcla por categoría, método de pago y efectivo esperado en caja
-- Navegación por día, accesos rápidos a *Hoy* y *Ayer*, y selector de fecha
+**Ventas en la app: Día | Semana**
+- *Día*: venta total, tickets, ticket promedio, kilos de carne, comparación contra el mismo día de la semana anterior, venta por hora, categorías, método de pago y efectivo esperado en caja
+- *Semana* (viernes a jueves): venta, utilidad, margen y tickets contra la semana anterior; cascada de la venta a la utilidad; sábado vs domingo con hora pico; categorías; productos principales; cobro; costos de la semana
+- Aviso de costos incompletos cuando hay ventas sin insumos capturados
 
 **Tablero ejecutivo**
-- Periodos por semana de lunes a domingo, para que las compras del viernes caigan en la misma semana que las ventas del fin de semana
-- Pestañas: *Resumen*, *Ventas*, *Costos* y *Datos*
-- Estado de resultados, rendimiento de la carne (vendida contra comprada en crudo) y costo por kilo por corte
-- Aviso cuando un periodo tiene ventas pero no costos capturados
-- Lee en vivo del servicio o de un Excel descargado de la hoja; modo claro y oscuro automático
+- **Semana del negocio: viernes a jueves.** Las ventas de sábado y domingo se cruzan con los insumos, gastos y sueldos de esos 7 días; los periodos siempre son semanas completas
+- Filtros: *Semana* (con flechas), *Últimas 4 semanas*, *Mes* (semanas cuyo sábado cae en el mes), *Todo* y *Personalizado*
+- **Utilidad = ventas − carne − otros insumos − gastos − sueldos**, con margen y promedio de 4 semanas
+- *Resumen*: KPIs, **Qué revisar** (observaciones automáticas), venta y utilidad por semana con margen, cascada de la venta a la utilidad, mezcla por categoría, sábado vs domingo, cobro
+- *Ventas*: mapa de calor día × hora, venta por hora, ranking de productos con regla 80/20, productos por ticket, tickets más grandes, ventas perdidas
+- *Costos*: costo por semana, estado de resultados, evolución del precio por kilo por corte, compras por proveedor, costo de carne por kilo vendido, rendimiento, punto de equilibrio semanal, gastos y nómina
+- *Datos*: calidad de captura (semanas sin insumos o sin sueldos) y descarga CSV
+- **Clic para filtrar** por categoría o producto; botón de **tema claro/oscuro** que se recuerda
+- Lee en vivo del servicio o de un Excel descargado de la hoja
 
 ---
 
@@ -177,6 +180,7 @@ Todo vive en **tu** Google Drive. La app no tiene servidor propio ni guarda tus 
 
 | Versión | Cambios |
 |---|---|
+| **2.2.0** | Semana del negocio de viernes a jueves en tablero y app · margen con gastos incluidos · vista *Semana* en la app · tablero con tema claro/oscuro, clic para filtrar, *Qué revisar*, mapa de calor, ranking 80/20, evolución del precio por kilo, compras por proveedor y punto de equilibrio · nueva acción `rango` en el servicio |
 | **2.1.1** | Se quita el código QR (las cámaras no copian texto simple); la CLABE se muestra más grande y agrupada en bloques · el aviso de versiones distintas solo compara MAYOR.MENOR |
 | **2.1.0** | Categoría Pollo (entero o medio) · precios por kilo, medio y cuarto desde la hoja, visibles en cada botón · cobro en efectivo con cálculo de cambio · cobro por transferencia con datos de cuenta · botón 🏦 para mostrar la cuenta sin perder el ticket · pestaña `Cuenta` · categorías en cuadrícula de 3 (vertical) y 5 (horizontal) |
 | **2.0.0** | Servicio de Apps Script en lugar de inicio de sesión con Google · cola de envío con reintento y sin duplicados · selector Kilos/Gramos/Monto · chicharrón por monto · piezas sin valor precargado · venta perdida por categoría · diseño horizontal y vertical con barra de ticket · vista *Venta del día* · tablero ejecutivo nuevo · corrección de fecha después de las 6 p. m. · el Surtido cuadra exacto con lo cobrado |

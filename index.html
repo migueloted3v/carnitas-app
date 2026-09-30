@@ -179,11 +179,19 @@
   .brow .b i{display:block;height:100%;background:var(--accent);border-radius:4px}
   .brow .val{width:62px;text-align:right}
   .paybar{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:8px;background:var(--bg)}
+  .wf{max-height:190px}
+  .kpis.sem{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .kpis.sem .kpi .v{font-size:clamp(17px,2.2vw,24px)}
+  .aviso{background:var(--card);border:1px solid var(--bad);border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:10px}
+  .aviso b{color:var(--bad);font-weight:500}
   .msg{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;text-align:center;color:var(--muted);font-size:14px}
   @media (max-width:760px){
     .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
     .kpis .kpi.main{grid-column:1/-1;text-align:center}
     .dgrid{grid-template-columns:1fr}
+    .kpis.sem{grid-template-columns:repeat(2,minmax(0,1fr))}
+    #barSem .fecha{font-size:14px;min-width:0}
+    #barSem .dchips{width:100%;justify-content:center}
   }
 </style>
 </head>
@@ -210,7 +218,7 @@
       <div class="navcard" onclick="irVista('insumos')"><span class="ic">🛒</span>Insumos</div>
       <div class="navcard" onclick="irVista('gastos')"><span class="ic">🧾</span>Gastos</div>
       <div class="navcard" onclick="irVista('sueldos')"><span class="ic">👷</span>Sueldos</div>
-      <div class="navcard wide" onclick="irVista('dia')"><span class="ic">📊</span>Venta del día</div>
+      <div class="navcard wide" onclick="irVista('dia')"><span class="ic">📊</span>Ventas · día y semana</div>
     </div>
     <p class="ver" id="verInicio"></p>
   </div>
@@ -323,7 +331,14 @@
   </div>
 
   <div id="view-dia" class="hidden">
-    <div class="dbar">
+    <div class="seg" style="max-width:320px;margin:0 auto 12px"><button id="modoDia" class="on" onclick="cambiarModoVentas('dia')">Día</button><button id="modoSem" onclick="cambiarModoVentas('semana')">Semana</button></div>
+    <div class="dbar hidden" id="barSem">
+      <button class="nav" onclick="moverSemana(-1)" aria-label="Semana anterior">‹</button>
+      <div class="fecha"><span id="semLabel"></span><small id="semSub" style="display:block;font-size:11px;color:var(--muted);font-weight:400"></small></div>
+      <button class="nav" onclick="moverSemana(1)" aria-label="Semana siguiente">›</button>
+      <div class="dchips"><button class="dchip" id="chipEsta" onclick="irSemana(semanaDe(hoy()))">Esta semana</button></div>
+    </div>
+    <div class="dbar" id="barDia">
       <button class="nav" onclick="moverDia(-1)" aria-label="Día anterior">‹</button>
       <div class="fecha" id="diaLabel"></div>
       <button class="nav" onclick="moverDia(1)" aria-label="Día siguiente">›</button>
@@ -341,7 +356,7 @@
 <div id="modalRoot"></div>
 
 <script>
-const APP_VERSION = '2.1.1';
+const APP_VERSION = '2.2.0';
 
 /* =========================================================
    Catálogo
@@ -399,7 +414,7 @@ const TITULOS = {
   insumos:['Insumos','Compras de carne y materia prima'],
   gastos:['Gastos','Otros gastos del negocio'],
   sueldos:['Sueldos','Pagos a ayudantes'],
-  dia:['Venta del día','Datos en vivo de tu hoja']
+  dia:['Ventas','Por día o por semana (viernes a jueves)']
 };
 
 const TIMEOUT_MS = 15000;
@@ -431,6 +446,8 @@ let modoCaptura = null;
 let fraccionSel = null;
 let diaActual = null;
 let diaPeticion = 0;
+let modoVentas = 'dia';
+let semanaActual = null;
 
 // Migración: ventas pendientes de la versión anterior pasan a la nueva cola
 (function migrarPendientes(){
@@ -583,7 +600,7 @@ function irVista(v){
   if(v==='insumos'){ document.getElementById('ins_fecha').value = hoy(); toggleInsumoCategoria(); renderLista('insumos'); }
   if(v==='gastos'){ document.getElementById('ga_fecha').value = hoy(); renderLista('gastos'); }
   if(v==='sueldos'){ document.getElementById('su_fecha').value = hoy(); renderLista('sueldos'); }
-  if(v==='dia'){ irDia(diaActual || hoy()); }
+  if(v==='dia'){ modoVentas==='semana' ? irSemana(semanaActual || semanaDe(hoy())) : irDia(diaActual || hoy()); }
   window.scrollTo(0,0);
 }
 function irInicio(){ irVista('inicio'); }
@@ -1268,6 +1285,141 @@ async function irDia(fecha){
     if(miPeticion !== diaPeticion) return;
     body.innerHTML = `<div class="msg">No se pudieron cargar las ventas (${esc(e.message)}).<br><button class="addbtn" style="max-width:220px" onclick="irDia('${fecha}')">Reintentar</button></div>`;
   }
+}
+
+/* =========================================================
+   Ventas por semana: viernes a jueves. Las ventas de sábado y domingo
+   se cruzan con los insumos, gastos y sueldos de esos 7 días.
+   ========================================================= */
+function semanaDe(iso){ const [y,m,d] = iso.split('-').map(Number); const f = new Date(y,m-1,d); return sumarDias(iso, -((f.getDay() - 5 + 7) % 7)); }
+function fechaCorta(iso){ const [y,m,d] = iso.split('-').map(Number); return `${d} ${MESES[m-1]}`; }
+const DIA3 = ['dom','lun','mar','mié','jue','vie','sáb'];
+function diaSem(iso){ const [y,m,d] = iso.split('-').map(Number); return new Date(y,m-1,d).getDay(); }
+
+function cambiarModoVentas(m){
+  modoVentas = m;
+  document.getElementById('modoDia').classList.toggle('on', m==='dia');
+  document.getElementById('modoSem').classList.toggle('on', m==='semana');
+  document.getElementById('barDia').classList.toggle('hidden', m!=='dia');
+  document.getElementById('barSem').classList.toggle('hidden', m!=='semana');
+  m==='semana' ? irSemana(semanaActual || semanaDe(hoy())) : irDia(diaActual || hoy());
+}
+function moverSemana(n){ irSemana(sumarDias(semanaActual || semanaDe(hoy()), 7*n)); }
+
+async function irSemana(vie){
+  semanaActual = vie;
+  const jue = sumarDias(vie, 6), vieAnt = sumarDias(vie, -7);
+  document.getElementById('semLabel').textContent = `vie ${fechaCorta(vie)} – jue ${fechaCorta(jue)}`;
+  document.getElementById('semSub').textContent = '';
+  document.getElementById('chipEsta').classList.toggle('on', vie===semanaDe(hoy()));
+  const body = document.getElementById('diaBody');
+  const enSem = (r, a, b) => { const d = String(r[0]).slice(0,10); return d>=a && d<=b; };
+  const pend = {};
+  ['Ventas','Insumos','Gastos','Sueldos'].forEach(h=>pend[h] = outbox.filter(i=>i.sheet===h).flatMap(i=>i.rows));
+  if(!servicioListo()){ body.innerHTML = `<div class="msg">Configura el servicio en ⚙ Ajustes para ver tus ventas.</div>`; return; }
+  const miPeticion = ++diaPeticion;
+  body.innerHTML = `<div class="msg">Cargando la semana…</div>`;
+  try{
+    const data = await apiGet('rango', {desde: vieAnt, hasta: jue});
+    if(miPeticion !== diaPeticion) return;
+    const D = data.datos || {};
+    const tomar = (h, a, b) => (D[h]||[]).filter(r=>enSem(r,a,b)).concat(pend[h].filter(r=>enSem(r,a,b)));
+    const act = {V: tomar('Ventas', vie, jue), I: tomar('Insumos', vie, jue), G: tomar('Gastos', vie, jue), S: tomar('Sueldos', vie, jue)};
+    const ant = {V: tomar('Ventas', vieAnt, sumarDias(vie,-1)), I: tomar('Insumos', vieAnt, sumarDias(vie,-1)), G: tomar('Gastos', vieAnt, sumarDias(vie,-1)), S: tomar('Sueldos', vieAnt, sumarDias(vie,-1))};
+    const nPend = ['Ventas','Insumos','Gastos','Sueldos'].reduce((s,h)=>s+pend[h].filter(r=>enSem(r,vie,jue)).length,0);
+    renderSemana(act, ant, nPend);
+  }catch(e){
+    if(miPeticion !== diaPeticion) return;
+    body.innerHTML = `<div class="msg">No se pudo cargar la semana (${esc(e.message)}).<br><button class="addbtn" style="max-width:220px" onclick="irSemana('${vie}')">Reintentar</button></div>`;
+  }
+}
+
+function costosSemana(x){
+  const carne = x.I.filter(r=>r[1]==='Carne').reduce((s,r)=>s+num(r[6]),0);
+  const otros = x.I.filter(r=>r[1]!=='Carne').reduce((s,r)=>s+num(r[6]),0);
+  const gastos = x.G.reduce((s,r)=>s+num(r[3]),0);
+  const sueldos = x.S.reduce((s,r)=>s+num(r[4]),0);
+  return {carne, otros, gastos, sueldos, total: carne+otros+gastos+sueldos};
+}
+
+function deltaTxt(a, b, txt){
+  if(!(b>0)) return `<p class="d">Sin ${txt} para comparar</p>`;
+  const p = (a/b-1)*100;
+  return `<p class="d ${p>=0?'up':'down'}">${p>=0?'▲':'▼'} ${Math.abs(p).toFixed(1)}% vs ${txt}</p>`;
+}
+
+function cascadaSVG(venta, c){
+  const pasos = [['Venta', venta, 'total'], ['Carne', -c.carne], ['Insumos', -c.otros], ['Gastos', -c.gastos], ['Sueldos', -c.sueldos]];
+  const util = venta - c.total;
+  const max = Math.max(venta, 1), W = 320, H = 130, top = 16, n = 6, gap = 8, bw = (W - gap*(n-1))/n;
+  const y = v => top + (H - top) * (1 - v/max);
+  let s = `<svg class="wf" viewBox="0 0 ${W} ${H+30}" width="100%" role="img" aria-label="De la venta a la utilidad">`;
+  s += `<line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--border)"/>`;
+  let nivel = venta;
+  pasos.forEach(([t, v], i)=>{
+    const x = i*(bw+gap);
+    let y1, y2, color;
+    if(i===0){ y1 = y(venta); y2 = y(0); color = '#9FB6C4'; }
+    else { const nuevo = nivel + v; y1 = y(Math.max(nivel, nuevo)); y2 = y(Math.min(nivel, nuevo)); nivel = nuevo; color = '#C94900'; }
+    const h = Math.max(1, y2 - y1);
+    s += `<g><title>${t}: ${fmt(v)}</title><rect x="${x}" y="${y1}" width="${bw}" height="${h}" rx="3" fill="${color}"/>
+      <text x="${x+bw/2}" y="${y1-4}" text-anchor="middle" font-size="10" fill="#fff">${i===0||v===0?'':'−'}${fmtK(Math.abs(v))}</text>
+      <text x="${x+bw/2}" y="${H+24}" text-anchor="middle" font-size="10" fill="#9FB6C4">${t}</text></g>`;
+  });
+  const x = 5*(bw+gap), yU = util>=0 ? y(util) : y(0), hU = Math.max(1, Math.abs(y(0)-y(util)));
+  s += `<g><title>Utilidad: ${fmt(util)}</title><rect x="${x}" y="${yU}" width="${bw}" height="${hU}" rx="3" fill="${util>=0?'#F85E00':'#FF8A80'}"/>
+    <text x="${x+bw/2}" y="${yU-4}" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">${fmtK(util)}</text>
+    <text x="${x+bw/2}" y="${H+24}" text-anchor="middle" font-size="10" fill="#fff">Utilidad</text></g>`;
+  return s + '</svg>';
+}
+function fmtK(n){ return Math.abs(n)>=1000 ? `${n<0?'-':''}$${(Math.abs(n)/1000).toFixed(1)}k` : fmt(n); }
+
+function barras(lista, total, max){
+  const m = max || Math.max(...lista.map(x=>x[1]), 1);
+  return lista.map(([n,v],i)=>`<div class="brow"><span class="n">${esc(n)}</span><span class="b"><i style="width:${(v/m*100).toFixed(1)}%"></i></span><span class="val">${fmt(v)}</span></div>`).join('');
+}
+
+function renderSemana(act, ant, nPend){
+  const body = document.getElementById('diaBody');
+  const r = resumir(act.V), a = resumir(ant.V);
+  const c = costosSemana(act), ca = costosSemana(ant);
+  const diasVenta = [...new Set(act.V.filter(x=>x[2]!=='Regalo').map(x=>String(x[0]).slice(0,10)))].sort();
+  document.getElementById('semSub').textContent = diasVenta.length ? 'Ventas ' + diasVenta.map(d=>`${DIA3[diaSem(d)]} ${fechaCorta(d)}`).join(' y ') : '';
+  if(r.total<=0 && c.total<=0){ body.innerHTML = `<div class="msg">Sin ventas ni costos registrados en esta semana.</div>`; return; }
+  const util = r.total - c.total, utilA = a.total - ca.total;
+  const costosOk = act.I.length > 0;
+  const margen = r.total>0 ? util/r.total*100 : 0;
+
+  const porDia = diasVenta.map(d=>[`${DIA3[diaSem(d)].replace(/^./,x=>x.toUpperCase())} ${fechaCorta(d)}`, act.V.filter(x=>x[2]!=='Regalo' && String(x[0]).startsWith(d)).reduce((s,x)=>s+num(x[7]),0)]);
+  const cats = Object.entries(r.porCat).sort((x,y)=>y[1]-x[1]);
+  const topCats = cats.slice(0,4); const resto = cats.slice(4).reduce((s,x)=>s+x[1],0); if(resto>0) topCats.push(['Otros', resto]);
+  const prods = Object.entries(act.V.filter(x=>x[2]!=='Regalo').reduce((o,x)=>{ o[x[3]] = (o[x[3]]||0) + num(x[7]); return o; },{})).sort((x,y)=>y[1]-x[1]).slice(0,5);
+  const colores = {Efectivo:'#F85E00', Tarjeta:'#9FB6C4', Transferencia:'#6F889A'};
+  const pagos = Object.entries(r.porPago).sort((x,y)=>y[1]-x[1]);
+  const horaPico = Object.entries(act.V.filter(x=>x[2]!=='Regalo').reduce((o,x)=>{ const k = `${DIA3[diaSem(String(x[0]).slice(0,10))]} ${String(x[0]).slice(11,13)}:00`; o[k]=(o[k]||0)+num(x[7]); return o; },{})).sort((x,y)=>y[1]-x[1])[0];
+
+  body.innerHTML = `
+    ${!costosOk && r.total>0 ? `<div class="aviso"><b>Costos incompletos:</b> hay ventas pero no hay insumos capturados de vie ${fechaCorta(semanaActual)} a jue ${fechaCorta(sumarDias(semanaActual,6))}. La utilidad no es confiable hasta que se registren.</div>` : ''}
+    <div class="kpis sem">
+      <div class="kpi main"><p class="l">Venta de la semana</p><p class="v">${fmt(r.total)}</p>${deltaTxt(r.total, a.total, 'semana anterior')}</div>
+      <div class="kpi"><p class="l">Utilidad</p><p class="v">${costosOk ? fmt(util) : '—'}</p>${costosOk && ca.total>0 ? deltaTxt(util, utilA, 'sem. ant.') : ''}</div>
+      <div class="kpi"><p class="l">Margen</p><p class="v">${costosOk ? margen.toFixed(1)+'%' : '—'}</p></div>
+      <div class="kpi"><p class="l">Tickets</p><p class="v">${r.tickets}</p></div>
+      <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${fmt(r.tickets ? r.total/r.tickets : 0)}</p></div>
+    </div>
+    <div class="dgrid">
+      <div class="dcard"><h4>De la venta a la utilidad</h4>${cascadaSVG(r.total, c)}</div>
+      <div class="dcard"><h4>${diasVenta.length>1 ? 'Sábado vs domingo' : 'Venta por día'}</h4>${barras(porDia)}
+        ${horaPico ? `<p class="hint" style="margin-top:8px">Hora pico: ${esc(horaPico[0])} · ${fmt(horaPico[1])}</p>` : ''}
+        <p class="hint">Carne vendida: ${r.kg.toFixed(1)} kg${r.tacosRegalo ? ` · Tacos regalados: ${r.tacosRegalo}` : ''}</p></div>
+      <div class="dcard"><h4>Por categoría</h4>${barras(topCats)}</div>
+      <div class="dcard"><h4>Productos principales</h4>${barras(prods)}</div>
+      <div class="dcard"><h4>Cobro</h4><div class="paybar">${pagos.map(([p,v])=>`<span style="width:${(v/r.total*100).toFixed(1)}%;background:${colores[p]||'#6F889A'}"></span>`).join('')}</div>
+        ${pagos.map(([p,v])=>`<div class="brow"><span style="width:10px;height:10px;border-radius:3px;background:${colores[p]||'#6F889A'}"></span><span style="flex:1">${esc(p)}</span><span>${fmt(v)} · ${Math.round(v/r.total*100)}%</span></div>`).join('')}</div>
+      <div class="dcard"><h4>Costos de la semana</h4>${barras([['Carne',c.carne],['Otros insumos',c.otros],['Gastos',c.gastos],['Sueldos',c.sueldos]], 0, Math.max(c.total,1))}
+        <p class="hint" style="margin-top:6px">Total: ${fmt(c.total)}</p></div>
+    </div>
+    ${nPend?`<p class="hint" style="margin-top:10px">Incluye ${nPend} renglones que aún no se envían a la hoja.</p>`:''}`;
 }
 
 function kgCarne(r){

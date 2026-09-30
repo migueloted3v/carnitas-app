@@ -9,26 +9,32 @@
 <style>
   :root{
     --bg:#F4F6F8; --card:#FFFFFF; --line:#E3E8EC; --ink:#153243; --ink2:#51687A; --muted:#7A8F9E;
-    --mark:#153243; --mark2:#9FB6C4; --mark3:#6B8394; --accent:#F85E00; --track:#EEF1F4;
-    --up:#2F7D32; --down:#C23B22; --chip:#153243; --chipTxt:#FFFFFF;
+    --mark:#153243; --mark2:#9FB6C4; --accent:#F85E00; --neg:#C94900; --track:#EEF1F4;
+    --up:#2F7D32; --down:#C23B22; --chip:#153243; --chipTxt:#FFFFFF; --tipBg:#153243; --tipTx:#FFFFFF;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4;
+    color-scheme: light;
   }
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
+    :root:where(:not([data-theme="light"])){
       --bg:#0E1C26; --card:#15293A; --line:#24394B; --ink:#E6EDF2; --ink2:#AFC2CF; --muted:#8499A8;
-      --mark:#8FB0C6; --mark2:#4E6A80; --mark3:#6B8394; --accent:#FF7A2E; --track:#1D3446;
-      --up:#7FD49B; --down:#FF8A80; --chip:#E6EDF2; --chipTxt:#0E1C26;
+      --mark:#8FB0C6; --mark2:#4E6A80; --accent:#FF7A2E; --neg:#D9642A; --track:#1D3446;
+      --up:#7FD49B; --down:#FF8A80; --chip:#E6EDF2; --chipTxt:#0E1C26; --tipBg:#E6EDF2; --tipTx:#0E1C26;
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+      color-scheme: dark;
     }
   }
   :root[data-theme="dark"]{
     --bg:#0E1C26; --card:#15293A; --line:#24394B; --ink:#E6EDF2; --ink2:#AFC2CF; --muted:#8499A8;
-    --mark:#8FB0C6; --mark2:#4E6A80; --mark3:#6B8394; --accent:#FF7A2E; --track:#1D3446;
-    --up:#7FD49B; --down:#FF8A80; --chip:#E6EDF2; --chipTxt:#0E1C26;
+    --mark:#8FB0C6; --mark2:#4E6A80; --accent:#FF7A2E; --neg:#D9642A; --track:#1D3446;
+    --up:#7FD49B; --down:#FF8A80; --chip:#E6EDF2; --chipTxt:#0E1C26; --tipBg:#E6EDF2; --tipTx:#0E1C26;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+    color-scheme: dark;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px}
   button,select,input{font-family:inherit;font-size:13px;color:var(--ink)}
-  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
-  .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .wrap{max-width:1200px;margin:0 auto;padding:20px 16px 40px}
+  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
   .brand h1{font-size:20px;font-weight:500;margin:0}
   .brand p{font-size:12px;color:var(--muted);margin:2px 0 0}
   .sp{flex:1}
@@ -36,37 +42,53 @@
   .tabs button{border:none;background:none;padding:7px 14px;border-radius:7px;color:var(--ink2);cursor:pointer}
   .tabs button.on{background:var(--chip);color:var(--chipTxt)}
   .ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  select,input[type=date],input[type=text],input[type=password],input[type=url]{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+  select,input[type=date],input[type=month],input[type=text],input[type=password],input[type=url]{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
   .btn{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer}
   .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .navp{display:flex;align-items:center;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:8px}
+  .navp button{border:none;background:none;padding:7px 10px;cursor:pointer;color:var(--ink2);font-size:15px}
+  .navp span{padding:0 6px;white-space:nowrap}
+  .sub{font-size:12px;color:var(--muted);margin:0 0 12px}
+  .filtro{display:inline-flex;align-items:center;gap:8px;background:var(--chip);color:var(--chipTxt);border-radius:16px;padding:5px 12px;font-size:12px;margin:0 0 12px}
+  .filtro button{background:none;border:none;color:var(--chipTxt);cursor:pointer;font-size:13px;padding:0}
   .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
   .kpi.hl{box-shadow:inset 0 3px 0 var(--accent)}
   .kpi .l{font-size:12px;color:var(--muted);margin:0}
-  .kpi .v{font-size:27px;font-weight:500;margin:6px 0 4px;letter-spacing:-.3px}
+  .kpi .v{font-size:26px;font-weight:500;margin:6px 0 4px;letter-spacing:-.3px}
   .kpi .d{font-size:12px;margin:0;color:var(--muted)}
   .kpi .d.up{color:var(--up)} .kpi .d.down{color:var(--down)}
   .g2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;margin-bottom:12px}
+  .g2e{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
   .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
   .card h3{font-size:13px;font-weight:500;margin:0 0 14px;display:flex;justify-content:space-between;gap:8px}
   .card h3 small{font-weight:400;color:var(--muted);font-size:12px}
-  .row{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:8px}
+  .row{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:8px;border-radius:6px}
+  .row.clic{cursor:pointer;padding:2px 4px;margin:0 -4px 6px}
+  .row.clic:hover{background:var(--track)}
+  .row.sel .n{color:var(--accent);font-weight:500}
   .row .n{width:110px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .row .b{flex:1;height:8px;background:var(--track);border-radius:4px;overflow:hidden}
   .row .b i{display:block;height:100%;background:var(--mark);border-radius:4px}
-  .row .v{width:92px;text-align:right;font-variant-numeric:tabular-nums}
+  .row .v{width:100px;text-align:right;font-variant-numeric:tabular-nums}
   table{width:100%;border-collapse:collapse;font-size:12px}
   th{text-align:left;font-weight:400;color:var(--muted);padding:6px 4px;border-bottom:1px solid var(--line)}
   td{padding:7px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
   th.r,td.r{text-align:right}
   tr:last-child td{border-bottom:none}
-  .pl td{padding:8px 4px}
+  tr.clic{cursor:pointer} tr.clic:hover td{background:var(--track)}
+  tr.corte td{border-bottom:2px dashed var(--accent)}
   .pl .tot td{font-weight:500;border-top:1.5px solid var(--ink)}
   .stack{display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px;margin:4px 0 12px}
   .lg{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px}
-  .sw{width:10px;height:10px;border-radius:3px;flex:0 0 10px}
+  .lgs{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:var(--ink2);margin-top:6px}
+  .sw{width:10px;height:10px;border-radius:3px;flex:0 0 10px;display:inline-block}
   .note{font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5}
+  .aviso{background:var(--card);border:1px solid var(--down);border-radius:12px;padding:12px 16px;font-size:13px;margin-bottom:12px}
+  .aviso b{color:var(--down);font-weight:500}
+  .insights{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:var(--ink2)}
+  .insights b{color:var(--ink);font-weight:500}
   .empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:40px 20px;text-align:center;color:var(--ink2)}
   .empty h2{font-size:17px;font-weight:500;margin:0 0 6px;color:var(--ink)}
   .src{max-width:520px;margin:18px auto 0;text-align:left}
@@ -74,12 +96,13 @@
   .src input{width:100%}
   .drop{margin-top:18px;border:1px dashed var(--line);border-radius:10px;padding:16px;cursor:pointer}
   .drop.on{border-color:var(--accent)}
-  #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 9px;border-radius:6px;opacity:0;transition:opacity .1s;z-index:10;white-space:nowrap}
+  .big{font-size:22px;font-weight:500}
+  #tip{position:fixed;pointer-events:none;background:var(--tipBg);color:var(--tipTx);font-size:12px;padding:6px 9px;border-radius:6px;opacity:0;transition:opacity .1s;z-index:10;white-space:nowrap}
   svg text{font-family:inherit}
   .hid{display:none !important}
   .err{color:var(--down);font-size:12px;margin-top:8px}
-  @media (max-width:900px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} .g2,.g3{grid-template-columns:1fr} }
-  @media print{ .ctl,.tabs,#tip{display:none} body{background:#fff} }
+  @media (max-width:900px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} .g2,.g2e,.g3{grid-template-columns:1fr} }
+  @media print{ .ctl,.tabs,#tip{display:none} }
 </style>
 </head>
 <body>
@@ -87,32 +110,35 @@
   <div class="top">
     <div class="brand"><h1>Carnitas</h1><p id="srcTxt">Sin datos cargados</p></div>
     <div class="sp"></div>
-    <div class="tabs" id="tabs"></div>
-    <div class="ctl" id="ctl">
+    <div class="tabs hid" id="tabs"></div>
+    <div class="ctl hid" id="ctl">
       <select id="periodo" aria-label="Periodo">
-        <option value="semana">Última semana</option>
-        <option value="4sem" selected>Últimas 4 semanas</option>
-        <option value="mes">Este mes</option>
-        <option value="mesant">Mes anterior</option>
+        <option value="semana" selected>Semana</option>
+        <option value="4sem">Últimas 4 semanas</option>
+        <option value="mes">Mes</option>
         <option value="todo">Todo el histórico</option>
         <option value="custom">Personalizado…</option>
       </select>
+      <div class="navp" id="navp"><button id="prev" aria-label="Anterior">‹</button><span id="rangoTxt"></span><button id="next" aria-label="Siguiente">›</button></div>
       <input type="date" id="desde" class="hid" aria-label="Desde">
       <input type="date" id="hasta" class="hid" aria-label="Hasta">
       <button class="btn" id="refresh" title="Actualizar datos">↻</button>
       <button class="btn" id="fuente" title="Cambiar fuente de datos">⚙</button>
     </div>
+    <button class="btn" id="tema" title="Cambiar tema"></button>
   </div>
+  <p class="sub" id="subTxt"></p>
+  <div id="filtroBox"></div>
   <div id="main"></div>
 </div>
 <div id="tip"></div>
 
 <script>
-const DASH_VERSION = '2.1.1';
+const DASH_VERSION = '2.2.0';
 
-/* ================= Formatos ================= */
-const MXN = n => '$' + Math.round(n||0).toLocaleString('es-MX');
-const K = n => Math.abs(n) >= 1000 ? '$' + (n/1000).toFixed(1) + 'k' : MXN(n);
+/* ================= Formatos y fechas ================= */
+const MXN = n => (n<0?'-':'') + '$' + Math.round(Math.abs(n||0)).toLocaleString('es-MX');
+const K = n => Math.abs(n) >= 1000 ? (n<0?'-':'') + '$' + (Math.abs(n)/1000).toFixed(1) + 'k' : MXN(n);
 const PCT = (n, d=0) => (isFinite(n) ? (n*100).toFixed(d) : '0') + '%';
 const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
 const pad = n => String(n).padStart(2,'0');
@@ -121,13 +147,18 @@ const addDays = (s, n) => { const [y,m,d] = s.split('-').map(Number); return iso
 const dow = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d).getDay(); };
 const diffDays = (a, b) => Math.round((new Date(b+'T12:00') - new Date(a+'T12:00'))/86400000);
 const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const DIAS_L = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MES_L = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const corto = s => { const [y,m,d] = s.split('-').map(Number); return `${d} ${MES[m-1]}`; };
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const jsq = s => String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
-/* ================= Modelo de datos =================
-   Todas las fuentes se normalizan a arreglos con el orden oficial de columnas.
-*/
+// Semana del negocio: viernes a jueves. Las ventas de sábado y domingo se cruzan
+// con los insumos, gastos y sueldos de esos 7 días.
+const semanaDe = s => addDays(s, -((dow(s) - 5 + 7) % 7));
+
+/* ================= Modelo ================= */
 const ENC = {
   Ventas:['Fecha','Ticket','Categoría','Producto','Modo','Cantidad','Precio unitario','Total','Método de pago'],
   Insumos:['Fecha','Categoría','Producto','Cantidad','Tipo','Precio unitario','Costo total','Proveedor'],
@@ -140,9 +171,8 @@ const ALIAS = {'Corte deseado':'Categoría'};
 const CORTES_COCCION = ['Pierna','Nuca','Aldilla','Costilla','Buche','Maciza','Chamorro','Codillo'];
 const CORTES_CARNE = ['Surtido','Maciza','Pierna','Chamorro','Buche','Aldilla','Nuca','Costilla','Cuerito','No especificó'];
 
-let RAW = null;       // {Ventas:[...], ...}
-let FUENTE = '';
-let TAB = 'resumen';
+let RAW = null, FUENTE = '', TAB = 'resumen', FILTRO = null;
+let CURSOR = null;   // viernes de la semana elegida (semana y 4 semanas) o 'aaaa-mm' (mes)
 
 function kgCarne(r){
   if(r[2] !== 'Carne') return 0;
@@ -162,14 +192,12 @@ function normalizar(datos){
       return f;
     }).filter(r => /^\d{4}-\d{2}-\d{2}/.test(r[0]));
   });
-  // Ventas perdidas de la versión anterior guardaban el corte; se agrupan como Carne
   out.VentasPerdidas.forEach(r => { if(CORTES_CARNE.includes(r[1])) r[1] = 'Carne'; });
   return out;
 }
 
 /* ================= Fuentes ================= */
 function cfgServicio(){
-  // Si el tablero vive en el mismo sitio que la app, reutiliza su configuración
   try{
     const d = JSON.parse(localStorage.getItem('carnitas_dash_cfg')||'null');
     if(d && d.scriptUrl && d.key) return d;
@@ -228,47 +256,78 @@ async function leerExcel(file){
   return datos;
 }
 
-/* ================= Periodos ================= */
-function lunesDe(s){ const d = dow(s); return addDays(s, d===0 ? -6 : 1-d); }
+/* ================= Periodos (siempre semanas completas vie–jue) ================= */
+function ultimaSemana(){ const f = RAW.Ventas.map(r=>r[0].slice(0,10)).sort(); return semanaDe(f[f.length-1]); }
+function primeraSemana(){ const f = RAW.Ventas.map(r=>r[0].slice(0,10)).sort(); return semanaDe(f[0]); }
 
 function rango(){
-  const fechas = RAW.Ventas.map(r => r[0].slice(0,10)).sort();
-  const ult = fechas[fechas.length-1], pri = fechas[0];
   const p = document.getElementById('periodo').value;
   let a, b;
-  if(p==='semana'){ a = lunesDe(ult); b = addDays(a, 6); }
-  else if(p==='4sem'){ b = addDays(lunesDe(ult), 6); a = addDays(b, -27); }
-  else if(p==='mes'){ a = ult.slice(0,8)+'01'; const [y,m] = ult.split('-').map(Number); b = iso(new Date(y, m, 0)); }
-  else if(p==='mesant'){ const [y,m] = ult.split('-').map(Number); a = iso(new Date(y, m-2, 1)); b = iso(new Date(y, m-1, 0)); }
-  else if(p==='todo'){ a = pri; b = ult; }
+  if(p==='semana'){ a = CURSOR; b = addDays(a, 6); }
+  else if(p==='4sem'){ a = addDays(CURSOR, -21); b = addDays(CURSOR, 6); }
+  else if(p==='mes'){
+    // Semanas cuyo sábado cae en el mes elegido
+    const [y,m] = CURSOR.split('-').map(Number);
+    const primerSab = (()=>{ let d = `${CURSOR}-01`; while(dow(d)!==6) d = addDays(d,1); return d; })();
+    a = addDays(primerSab, -1);
+    let ult = primerSab; while(addDays(ult,7).slice(0,7)===CURSOR) ult = addDays(ult,7);
+    b = addDays(ult, 5);
+  }
+  else if(p==='todo'){ a = primeraSemana(); b = addDays(ultimaSemana(), 6); }
   else {
-    a = document.getElementById('desde').value || lunesDe(ult);
-    b = document.getElementById('hasta').value || ult;
-    if(a > b) [a, b] = [b, a];
+    let d = document.getElementById('desde').value || ultimaSemana();
+    let h = document.getElementById('hasta').value || addDays(ultimaSemana(), 6);
+    if(d > h) [d, h] = [h, d];
+    a = semanaDe(d); b = addDays(semanaDe(h), 6);
   }
   const largo = diffDays(a, b) + 1;
-  return {a, b, pa: addDays(a, -largo), pb: addDays(a, -1), largo};
+  return {a, b, pa: addDays(a, -largo), pb: addDays(a, -1), semanas: Math.round(largo/7)};
 }
 
+function semanasEntre(a, b){ const out = []; for(let s = semanaDe(a); s <= b; s = addDays(s, 7)) out.push(s); return out; }
 const enRango = (rows, a, b) => rows.filter(r => { const d = r[0].slice(0,10); return d >= a && d <= b; });
 
+function etiquetaRango(R){
+  const p = document.getElementById('periodo').value;
+  if(p==='mes'){ const [y,m] = CURSOR.split('-').map(Number); return `${MES_L[m-1]} ${y}`; }
+  return `vie ${corto(R.a)} – jue ${corto(R.b)}`;
+}
+
 /* ================= Métricas ================= */
+function pasaFiltro(r){
+  if(!FILTRO) return true;
+  return FILTRO.campo==='cat' ? r[2]===FILTRO.valor : r[3]===FILTRO.valor;
+}
+
 function metricas(a, b){
-  const V = enRango(RAW.Ventas, a, b);
-  const ventas = V.filter(r => r[2] !== 'Regalo');
-  const regalos = V.filter(r => r[2] === 'Regalo');
+  const V0 = enRango(RAW.Ventas, a, b);
+  const V = V0.filter(r => r[2] !== 'Regalo' && pasaFiltro(r));
+  const regalos = V0.filter(r => r[2] === 'Regalo');
   const I = enRango(RAW.Insumos, a, b), G = enRango(RAW.Gastos, a, b), S = enRango(RAW.Sueldos, a, b), P = enRango(RAW.VentasPerdidas, a, b);
-  const total = ventas.reduce((s,r)=>s+num(r[7]),0);
-  const tickets = new Set(ventas.map(r=>r[1]).filter(Boolean)).size;
-  const dias = [...new Set(ventas.map(r=>r[0].slice(0,10)))].sort();
-  const insCarne = I.filter(r=>r[1]==='Carne').reduce((s,r)=>s+num(r[6]),0);
-  const insOtros = I.filter(r=>r[1]!=='Carne').reduce((s,r)=>s+num(r[6]),0);
+  const total = V.reduce((s,r)=>s+num(r[7]),0);
+  const tickets = new Set(V.map(r=>r[1]).filter(Boolean)).size;
+  const dias = [...new Set(V.map(r=>r[0].slice(0,10)))].sort();
+  const carne = I.filter(r=>r[1]==='Carne').reduce((s,r)=>s+num(r[6]),0);
+  const otros = I.filter(r=>r[1]!=='Carne').reduce((s,r)=>s+num(r[6]),0);
   const sueldos = S.reduce((s,r)=>s+num(r[4]),0);
   const gastos = G.reduce((s,r)=>s+num(r[3]),0);
-  const utilidad = total - insCarne - insOtros - sueldos;
-  const kgVend = ventas.reduce((s,r)=>s+kgCarne(r),0);
+  const costos = carne + otros + gastos + sueldos;
+  const utilidad = total - costos;
+  const kgVend = V.reduce((s,r)=>s+kgCarne(r),0);
   const kgComp = I.filter(r=>r[1]==='Carne' && CORTES_COCCION.includes(r[2])).reduce((s,r)=>s+num(r[3]),0);
-  return {V: ventas, regalos, I, G, S, P, total, tickets, dias, insCarne, insOtros, sueldos, gastos, utilidad, kgVend, kgComp};
+  // Semanas con ventas pero sin insumos capturados
+  const semVenta = new Set(V0.filter(r=>r[2]!=='Regalo').map(r=>semanaDe(r[0].slice(0,10))));
+  const semIns = new Set(I.map(r=>semanaDe(r[0].slice(0,10))));
+  const sinCostos = [...semVenta].filter(s=>!semIns.has(s)).sort();
+  return {V, regalos, I, G, S, P, total, tickets, dias, carne, otros, gastos, sueldos, costos, utilidad, kgVend, kgComp, sinCostos};
+}
+
+function porSemana(a, b){
+  if(RAW.Ventas.length && a < primeraSemana()) a = primeraSemana();
+  return semanasEntre(a, b).map(s => {
+    const m = metricas(s, addDays(s, 6));
+    return {s, ...m, ok: m.I.length > 0};
+  });
 }
 
 function agrupar(rows, keyFn, valFn){
@@ -278,17 +337,21 @@ function agrupar(rows, keyFn, valFn){
 }
 
 /* ================= Componentes ================= */
-function delta(act, ant, invertir){
-  if(!(ant > 0)) return `<p class="d">Sin periodo anterior comparable</p>`;
+function delta(act, ant, txt, invertir){
+  if(!(ant > 0) || !isFinite(act)) return `<p class="d">Sin ${txt||'periodo anterior'} comparable</p>`;
   const p = act/ant - 1; const bueno = invertir ? p <= 0 : p >= 0;
-  return `<p class="d ${bueno?'up':'down'}">${p>=0?'▲':'▼'} ${Math.abs(p*100).toFixed(1)}% vs periodo anterior</p>`;
+  return `<p class="d ${bueno?'up':'down'}">${p>=0?'▲':'▼'} ${Math.abs(p*100).toFixed(1)}% vs ${txt||'periodo anterior'}</p>`;
 }
 
-function barras(lista, total, max){
-  const m = max || Math.max(...lista.map(x=>x[1]), 1);
-  return lista.map(([n,v]) => `<div class="row" data-tip="${esc(n)} · ${MXN(v)}${total?` · ${PCT(v/total,1)}`:''}">
+function barras(lista, total, clic){
+  const m = Math.max(...lista.map(x=>x[1]), 1);
+  return lista.map(([n,v]) => {
+    const sel = FILTRO && FILTRO.valor===n;
+    const on = clic && n!=='Otros' ? ` onclick="filtrar('${clic}','${jsq(n)}')"` : '';
+    return `<div class="row ${on?'clic':''} ${sel?'sel':''}"${on} data-tip="${esc(n)} · ${MXN(v)}${total?` · ${PCT(v/total,1)}`:''}">
     <span class="n">${esc(n)}</span><span class="b"><i style="width:${Math.max(0.5, v/m*100).toFixed(1)}%"></i></span>
-    <span class="v">${MXN(v)}${total?` <span style="color:var(--muted)">${PCT(v/total)}</span>`:''}</span></div>`).join('') || '<p class="note">Sin datos en el periodo</p>';
+    <span class="v">${MXN(v)}${total?` <span style="color:var(--muted)">${PCT(v/total)}</span>`:''}</span></div>`;
+  }).join('') || '<p class="note">Sin datos en el periodo</p>';
 }
 
 function topN(lista, n){
@@ -297,13 +360,19 @@ function topN(lista, n){
   return lista.slice(0,n).concat([['Otros', resto]]);
 }
 
-/* Columnas verticales con línea de promedio; data-tip por barra */
+function rr(x, y, w, h, r){
+  if(h <= 0) return '';
+  r = Math.min(r, w/2, h);
+  return `M${x},${y+h} V${y+r} Q${x},${y} ${x+r},${y} H${x+w-r} Q${x+w},${y} ${x+w},${y+r} V${y+h} Z`;
+}
+
+/* Columnas simples con línea de promedio */
 function columnas(puntos, opt){
   opt = opt || {};
   if(!puntos.length) return '<p class="note">Sin datos en el periodo</p>';
   const W = 640, H = 190, top = 22, bot = 26, n = puntos.length;
   const gap = n > 20 ? 2 : 6, bw = (W - gap*(n-1))/n;
-  const max = Math.max(...puntos.map(p=>p.v), 1) * 1.08;
+  const max = Math.max(...puntos.map(p=>p.v), 1) * 1.1;
   const y = v => top + (H - top - bot) * (1 - v/max);
   const prom = puntos.reduce((s,p)=>s+p.v,0)/n;
   const imax = puntos.reduce((b,p,i)=>p.v>puntos[b].v?i:b,0);
@@ -311,10 +380,9 @@ function columnas(puntos, opt){
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(opt.aria||'Gráfica')}">`;
   s += `<line x1="0" x2="${W}" y1="${H-bot}" y2="${H-bot}" stroke="var(--line)"/>`;
   puntos.forEach((p,i) => {
-    const x = i*(bw+gap), yy = y(p.v), h = Math.max(p.v>0?2:0, H-bot-yy);
-    const r = Math.min(4, bw/2);
+    const x = i*(bw+gap), yy = y(p.v);
     s += `<g data-tip="${esc(p.tip||p.label)} · ${MXN(p.v)}"><rect x="${x}" y="${top}" width="${bw}" height="${H-bot-top}" fill="transparent"/>`;
-    s += `<path d="M${x},${H-bot} V${yy+r} Q${x},${yy} ${x+r},${yy} H${x+bw-r} Q${x+bw},${yy} ${x+bw},${yy+r} V${H-bot} Z" fill="${i===imax?'var(--accent)':'var(--mark)'}"/></g>`;
+    s += `<path d="${rr(x, yy, bw, H-bot-yy, 4)}" fill="${i===imax?'var(--accent)':'var(--mark)'}"/></g>`;
     if(i===imax) s += `<text x="${x+bw/2}" y="${yy-6}" text-anchor="middle" font-size="11" font-weight="500" fill="var(--ink)">${K(p.v)}</text>`;
     if(i%cada===0 || i===n-1) s += `<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${esc(p.label)}</text>`;
   });
@@ -325,127 +393,299 @@ function columnas(puntos, opt){
   return s + '</svg>';
 }
 
+/* Venta y utilidad por semana: dos barras por semana, margen arriba */
+function ventaUtilidad(sem, R){
+  if(!sem.length) return '<p class="note">Sin datos</p>';
+  const W = 640, H = 200, top = 26, bot = 28, n = sem.length, gg = 10;
+  const grp = (W - gg*(n-1))/n, bw = Math.min(26, (grp-4)/2);
+  const max = Math.max(...sem.map(x=>x.total), 1) * 1.1;
+  const y = v => top + (H - top - bot) * (1 - Math.max(v,0)/max);
+  const base = H - bot;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Venta y utilidad por semana">`;
+  s += `<line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="var(--line)"/>`;
+  const cada = Math.ceil(n/12);
+  sem.forEach((x,i) => {
+    const cx = i*(grp+gg) + grp/2, en = x.s >= R.a && x.s <= R.b;
+    const op = en ? 1 : 0.45;
+    s += `<g opacity="${op}" data-tip="Semana vie ${corto(x.s)} · Venta ${MXN(x.total)}${x.ok?` · Utilidad ${MXN(x.utilidad)} · Margen ${x.total?PCT(x.utilidad/x.total,1):'—'}`:' · sin insumos capturados'}">
+      <rect x="${cx-bw-2}" y="${top-10}" width="${bw*2+4}" height="${base-top+10}" fill="transparent"/>
+      <path d="${rr(cx-bw-1, y(x.total), bw, base-y(x.total), 3)}" fill="var(--mark2)"/>`;
+    if(x.ok){
+      s += `<path d="${rr(cx+1, y(x.utilidad), bw, base-y(x.utilidad), 3)}" fill="${en && document.getElementById('periodo').value==='semana' ? 'var(--accent)' : 'var(--mark)'}"/>`;
+      s += `<text x="${cx}" y="${y(x.total)-6}" text-anchor="middle" font-size="10" font-weight="500" fill="var(--ink)">${x.total?PCT(x.utilidad/x.total):''}</text>`;
+    } else {
+      s += `<text x="${cx}" y="${y(x.total)-6}" text-anchor="middle" font-size="10" fill="var(--down)">sin costos</text>`;
+    }
+    s += `</g>`;
+    if(i%cada===0 || i===n-1) s += `<text x="${cx}" y="${H-9}" text-anchor="middle" font-size="10" fill="var(--muted)">${corto(x.s)}</text>`;
+  });
+  return s + `</svg><div class="lgs"><span><span class="sw" style="background:var(--mark2)"></span> Venta</span><span><span class="sw" style="background:var(--mark)"></span> Utilidad</span><span>% = margen de la semana</span></div>`;
+}
+
+/* Cascada: de la venta a la utilidad */
+function cascada(m){
+  const pasos = [['Venta', m.total], ['Carne', -m.carne], ['Otros insumos', -m.otros], ['Gastos', -m.gastos], ['Sueldos', -m.sueldos]];
+  const W = 420, H = 190, top = 20, bot = 26, n = 6, gap = 12, bw = (W - gap*(n-1))/n;
+  const max = Math.max(m.total, 1) * 1.05, min = Math.min(0, m.utilidad);
+  const y = v => top + (H - top - bot) * (max - v)/(max - min);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="De la venta a la utilidad">`;
+  s += `<line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)"/>`;
+  let nivel = 0;
+  pasos.forEach(([t, v], i) => {
+    const x = i*(bw+gap);
+    const a0 = i===0 ? 0 : nivel, a1 = i===0 ? v : nivel + v;
+    nivel = a1;
+    const y1 = y(Math.max(a0,a1)), y2 = y(Math.min(a0,a1));
+    s += `<g data-tip="${t} · ${MXN(v)}"><rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(1,y2-y1)}" rx="3" fill="${i===0?'var(--mark2)':'var(--neg)'}"/>
+      <text x="${x+bw/2}" y="${y1-5}" text-anchor="middle" font-size="10" fill="var(--ink)">${i===0||v===0?'':'−'}${K(Math.abs(v))}</text></g>
+      <text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${t}</text>`;
+  });
+  const x = 5*(bw+gap), u = m.utilidad, y1 = y(Math.max(0,u)), y2 = y(Math.min(0,u));
+  s += `<g data-tip="Utilidad · ${MXN(u)}"><rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(1,y2-y1)}" rx="3" fill="${u>=0?'var(--accent)':'var(--down)'}"/>
+    <text x="${x+bw/2}" y="${y1-5}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">${K(u)}</text></g>
+    <text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--ink)">Utilidad</text>`;
+  return s + '</svg>';
+}
+
+/* Líneas multiserie (máx. 5 series) con etiqueta al final */
+function lineas(xs, series, fmtV, aria){
+  if(!xs.length || !series.length) return '<p class="note">Sin datos en el periodo</p>';
+  const W = 1100, H = 240, top = 14, bot = 26, left = 30, right = 130;
+  const vals = series.flatMap(s=>s.v.filter(v=>v!=null));
+  if(!vals.length) return '<p class="note">Sin datos en el periodo</p>';
+  let mn = Math.min(...vals), mx = Math.max(...vals); const pad0 = (mx-mn)*0.15 || mx*0.1 || 1; mn -= pad0; mx += pad0;
+  const X = i => left + (xs.length===1 ? (W-left-right)/2 : i*(W-left-right)/(xs.length-1));
+  const Y = v => top + (H-top-bot)*(1-(v-mn)/(mx-mn));
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(aria)}">`;
+  s += `<line x1="${left}" x2="${W-right}" y1="${H-bot}" y2="${H-bot}" stroke="var(--line)"/>`;
+  const cada = Math.ceil(xs.length/10);
+  xs.forEach((x,i)=>{ if(i%cada===0 || i===xs.length-1) s += `<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${esc(x)}</text>`; });
+  const fin = [];
+  series.forEach((se, k) => {
+    const col = `var(--s${k+1})`;
+    let d = ''; let pen = false;
+    se.v.forEach((v,i)=>{ if(v==null){ pen = false; return; } d += `${pen?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)} `; pen = true; });
+    s += `<path d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    se.v.forEach((v,i)=>{ if(v==null) return;
+      s += `<g data-tip="${esc(se.nombre)} · ${esc(xs[i])} · ${fmtV(v)}"><circle cx="${X(i)}" cy="${Y(v)}" r="10" fill="transparent"/><circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${col}" stroke="var(--card)" stroke-width="2"/></g>`; });
+    const li = se.v.map((v,i)=>v==null?-1:i).filter(i=>i>=0).pop();
+    if(li!=null && li>=0) fin.push({y: Y(se.v[li]), x: X(li), t: `${se.nombre} ${fmtV(se.v[li])}`, col});
+  });
+  // Etiquetas al final sin encimarse
+  fin.sort((a,b)=>a.y-b.y); for(let i=1;i<fin.length;i++) if(fin[i].y - fin[i-1].y < 12) fin[i].y = fin[i-1].y + 12;
+  fin.forEach(f=>{ s += `<text x="${W-right+8}" y="${f.y+4}" font-size="10" fill="var(--ink2)"><tspan fill="${f.col}">●</tspan> ${esc(f.t)}</text>`; });
+  return s + '</svg>' + `<div class="lgs">${series.map((se,k)=>`<span><span class="sw" style="background:var(--s${k+1})"></span> ${esc(se.nombre)}</span>`).join('')}</div>`;
+}
+
+/* Barras apiladas por semana (costos) */
+function apiladas(sem, capas){
+  if(!sem.length) return '<p class="note">Sin datos</p>';
+  const W = 640, H = 200, top = 16, bot = 26, n = sem.length, gap = n>16?3:8, bw = (W-gap*(n-1))/n;
+  const tot = sem.map(x=>capas.reduce((s,c)=>s+x[c.k],0));
+  const max = Math.max(...tot, 1)*1.08;
+  const Y = v => (H-top-bot)*(v/max);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Costo por semana">`;
+  s += `<line x1="0" x2="${W}" y1="${H-bot}" y2="${H-bot}" stroke="var(--line)"/>`;
+  const cada = Math.ceil(n/12);
+  sem.forEach((x,i)=>{
+    let yb = H-bot; const xx = i*(bw+gap);
+    s += `<g data-tip="vie ${corto(x.s)} · ${capas.map(c=>`${c.n} ${MXN(x[c.k])}`).join(' · ')} · Total ${MXN(tot[i])}"><rect x="${xx}" y="${top}" width="${bw}" height="${H-bot-top}" fill="transparent"/>`;
+    capas.forEach((c,k)=>{ const h = Y(x[c.k]); if(h<=0) return; yb -= h; s += `<rect x="${xx}" y="${yb}" width="${bw}" height="${Math.max(0,h-2)}" fill="var(--s${k+1})"/>`; });
+    s += `</g>`;
+    if(tot[i]===0) s += `<text x="${xx+bw/2}" y="${H-bot-6}" text-anchor="middle" font-size="9" fill="var(--down)">sin datos</text>`;
+    if(i%cada===0 || i===n-1) s += `<text x="${xx+bw/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${corto(x.s)}</text>`;
+  });
+  return s + `</svg><div class="lgs">${capas.map((c,k)=>`<span><span class="sw" style="background:var(--s${k+1})"></span> ${c.n}</span>`).join('')}</div>`;
+}
+
+/* Mapa de calor día × hora */
+function mapaCalor(m){
+  const rows = m.V; if(!rows.length) return '<p class="note">Sin datos</p>';
+  const cel = {}, dias = new Set(), horas = new Set();
+  rows.forEach(r=>{ const d = dow(r[0].slice(0,10)), h = parseInt(r[0].slice(11,13),10); if(!isFinite(h)) return;
+    dias.add(d); horas.add(h); const k = d+'_'+h; cel[k] = (cel[k]||0) + num(r[7]); });
+  const orden = [5,6,0,1,2,3,4].filter(d=>dias.has(d));
+  const hs = [...horas].sort((a,b)=>a-b); if(!hs.length) return '<p class="note">Sin hora registrada</p>';
+  const lista = []; for(let h=hs[0]; h<=hs[hs.length-1]; h++) lista.push(h);
+  const max = Math.max(...Object.values(cel), 1);
+  const cw = 44, ch = 30, lw = 60, W = lw + lista.length*cw, H = 20 + orden.length*ch;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W*1.4}px" role="img" aria-label="Venta por día y hora">`;
+  lista.forEach((h,i)=>{ s += `<text x="${lw+i*cw+cw/2}" y="12" text-anchor="middle" font-size="10" fill="var(--muted)">${h}:00</text>`; });
+  orden.forEach((d,j)=>{
+    s += `<text x="0" y="${20+j*ch+ch/2+4}" font-size="11" fill="var(--ink2)">${DIAS_L[d]}</text>`;
+    lista.forEach((h,i)=>{ const v = cel[d+'_'+h]||0, a = v ? 0.12 + 0.88*(v/max) : 0;
+      s += `<g data-tip="${DIAS_L[d]} ${h}:00 · ${MXN(v)}"><rect x="${lw+i*cw+1}" y="${20+j*ch+1}" width="${cw-2}" height="${ch-2}" rx="4" fill="${v?'var(--accent)':'var(--track)'}" fill-opacity="${v?a.toFixed(2):1}"/>
+      ${v/max>0.55?`<text x="${lw+i*cw+cw/2}" y="${20+j*ch+ch/2+4}" text-anchor="middle" font-size="9" fill="#fff">${K(v)}</text>`:''}</g>`; });
+  });
+  return s + '</svg><p class="note">Más oscuro = más venta. Suma de todo el periodo.</p>';
+}
+
 function pagos(m){
   const COL = {Efectivo:'var(--mark)', Tarjeta:'var(--accent)', Transferencia:'var(--mark2)'};
   const l = agrupar(m.V, r=>r[8]||'Sin método', r=>num(r[7]));
   if(!l.length) return '<p class="note">Sin datos</p>';
-  return `<div class="stack">${l.map(([k,v])=>`<span data-tip="${esc(k)} · ${MXN(v)}" style="width:${(v/m.total*100).toFixed(2)}%;background:${COL[k]||'var(--mark3)'}"></span>`).join('')}</div>` +
-    l.map(([k,v])=>`<div class="lg"><span class="sw" style="background:${COL[k]||'var(--mark3)'}"></span><span style="flex:1">${esc(k)}</span><span>${MXN(v)} · ${PCT(v/m.total)}</span></div>`).join('');
+  return `<div class="stack">${l.map(([k,v])=>`<span data-tip="${esc(k)} · ${MXN(v)}" style="width:${(v/m.total*100).toFixed(2)}%;background:${COL[k]||'var(--muted)'}"></span>`).join('')}</div>` +
+    l.map(([k,v])=>`<div class="lg"><span class="sw" style="background:${COL[k]||'var(--muted)'}"></span><span style="flex:1">${esc(k)}</span><span>${MXN(v)} · ${PCT(v/m.total)}</span></div>`).join('');
+}
+
+function avisoCostos(m){
+  if(FILTRO || !m.sinCostos.length) return '';
+  return `<div class="aviso"><b>Costos incompletos:</b> ${m.sinCostos.length===1?'la semana':'las semanas'} del ${m.sinCostos.map(s=>`vie ${corto(s)}`).join(', ')} ${m.sinCostos.length===1?'tiene':'tienen'} ventas pero no insumos capturados. La utilidad de ${m.sinCostos.length===1?'esa semana':'esas semanas'} no es confiable hasta que se registren.</div>`;
+}
+
+/* ================= Qué revisar ================= */
+function queRevisar(m, ant, R){
+  const out = [];
+  const sem = porSemana(addDays(R.b, -27), R.b).filter(x=>x.ok && x.total>0);
+  if(!FILTRO && m.I.length && m.total>0){
+    const mg = m.utilidad/m.total;
+    if(sem.length >= 2){
+      const prom = sem.reduce((s,x)=>s+x.utilidad/x.total,0)/sem.length;
+      const dif = (mg - prom)*100;
+      if(Math.abs(dif) >= 3) out.push(`El margen del periodo (<b>${PCT(mg,1)}</b>) está ${dif>0?'arriba':'abajo'} de tu promedio de las últimas 4 semanas (${PCT(prom,1)}) por <b>${Math.abs(dif).toFixed(1)} puntos</b>.`);
+    }
+    const pctCarne = m.carne/m.total;
+    if(pctCarne > 0.55) out.push(`La carne se lleva el <b>${PCT(pctCarne)}</b> de la venta. Revisa precios de compra o de venta.`);
+  }
+  // Precio de compra por corte vs periodo anterior
+  const precio = I => { const o = {}; I.filter(r=>r[1]==='Carne' && CORTES_COCCION.includes(r[2])).forEach(r=>{ o[r[2]] = o[r[2]] || {kg:0,c:0}; o[r[2]].kg += num(r[3]); o[r[2]].c += num(r[6]); }); return o; };
+  const pa = precio(m.I), pb = precio(ant.I);
+  Object.keys(pa).forEach(k=>{ if(pb[k] && pa[k].kg && pb[k].kg){ const a1 = pa[k].c/pa[k].kg, b1 = pb[k].c/pb[k].kg, d = a1/b1-1;
+    if(Math.abs(d) >= 0.05) out.push(`${d>0?'Subió':'Bajó'} el precio de compra de <b>${esc(k)}</b> ${Math.abs(d*100).toFixed(0)}% (${MXN(b1)} → ${MXN(a1)} por kilo).`); } });
+  const ef = m.V.filter(r=>r[8]==='Efectivo').reduce((s,r)=>s+num(r[7]),0);
+  if(m.total && ef/m.total > 0.85) out.push(`El <b>${PCT(ef/m.total)}</b> se cobra en efectivo: cuadra la caja al cierre de cada día.`);
+  const prods = agrupar(m.V, r=>r[3], r=>num(r[7]));
+  if(prods.length && m.total && prods[0][1]/m.total > 0.5) out.push(`<b>${esc(prods[0][0])}</b> hace el ${PCT(prods[0][1]/m.total)} de la venta: que nunca falte.`);
+  if(m.P.length) out.push(`Se registraron <b>${m.P.length} ventas perdidas</b>${(()=>{ const c = agrupar(m.P, r=>r[1], ()=>1)[0]; return c ? `, sobre todo de ${esc(c[0])}` : ''; })()}.`);
+  if(m.sinCostos.length && !FILTRO) out.push(`Faltan insumos de ${m.sinCostos.length} semana${m.sinCostos.length>1?'s':''}; captúralos para ver la utilidad real.`);
+  return out.length ? `<ul class="insights">${out.slice(0,5).map(x=>`<li>${x}</li>`).join('')}</ul>` : '<p class="note">Todo en orden en este periodo.</p>';
 }
 
 /* ================= Vistas ================= */
 function vResumen(m, ant, R){
   const margen = m.total ? m.utilidad/m.total : 0;
-  const porDia = m.dias.length ? m.total/m.dias.length : 0;
-  const porDiaAnt = ant.dias.length ? ant.total/ant.dias.length : 0;
-  const puntos = m.dias.map(d => ({label:`${DIAS[dow(d)]} ${corto(d)}`, tip:`${DIAS[dow(d)]} ${corto(d)}`, v: m.V.filter(r=>r[0].startsWith(d)).reduce((s,r)=>s+num(r[7]),0)}));
+  const costosOk = !FILTRO && m.I.length > 0;
+  const semVentana = porSemana(document.getElementById('periodo').value==='semana' ? addDays(R.a, -7*7) : R.a, R.b);
+  const ult4 = porSemana(addDays(R.b, -27), R.b).filter(x=>x.ok && x.total>0);
+  const prom4 = ult4.length ? ult4.reduce((s,x)=>s+x.utilidad/x.total,0)/ult4.length : null;
   const cats = topN(agrupar(m.V, r=>r[2]||'Sin categoría', r=>num(r[7])), 5);
-  const prods = agrupar(m.V, r=>r[3]||'-', r=>num(r[7])).slice(0,6);
+  const porDow = [6,0].map(d=>{ const dd = m.dias.filter(x=>dow(x)===d); const t = m.V.filter(r=>dd.includes(r[0].slice(0,10))).reduce((s,r)=>s+num(r[7]),0); return [DIAS_L[d] + (dd.length>1?` (prom. ${dd.length} días)`:''), dd.length ? t/dd.length : 0]; }).filter(x=>x[1]>0);
+  const pico = agrupar(m.V.filter(r=>r[0].length>12), r=>`${DIAS_L[dow(r[0].slice(0,10))]} ${parseInt(r[0].slice(11,13),10)}:00`, r=>num(r[7]))[0];
   return `
+  ${avisoCostos(m)}
   <div class="kpis">
     <div class="kpi hl"><p class="l">Ventas</p><p class="v">${MXN(m.total)}</p>${delta(m.total, ant.total)}</div>
-    <div class="kpi"><p class="l">Utilidad operativa</p><p class="v">${m.insCarne>0 ? MXN(m.utilidad) : '—'}</p>${m.insCarne>0 ? `<p class="d">Margen ${PCT(margen)}</p>` : `<p class="d down">Sin compras de carne capturadas en el periodo</p>`}</div>
+    <div class="kpi"><p class="l">Utilidad</p><p class="v">${costosOk ? MXN(m.utilidad) : '—'}</p>${costosOk ? delta(m.utilidad, ant.I.length ? ant.utilidad : 0) : `<p class="d">${FILTRO ? 'Quita el filtro para verla' : 'Faltan insumos capturados'}</p>`}</div>
+    <div class="kpi"><p class="l">Margen</p><p class="v">${costosOk ? PCT(margen,1) : '—'}</p><p class="d">${prom4!=null ? `Promedio 4 semanas: ${PCT(prom4,1)}` : 'Sin promedio de 4 semanas'}</p></div>
     <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${MXN(m.tickets ? m.total/m.tickets : 0)}</p><p class="d">${m.tickets.toLocaleString('es-MX')} tickets</p></div>
-    <div class="kpi"><p class="l">Venta por día operado</p><p class="v">${MXN(porDia)}</p>${delta(porDia, porDiaAnt)}</div>
   </div>
+  <div class="card" style="margin-bottom:12px"><h3>Qué revisar</h3>${queRevisar(m, ant, R)}</div>
   <div class="g2">
-    <div class="card"><h3>Venta por día de operación <small>${m.dias.length} días</small></h3>${columnas(puntos, {aria:'Venta por día'})}</div>
-    <div class="card"><h3>Mezcla por categoría</h3>${barras(cats, m.total)}</div>
+    <div class="card"><h3>Venta y utilidad por semana <small>${document.getElementById('periodo').value==='semana' ? 'últimas 8 semanas, resaltada la elegida' : semVentana.length+' semanas'}</small></h3>${ventaUtilidad(semVentana, R)}</div>
+    <div class="card"><h3>De la venta a la utilidad</h3>${FILTRO ? '<p class="note">Quita el filtro para ver la utilidad.</p>' : cascada(m)}</div>
   </div>
-  <div class="g2">
-    <div class="card"><h3>Productos principales</h3>
-      <table><tr><th>Producto</th><th class="r">Venta</th><th class="r">% del total</th></tr>
-      ${prods.map(([p,v])=>`<tr><td>${esc(p)}</td><td class="r">${MXN(v)}</td><td class="r">${PCT(v/m.total,1)}</td></tr>`).join('')}</table>
-      <p class="note">El Surtido se registra repartido en sus cortes (Pierna, Buche, Nuca, Aldilla, Costilla).</p></div>
-    <div class="card"><h3>Método de pago</h3>${pagos(m)}</div>
+  <div class="g3">
+    <div class="card"><h3>Mezcla por categoría <small>clic para filtrar</small></h3>${barras(cats, m.total, 'cat')}</div>
+    <div class="card"><h3>Sábado vs domingo</h3>${barras(porDow, 0)}${pico ? `<p class="note">Hora pico: ${esc(pico[0])} · ${MXN(pico[1])}</p>` : ''}</div>
+    <div class="card"><h3>Cómo se cobró</h3>${pagos(m)}</div>
   </div>
-  ${avisoCostos(m)}
-  <p class="note">Utilidad operativa = ventas − insumos − sueldos. Los gastos (Oxxo, comida, postres) se ven aparte en Costos. Comparación contra ${corto(R.pa)} – ${corto(R.pb)}.</p>`;
+  <p class="note">Semana del negocio: viernes a jueves. Utilidad = ventas − carne − otros insumos − gastos − sueldos. Comparación contra vie ${corto(R.pa)} – jue ${corto(R.pb)}.</p>`;
 }
 
-function avisoCostos(m){
-  const falta = [];
-  if(m.total>0 && !m.I.length) falta.push('insumos');
-  if(m.total>0 && !m.S.length) falta.push('sueldos');
-  if(!falta.length) return '';
-  return `<div class="card" style="border-color:var(--down);margin-bottom:12px"><p style="margin:0;font-size:13px"><b style="font-weight:500;color:var(--down)">Costos incompletos:</b> hay ventas en este periodo pero no hay ${falta.join(' ni ')} capturados. La utilidad no es confiable hasta que se registren.</p></div>`;
-}
-
-function semanasSinCostos(){
-  const sem = new Set(RAW.Ventas.map(r=>lunesDe(r[0].slice(0,10))));
-  const conIns = new Set(RAW.Insumos.map(r=>lunesDe(r[0].slice(0,10))));
-  return [...sem].filter(s=>!conIns.has(s)).sort();
-}
-
-function vVentas(m){
-  // Venta promedio por hora (sobre los días operados)
+function vVentas(m, ant){
   const porHora = {}; m.V.forEach(r=>{ const h = parseInt(r[0].slice(11,13),10); if(isFinite(h)) porHora[h] = (porHora[h]||0) + num(r[7]); });
   const hs = Object.keys(porHora).map(Number).sort((a,b)=>a-b);
   const nd = Math.max(m.dias.length, 1);
   const pH = hs.length ? Array.from({length: hs[hs.length-1]-hs[0]+1}, (_,i)=>hs[0]+i).map(h=>({label:`${h}:00`, v:(porHora[h]||0)/nd})) : [];
-  // Sábado vs domingo
-  const dsem = [6,0].map(d => {
-    const dd = m.dias.filter(x=>dow(x)===d); const rs = m.V.filter(r=>dd.includes(r[0].slice(0,10)));
-    const t = rs.reduce((s,r)=>s+num(r[7]),0), tk = new Set(rs.map(r=>r[1])).size;
-    return {n: d===6?'Sábado':'Domingo', dias: dd.length, prom: dd.length ? t/dd.length : 0, tk: dd.length ? tk/dd.length : 0, tp: tk ? t/tk : 0};
-  });
-  // Por producto
+  // Ranking con regla 80/20
   const prod = new Map();
-  m.V.forEach(r=>{ const k = r[3]||'-'; const o = prod.get(k) || {cat:r[2], v:0, kg:0, pz:0}; o.v += num(r[7]); o.kg += kgCarne(r); if(r[4]==='Piezas'||!r[4] && r[2]!=='Carne') o.pz += num(r[5]); prod.set(k,o); });
+  m.V.forEach(r=>{ const k = r[3]||'-'; const o = prod.get(k) || {cat:r[2], v:0, kg:0, pz:0}; o.v += num(r[7]); o.kg += kgCarne(r); if(r[4]==='Piezas' || (!r[4] && r[2]!=='Carne')) o.pz += num(r[5]); prod.set(k,o); });
   const prods = [...prod.entries()].sort((a,b)=>b[1].v-a[1].v);
+  let acum = 0, corte = -1;
+  prods.forEach(([p,o],i)=>{ acum += o.v; o.acum = m.total ? acum/m.total : 0; if(corte<0 && o.acum>=0.8) corte = i; });
+  // Tickets
+  const tk = new Map(); m.V.forEach(r=>{ const o = tk.get(r[1]) || {f:r[0], n:0, t:0, p:r[8]}; o.n++; o.t += num(r[7]); tk.set(r[1], o); });
+  const tks = [...tk.values()];
+  const lineas = tks.length ? tks.reduce((s,x)=>s+x.n,0)/tks.length : 0;
+  const grandes = tks.slice().sort((a,b)=>b.t-a.t).slice(0,5);
   // Ventas perdidas
   const vp = new Map();
   m.P.forEach(r=>{ const k = r[1]||'Sin categoría'; const o = vp.get(k) || {n:0, kg:0, mt:0, pz:0}; o.n++; o.kg += num(r[2]); o.mt += num(r[4]); o.pz += num(r[5]); vp.set(k,o); });
   const regalo = m.regalos.reduce((s,r)=>s+num(r[5]),0);
   return `
+  <div class="kpis">
+    <div class="kpi hl"><p class="l">Ventas</p><p class="v">${MXN(m.total)}</p>${delta(m.total, ant.total)}</div>
+    <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${MXN(m.tickets ? m.total/m.tickets : 0)}</p>${delta(m.tickets ? m.total/m.tickets : 0, ant.tickets ? ant.total/ant.tickets : 0)}</div>
+    <div class="kpi"><p class="l">Productos por ticket</p><p class="v">${lineas.toFixed(1)}</p><p class="d">${m.tickets} tickets</p></div>
+    <div class="kpi"><p class="l">Carne vendida</p><p class="v">${m.kgVend.toFixed(1)} kg</p>${delta(m.kgVend, ant.kgVend)}</div>
+  </div>
   <div class="g2">
+    <div class="card"><h3>Venta por día y hora</h3>${mapaCalor(m)}</div>
     <div class="card"><h3>Venta promedio por hora <small>por día operado</small></h3>${columnas(pH, {aria:'Venta por hora', promedio:false})}</div>
-    <div class="card"><h3>Sábado vs domingo <small>promedio por día</small></h3>
-      <table><tr><th></th><th class="r">Días</th><th class="r">Venta</th><th class="r">Tickets</th><th class="r">Ticket prom.</th></tr>
-      ${dsem.map(d=>`<tr><td>${d.n}</td><td class="r">${d.dias}</td><td class="r">${MXN(d.prom)}</td><td class="r">${d.tk.toFixed(0)}</td><td class="r">${MXN(d.tp)}</td></tr>`).join('')}</table>
-      <h3 style="margin-top:22px">Ventas perdidas <small>${m.P.length} registros</small></h3>
+  </div>
+  <div class="card" style="margin-bottom:12px"><h3>Ranking de productos <small>${corte>=0 ? `${corte+1} de ${prods.length} productos hacen el 80% de la venta · clic para filtrar` : 'clic para filtrar'}</small></h3>
+    <table><tr><th>#</th><th>Producto</th><th>Categoría</th><th class="r">Kilos</th><th class="r">Piezas</th><th class="r">Venta</th><th class="r">%</th><th class="r">% acumulado</th></tr>
+    ${prods.map(([p,o],i)=>`<tr class="clic ${i===corte?'corte':''}" onclick="filtrar('prod','${jsq(p)}')"><td style="color:var(--muted)">${i+1}</td><td>${esc(p)}</td><td style="color:var(--ink2)">${esc(o.cat)}</td><td class="r">${o.kg?o.kg.toFixed(1):'–'}</td><td class="r">${o.pz?(+o.pz.toFixed(1)).toLocaleString('es-MX'):'–'}</td><td class="r">${MXN(o.v)}</td><td class="r">${PCT(m.total?o.v/m.total:0,1)}</td><td class="r">${PCT(o.acum,0)}</td></tr>`).join('')}</table>
+    ${corte>=0?'<p class="note">La línea naranja marca dónde se alcanza el 80% de la venta.</p>':''}</div>
+  <div class="g2e">
+    <div class="card"><h3>Tickets más grandes</h3>
+      <table><tr><th>Fecha</th><th class="r">Productos</th><th class="r">Total</th><th>Pago</th></tr>
+      ${grandes.map(x=>`<tr><td>${DIAS[dow(x.f.slice(0,10))]} ${corto(x.f.slice(0,10))} ${esc(x.f.slice(11,16))}</td><td class="r">${x.n}</td><td class="r">${MXN(x.t)}</td><td>${esc(x.p)}</td></tr>`).join('')}</table></div>
+    <div class="card"><h3>Ventas perdidas <small>${m.P.length} registros</small></h3>
       ${vp.size ? `<table><tr><th>Categoría</th><th class="r">Veces</th><th class="r">Kilos</th><th class="r">Piezas</th><th class="r">Monto</th></tr>
       ${[...vp.entries()].sort((a,b)=>b[1].n-a[1].n).map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.n}</td><td class="r">${o.kg?o.kg.toFixed(2):'–'}</td><td class="r">${o.pz||'–'}</td><td class="r">${o.mt?MXN(o.mt):'–'}</td></tr>`).join('')}</table>` : '<p class="note">Sin ventas perdidas en el periodo</p>'}
-      ${regalo ? `<p class="note">Tacos regalados en el periodo: ${regalo}</p>` : ''}
-    </div>
-  </div>
-  <div class="card"><h3>Detalle por producto</h3>
-    <table><tr><th>Producto</th><th>Categoría</th><th class="r">Kilos</th><th class="r">Piezas</th><th class="r">Venta</th><th class="r">%</th></tr>
-    ${prods.map(([p,o])=>`<tr><td>${esc(p)}</td><td style="color:var(--ink2)">${esc(o.cat)}</td><td class="r">${o.kg?o.kg.toFixed(1):'–'}</td><td class="r">${o.pz?o.pz.toLocaleString('es-MX'):'–'}</td><td class="r">${MXN(o.v)}</td><td class="r">${PCT(o.v/m.total,1)}</td></tr>`).join('')}</table>
+      ${regalo ? `<p class="note">Tacos regalados en el periodo: ${regalo}</p>` : ''}</div>
   </div>`;
 }
 
-function vCostos(m){
-  const neto = m.utilidad - m.gastos;
+function vCostos(m, ant, R){
+  const sem = porSemana(document.getElementById('periodo').value==='semana' ? addDays(R.a, -7*7) : R.a, R.b);
+  const nSem = Math.max(R.semanas, 1);
   const rend = m.kgComp ? m.kgVend/m.kgComp : 0;
-  const insCat = agrupar(m.I, r=>r[1]||'Otros', r=>num(r[6]));
-  const cortes = new Map();
-  m.I.filter(r=>r[1]==='Carne').forEach(r=>{ const o = cortes.get(r[2]) || {kg:0, c:0}; o.kg += num(r[3]); o.c += num(r[6]); cortes.set(r[2], o); });
+  const costoKg = m.kgVend ? m.carne/m.kgVend : 0, costoKgAnt = ant.kgVend ? ant.carne/ant.kgVend : 0;
+  // Punto de equilibrio semanal: la carne es costo variable (proporcional a la venta); lo demás es fijo por semana
+  const semOk = sem.filter(x=>x.ok && x.total>0 && x.s>=R.a && x.s<=R.b);
+  let pe = null, ventaProm = null;
+  if(semOk.length){
+    const v = semOk.reduce((s,x)=>s+x.total,0), c = semOk.reduce((s,x)=>s+x.carne,0), f = semOk.reduce((s,x)=>s+x.otros+x.gastos+x.sueldos,0);
+    const ratio = v ? c/v : 0; ventaProm = v/semOk.length;
+    if(ratio < 1) pe = (f/semOk.length)/(1-ratio);
+  }
+  // Precio por kilo por corte, por semana
+  const cortes = agrupar(RAW.Insumos.filter(r=>r[1]==='Carne' && CORTES_COCCION.includes(r[2]) && r[0].slice(0,10)>=sem[0]?.s && r[0].slice(0,10)<=R.b), r=>r[2], r=>num(r[3])).slice(0,5).map(x=>x[0]);
+  const series = cortes.map(c=>({nombre:c, v: sem.map(x=>{ const rs = x.I.filter(r=>r[1]==='Carne' && r[2]===c); const kg = rs.reduce((s,r)=>s+num(r[3]),0); return kg ? rs.reduce((s,r)=>s+num(r[6]),0)/kg : null; })}));
+  const prov = agrupar(m.I, r=>r[7]||'Sin proveedor', r=>num(r[6]));
+  const cortesTab = new Map(), cortesAnt = new Map();
+  m.I.filter(r=>r[1]==='Carne').forEach(r=>{ const o = cortesTab.get(r[2]) || {kg:0,c:0}; o.kg += num(r[3]); o.c += num(r[6]); cortesTab.set(r[2], o); });
+  ant.I.filter(r=>r[1]==='Carne').forEach(r=>{ const o = cortesAnt.get(r[2]) || {kg:0,c:0}; o.kg += num(r[3]); o.c += num(r[6]); cortesAnt.set(r[2], o); });
   const gCat = agrupar(m.G, r=>r[1]||'Otros', r=>num(r[3]));
   const sPer = agrupar(m.S, r=>r[1]||'-', r=>num(r[4]));
-  const fila = (n, v, cls, tot) => `<tr class="${cls||''}"><td>${n}</td><td class="r">${MXN(v)}</td><td class="r" style="color:var(--muted)">${m.total?PCT(v/m.total):''}</td></tr>`;
+  const fila = (n, v, cls) => `<tr class="${cls||''}"><td>${n}</td><td class="r">${MXN(v)}</td><td class="r" style="color:var(--muted)">${m.total?PCT(v/m.total):''}</td></tr>`;
   return `
   ${avisoCostos(m)}
+  ${FILTRO ? '<p class="note" style="margin:-4px 0 10px">El filtro solo aplica a ventas; los costos se muestran completos.</p>' : ''}
   <div class="kpis">
-    <div class="kpi"><p class="l">Costo de carne</p><p class="v">${MXN(m.insCarne)}</p><p class="d">${PCT(m.total?m.insCarne/m.total:0)} de las ventas</p></div>
-    <div class="kpi"><p class="l">Otros insumos</p><p class="v">${MXN(m.insOtros)}</p><p class="d">${PCT(m.total?m.insOtros/m.total:0)} de las ventas</p></div>
-    <div class="kpi"><p class="l">Sueldos</p><p class="v">${MXN(m.sueldos)}</p><p class="d">${PCT(m.total?m.sueldos/m.total:0)} de las ventas</p></div>
-    <div class="kpi hl"><p class="l">Rendimiento de la carne</p><p class="v">${PCT(rend)}</p><p class="d">${m.kgVend.toFixed(1)} kg vendidos / ${m.kgComp.toFixed(1)} kg en crudo</p></div>
+    <div class="kpi"><p class="l">Costo total</p><p class="v">${MXN(m.costos)}</p>${delta(m.costos, ant.costos, 'periodo anterior', true)}</div>
+    <div class="kpi"><p class="l">Costo de carne por kilo vendido</p><p class="v">${costoKg ? MXN(costoKg) : '—'}</p>${costoKg && costoKgAnt ? delta(costoKg, costoKgAnt, 'periodo anterior', true) : '<p class="d">Carne comprada ÷ kilos vendidos</p>'}</div>
+    <div class="kpi"><p class="l">Rendimiento de la carne</p><p class="v">${m.kgComp ? PCT(rend) : '—'}</p><p class="d">${m.kgVend.toFixed(1)} kg vendidos / ${m.kgComp.toFixed(1)} kg en crudo</p></div>
+    <div class="kpi hl"><p class="l">Punto de equilibrio semanal</p><p class="v">${pe!=null ? MXN(pe) : '—'}</p><p class="d">${pe!=null ? (ventaProm>=pe ? `Vendes ${MXN(ventaProm)} en promedio: ${PCT(ventaProm/pe-1)} arriba` : `Vendes ${MXN(ventaProm)}: te faltan ${MXN(pe-ventaProm)}`) : 'Faltan semanas con costos capturados'}</p></div>
   </div>
   <div class="g2">
+    <div class="card"><h3>Costo por semana</h3>${apiladas(sem, [{k:'carne',n:'Carne'},{k:'otros',n:'Otros insumos'},{k:'gastos',n:'Gastos'},{k:'sueldos',n:'Sueldos'}])}</div>
     <div class="card"><h3>Estado de resultados del periodo</h3>
       <table class="pl"><tr><th></th><th class="r">Monto</th><th class="r">% ventas</th></tr>
-      ${fila('Ventas', m.total)}${fila('− Carne', m.insCarne)}${fila('− Otros insumos', m.insOtros)}${fila('− Sueldos', m.sueldos)}
-      ${fila('Utilidad operativa', m.utilidad, 'tot')}${fila('− Gastos', m.gastos)}${fila('Resultado después de gastos', neto, 'tot')}</table>
-      <p class="note">Las compras se registran el día que se hacen (normalmente viernes); por eso los periodos van de lunes a domingo. El rendimiento compara la carne vendida contra los cortes crudos que se cocinan (sin manteca, pellet, cuero ni cachete).</p></div>
-    <div class="card"><h3>Insumos por categoría</h3>${barras(insCat, null)}</div>
+      ${fila('Ventas', m.total)}${fila('− Carne', m.carne)}${fila('− Otros insumos', m.otros)}${fila('− Gastos', m.gastos)}${fila('− Sueldos', m.sueldos)}
+      ${fila('Utilidad', m.utilidad, 'tot')}</table>
+      <p class="note">Punto de equilibrio: la carne se toma como costo variable (sube con la venta) y lo demás como fijo por semana.</p></div>
   </div>
+  <div class="card" style="margin-bottom:12px"><h3>Evolución del precio por kilo <small>cortes principales, por semana</small></h3>${lineas(sem.map(x=>corto(x.s)), series, v=>MXN(v), 'Precio por kilo por corte')}</div>
   <div class="g3">
     <div class="card"><h3>Compra de carne por corte</h3>
-      ${cortes.size ? `<table><tr><th>Corte</th><th class="r">Kg</th><th class="r">$/kg</th></tr>
-      ${[...cortes.entries()].sort((a,b)=>b[1].c-a[1].c).map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.kg.toFixed(1)}</td><td class="r">${MXN(o.kg?o.c/o.kg:0)}</td></tr>`).join('')}</table>` : '<p class="note">Sin compras de carne</p>'}</div>
-    <div class="card"><h3>Gastos por categoría</h3>${barras(gCat, null)}</div>
-    <div class="card"><h3>Sueldos por persona</h3>${barras(sPer, null)}</div>
+      ${cortesTab.size ? `<table><tr><th>Corte</th><th class="r">Kg</th><th class="r">$/kg</th><th class="r">vs ant.</th></tr>
+      ${[...cortesTab.entries()].sort((a,b)=>b[1].c-a[1].c).map(([k,o])=>{ const p = o.kg?o.c/o.kg:0, b0 = cortesAnt.get(k), pb = b0&&b0.kg?b0.c/b0.kg:0, d = pb?p/pb-1:null;
+        return `<tr><td>${esc(k)}</td><td class="r">${o.kg.toFixed(1)}</td><td class="r">${MXN(p)}</td><td class="r" style="color:${d==null||Math.abs(d)<0.005?'var(--muted)':d>0?'var(--down)':'var(--up)'}">${d==null?'–':Math.abs(d)<0.005?'0%':(d>0?'▲':'▼')+Math.abs(d*100).toFixed(0)+'%'}</td></tr>`; }).join('')}</table>` : '<p class="note">Sin compras de carne</p>'}</div>
+    <div class="card"><h3>Compras por proveedor</h3>${barras(prov, m.I.reduce((s,r)=>s+num(r[6]),0))}</div>
+    <div class="card"><h3>Gastos por categoría</h3>${barras(gCat, 0)}<h3 style="margin-top:18px">Nómina por persona</h3>${barras(sPer, 0)}</div>
   </div>`;
 }
 
@@ -455,6 +695,8 @@ function vDatos(m, R){
   const sinPago = all.filter(r=>!r[8]).length;
   const cero = all.filter(r=>num(r[7])<=0 && r[2]!=='Regalo').length;
   const fechas = all.map(r=>r[0].slice(0,10)).sort();
+  const semS = new Set(all.map(r=>semanaDe(r[0].slice(0,10)))), semI = new Set(RAW.Insumos.map(r=>semanaDe(r[0].slice(0,10)))), semN = new Set(RAW.Sueldos.map(r=>semanaDe(r[0].slice(0,10))));
+  const faltaI = [...semS].filter(s=>!semI.has(s)).sort(), faltaN = [...semS].filter(s=>!semN.has(s)).sort();
   const ult = m.V.slice().sort((a,b)=>a[0]<b[0]?1:-1).slice(0,40);
   return `
   <div class="g2">
@@ -462,14 +704,15 @@ function vDatos(m, R){
       <table>
         <tr><td>Rango de fechas</td><td class="r">${corto(fechas[0])} – ${corto(fechas[fechas.length-1])}</td></tr>
         ${Object.keys(ENC).map(k=>`<tr><td>Renglones en ${k}</td><td class="r">${RAW[k].length.toLocaleString('es-MX')}</td></tr>`).join('')}
+        <tr><td>Semanas con ventas pero sin insumos</td><td class="r">${faltaI.length ? faltaI.map(s=>'vie '+corto(s)).join(', ') : '0'}</td></tr>
+        <tr><td>Semanas con ventas pero sin sueldos</td><td class="r">${faltaN.length ? faltaN.map(s=>'vie '+corto(s)).join(', ') : '0'}</td></tr>
         <tr><td>Ventas sin modo de captura <span style="color:var(--muted)">(versión anterior de la app)</span></td><td class="r">${sinModo}</td></tr>
         <tr><td>Ventas sin método de pago</td><td class="r">${sinPago}</td></tr>
         <tr><td>Ventas con total en cero</td><td class="r">${cero}</td></tr>
-        <tr><td>Semanas con ventas pero sin insumos</td><td class="r">${(()=>{const l=semanasSinCostos();return l.length?l.map(corto).join(', '):'0';})()}</td></tr>
       </table>
       <p class="note">Los renglones de "Regalo" no cuentan como venta.</p>
       <button class="btn" style="margin-top:12px" onclick="descargarCSV()">Descargar ventas del periodo (CSV)</button></div>
-    <div class="card"><h3>Últimas ventas del periodo <small>${corto(R.a)} – ${corto(R.b)}</small></h3>
+    <div class="card"><h3>Últimas ventas del periodo <small>${esc(etiquetaRango(R))}</small></h3>
       <table><tr><th>Fecha</th><th>Producto</th><th>Modo</th><th class="r">Total</th><th>Pago</th></tr>
       ${ult.map(r=>`<tr><td>${esc(r[0].slice(5,16))}</td><td>${esc(r[3])}</td><td style="color:var(--ink2)">${esc(r[4]||'–')}</td><td class="r">${MXN(r[7])}</td><td>${esc(r[8])}</td></tr>`).join('')}</table></div>
   </div>`;
@@ -486,18 +729,40 @@ function descargarCSV(){
 /* ================= Render ================= */
 const TABS = [['resumen','Resumen'],['ventas','Ventas'],['costos','Costos'],['datos','Datos']];
 
+function filtrar(campo, valor){
+  if(valor==='Otros') return;
+  FILTRO = (FILTRO && FILTRO.valor===valor) ? null : {campo, valor};
+  render();
+}
+
 function render(){
   const main = document.getElementById('main');
   document.getElementById('tabs').classList.toggle('hid', !RAW);
   document.getElementById('ctl').classList.toggle('hid', !RAW);
-  if(!RAW){ pantallaFuente(); return; }
+  if(!RAW){ document.getElementById('subTxt').textContent=''; document.getElementById('filtroBox').innerHTML=''; pantallaFuente(); return; }
   if(!RAW.Ventas.length){ main.innerHTML = `<div class="empty"><h2>Tu hoja aún no tiene ventas</h2><p>En cuanto captures la primera venta en la app, aparecerá aquí.</p></div>`; return; }
+  const p = document.getElementById('periodo').value;
+  if(!CURSOR || (p==='mes') !== /^\d{4}-\d{2}$/.test(CURSOR)) CURSOR = p==='mes' ? addDays(ultimaSemana(),1).slice(0,7) : ultimaSemana();
   document.getElementById('tabs').innerHTML = TABS.map(([k,t])=>`<button class="${k===TAB?'on':''}" onclick="TAB='${k}';render()">${t}</button>`).join('');
+  document.getElementById('navp').classList.toggle('hid', p==='todo' || p==='custom');
+  document.getElementById('desde').classList.toggle('hid', p!=='custom');
+  document.getElementById('hasta').classList.toggle('hid', p!=='custom');
   const R = rango();
+  document.getElementById('rangoTxt').textContent = etiquetaRango(R);
   const m = metricas(R.a, R.b), ant = metricas(R.pa, R.pb);
-  document.getElementById('srcTxt').textContent = `${FUENTE} · ${corto(R.a)} – ${corto(R.b)}`;
-  if(!m.V.length && TAB!=='datos'){ main.innerHTML = `<div class="empty"><h2>Sin ventas entre ${corto(R.a)} y ${corto(R.b)}</h2><p>Elige otro periodo arriba.</p></div>`; return; }
-  main.innerHTML = TAB==='resumen' ? vResumen(m, ant, R) : TAB==='ventas' ? vVentas(m) : TAB==='costos' ? vCostos(m) : vDatos(m, R);
+  const diasV = m.dias.map(d=>`${DIAS[dow(d)].toLowerCase()} ${corto(d)}`);
+  document.getElementById('srcTxt').textContent = FUENTE;
+  document.getElementById('subTxt').textContent = `vie ${corto(R.a)} – jue ${corto(R.b)} · ${R.semanas} semana${R.semanas>1?'s':''} · ${diasV.length<=4 && diasV.length ? 'ventas ' + diasV.join(', ') : diasV.length + ' días con venta'} · costos de viernes a jueves`;
+  document.getElementById('filtroBox').innerHTML = FILTRO ? `<span class="filtro">Filtrado por ${FILTRO.campo==='cat'?'categoría':'producto'}: <b>${esc(FILTRO.valor)}</b> <button onclick="FILTRO=null;render()" aria-label="Quitar filtro">✕</button></span>` : '';
+  if(!m.V.length && TAB!=='datos' && TAB!=='costos'){ main.innerHTML = `<div class="empty"><h2>Sin ventas entre vie ${corto(R.a)} y jue ${corto(R.b)}</h2><p>Usa las flechas o elige otro periodo arriba.</p></div>`; return; }
+  main.innerHTML = TAB==='resumen' ? vResumen(m, ant, R) : TAB==='ventas' ? vVentas(m, ant) : TAB==='costos' ? vCostos(m, ant, R) : vDatos(m, R);
+}
+
+function mover(n){
+  const p = document.getElementById('periodo').value;
+  if(p==='mes'){ const [y,m] = CURSOR.split('-').map(Number); const d = new Date(y, m-1+n, 1); CURSOR = `${d.getFullYear()}-${pad(d.getMonth()+1)}`; }
+  else CURSOR = addDays(CURSOR, 7*n);
+  render();
 }
 
 function pantallaFuente(msg){
@@ -534,15 +799,35 @@ async function desdeServicio(c){
   try{
     RAW = normalizar(await cargarServicio(c));
     const h = new Date(); FUENTE = `En vivo · ${pad(h.getHours())}:${pad(h.getMinutes())}`;
-    render();
+    CURSOR = null; render();
   }catch(e){ RAW = null; render(); pantallaFuente('No se pudo conectar: ' + e.message); }
 }
 
 async function usarExcel(f){
   document.getElementById('main').innerHTML = `<div class="empty"><p>Leyendo ${esc(f.name)}…</p></div>`;
-  try{ RAW = normalizar(await leerExcel(f)); FUENTE = `Archivo: ${f.name}`; render(); }
+  try{ RAW = normalizar(await leerExcel(f)); FUENTE = `Archivo: ${f.name}`; CURSOR = null; render(); }
   catch(e){ RAW = null; render(); pantallaFuente('No se pudo leer el archivo: ' + e.message); }
 }
+
+/* ================= Tema claro / oscuro ================= */
+function temaActual(){
+  const t = document.documentElement.getAttribute('data-theme');
+  if(t) return t;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function pintarBotonTema(){
+  const oscuro = temaActual()==='dark';
+  document.getElementById('tema').textContent = oscuro ? '☀ Claro' : '☾ Oscuro';
+  document.getElementById('tema').title = oscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro';
+}
+document.getElementById('tema').onclick = () => {
+  const nuevo = temaActual()==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', nuevo);
+  try{ localStorage.setItem('carnitas_dash_tema', nuevo); }catch(e){}
+  pintarBotonTema();
+};
+try{ const t = localStorage.getItem('carnitas_dash_tema'); if(t==='dark'||t==='light') document.documentElement.setAttribute('data-theme', t); }catch(e){}
+pintarBotonTema();
 
 /* Tooltip compartido: cualquier elemento con data-tip */
 const tip = document.getElementById('tip');
@@ -552,19 +837,16 @@ document.addEventListener('mousemove', e => {
   tip.textContent = t.getAttribute('data-tip');
   tip.style.opacity = 1;
   const x = Math.min(e.clientX + 12, window.innerWidth - tip.offsetWidth - 8);
-  tip.style.left = x + 'px'; tip.style.top = (e.clientY - 34) + 'px';
+  tip.style.left = Math.max(8, x) + 'px'; tip.style.top = (e.clientY - 34) + 'px';
 });
 
-document.getElementById('periodo').onchange = () => {
-  const c = document.getElementById('periodo').value === 'custom';
-  document.getElementById('desde').classList.toggle('hid', !c);
-  document.getElementById('hasta').classList.toggle('hid', !c);
-  render();
-};
+document.getElementById('periodo').onchange = () => { CURSOR = null; render(); };
+document.getElementById('prev').onclick = () => mover(-1);
+document.getElementById('next').onclick = () => mover(1);
 document.getElementById('desde').onchange = render;
 document.getElementById('hasta').onchange = render;
 document.getElementById('refresh').onclick = () => { const c = cfgServicio(); c ? desdeServicio(c) : pantallaFuente(); };
-document.getElementById('fuente').onclick = () => { RAW = null; render(); };
+document.getElementById('fuente').onclick = () => { RAW = null; FILTRO = null; render(); };
 
 const inicial = cfgServicio();
 if(inicial) desdeServicio(inicial); else render();
