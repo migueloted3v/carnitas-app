@@ -6,7 +6,7 @@
 
 Captura ventas, insumos, gastos y sueldos desde el celular, sin servidor ni costos de hosting, sincronizado directo a Google Sheets.
 
-[![Versión](https://img.shields.io/badge/versión-2.2.0-F85E00)]()
+[![Versión](https://img.shields.io/badge/versión-2.2.1-F85E00)]()
 [![Static Site](https://img.shields.io/badge/hosting-GitHub%20Pages-24292e?logo=github)](https://pages.github.com/)
 [![No Build](https://img.shields.io/badge/build-none-brightgreen)]()
 [![Backend](https://img.shields.io/badge/backend-Google%20Sheets%20%2B%20Apps%20Script-34A853?logo=googlesheets&logoColor=white)]()
@@ -180,6 +180,7 @@ Todo vive en **tu** Google Drive. La app no tiene servidor propio ni guarda tus 
 
 | Versión | Cambios |
 |---|---|
+| **2.2.1** | Servicio: las fechas se leen con la zona horaria de la propia hoja; corrige insumos capturados a mano que caían en la semana anterior y horas de venta recorridas 6 horas · acepta fechas escritas como texto (25/09/2026) |
 | **2.2.0** | Semana del negocio de viernes a jueves en tablero y app · margen con gastos incluidos · vista *Semana* en la app · tablero con tema claro/oscuro, clic para filtrar, *Qué revisar*, mapa de calor, ranking 80/20, evolución del precio por kilo, compras por proveedor y punto de equilibrio · nueva acción `rango` en el servicio |
 | **2.1.1** | Se quita el código QR (las cámaras no copian texto simple); la CLABE se muestra más grande y agrupada en bloques · el aviso de versiones distintas solo compara MAYOR.MENOR |
 | **2.1.0** | Categoría Pollo (entero o medio) · precios por kilo, medio y cuarto desde la hoja, visibles en cada botón · cobro en efectivo con cálculo de cambio · cobro por transferencia con datos de cuenta · botón 🏦 para mostrar la cuenta sin perder el ticket · pestaña `Cuenta` · categorías en cuadrícula de 3 (vertical) y 5 (horizontal) |
