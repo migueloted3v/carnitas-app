@@ -1,6 +1,6 @@
 /**
  * Carnitas App — servicio web (Google Apps Script)
- * Versión: 2.2.0
+ * Versión: 2.2.1
  *
  * Vive pegado a la hoja "Carnitas Ventas" (Extensiones → Apps Script).
  * La app y el tablero le mandan y le piden datos con una clave; así la app
@@ -14,8 +14,17 @@
  *   4. Pega la URL /exec y la clave en ⚙ Ajustes de la app.
  */
 
-const SCRIPT_VERSION = '2.2.0';
-const TZ = 'America/Mexico_City';
+const SCRIPT_VERSION = '2.2.1';
+const TZ = 'America/Mexico_City'; // respaldo si la hoja no tiene zona horaria
+
+// Las fechas se leen y escriben SIEMPRE con la zona horaria de la propia hoja
+// (Archivo → Configuración). Así la hora que ves en la celda es la misma que
+// recibe la app, sin importar si la fecha la capturó la app o tú a mano.
+let _tzHoja = null;
+function tzHoja() {
+  if (!_tzHoja) _tzHoja = SpreadsheetApp.getActive().getSpreadsheetTimeZone() || TZ;
+  return _tzHoja;
+}
 
 // Pestañas que se pueden escribir y leer desde la app, con su encabezado oficial.
 // Si una pestaña ya existe con menos columnas, se agregan las que falten al final
@@ -205,7 +214,19 @@ function leer(nombre) {
   const valores = sh.getRange(2, 1, sh.getLastRow() - 1, sh.getLastColumn()).getValues();
   return valores
     .filter(r => r.some(v => v !== '' && v !== null))
-    .map(r => r.map(v => (v instanceof Date) ? Utilities.formatDate(v, TZ, 'yyyy-MM-dd HH:mm:ss') : v));
+    .map(r => r.map((v, i) => (v instanceof Date) ? Utilities.formatDate(v, tzHoja(), 'yyyy-MM-dd HH:mm:ss')
+                             : (i === 0 ? fechaTexto(v) : v)));
+}
+
+/** Fecha capturada como texto (25/09/2026, 25-9-2026 o 2026-09-25) → aaaa-mm-dd. */
+function fechaTexto(v) {
+  if (typeof v !== 'string') return v;
+  const t = v.trim();
+  let m = t.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(.*)$/);
+  if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}${m[4]}`;
+  m = t.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})(.*)$/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}${m[4]}`;
+  return t;
 }
 
 function ventasPorFechas(fechasTxt) {
@@ -246,7 +267,7 @@ function aFecha(v) {
   const m = v.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
   if (!m) return v;
   const txt = `${m[1]}-${m[2]}-${m[3]} ${m[4] || '00'}:${m[5] || '00'}:${m[6] || '00'}`;
-  return Utilities.parseDate(txt, TZ, 'yyyy-MM-dd HH:mm:ss');
+  return Utilities.parseDate(txt, tzHoja(), 'yyyy-MM-dd HH:mm:ss');
 }
 
 function responder(obj) {
