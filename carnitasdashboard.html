@@ -10,7 +10,7 @@
   :root{
     --bg:#F4F6F8; --card:#FFFFFF; --line:#E3E8EC; --ink:#153243; --ink2:#51687A; --muted:#7A8F9E;
     --mark:#153243; --mark2:#9FB6C4; --accent:#F85E00; --neg:#C94900; --track:#EEF1F4;
-    --up:#2F7D32; --down:#C23B22; --chip:#153243; --chipTxt:#FFFFFF; --tipBg:#153243; --tipTx:#FFFFFF;
+    --up:#2F7D32; --down:#C23B22; --warn:#9A6200; --chip:#153243; --chipTxt:#FFFFFF; --tipBg:#153243; --tipTx:#FFFFFF;
     --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4;
     color-scheme: light;
   }
@@ -18,7 +18,7 @@
     :root:where(:not([data-theme="light"])){
       --bg:#0E1C26; --card:#15293A; --line:#24394B; --ink:#E6EDF2; --ink2:#AFC2CF; --muted:#8499A8;
       --mark:#8FB0C6; --mark2:#4E6A80; --accent:#FF7A2E; --neg:#D9642A; --track:#1D3446;
-      --up:#7FD49B; --down:#FF8A80; --chip:#E6EDF2; --chipTxt:#0E1C26; --tipBg:#E6EDF2; --tipTx:#0E1C26;
+      --up:#7FD49B; --down:#FF8A80; --warn:#F5C26B; --chip:#E6EDF2; --chipTxt:#0E1C26; --tipBg:#E6EDF2; --tipTx:#0E1C26;
       --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
       color-scheme: dark;
     }
@@ -26,7 +26,7 @@
   :root[data-theme="dark"]{
     --bg:#0E1C26; --card:#15293A; --line:#24394B; --ink:#E6EDF2; --ink2:#AFC2CF; --muted:#8499A8;
     --mark:#8FB0C6; --mark2:#4E6A80; --accent:#FF7A2E; --neg:#D9642A; --track:#1D3446;
-    --up:#7FD49B; --down:#FF8A80; --chip:#E6EDF2; --chipTxt:#0E1C26; --tipBg:#E6EDF2; --tipTx:#0E1C26;
+    --up:#7FD49B; --down:#FF8A80; --warn:#F5C26B; --chip:#E6EDF2; --chipTxt:#0E1C26; --tipBg:#E6EDF2; --tipTx:#0E1C26;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
     color-scheme: dark;
   }
@@ -89,6 +89,27 @@
   .aviso b{color:var(--down);font-weight:500}
   .insights{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:var(--ink2)}
   .insights b{color:var(--ink);font-weight:500}
+  .fl{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.55;color:var(--ink2)}
+  .fl:first-of-type{border-top:none;padding-top:0}
+  .fl b{color:var(--ink);font-weight:500}
+  .fl code,.note code{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .ic{flex:0 0 22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+  .ic.up{color:var(--up);background:color-mix(in srgb,var(--up) 16%,transparent)}
+  .ic.dn{color:var(--down);background:color-mix(in srgb,var(--down) 16%,transparent)}
+  .ic.wa{color:var(--warn);background:color-mix(in srgb,var(--warn) 18%,transparent)}
+  .seg{display:flex;flex-wrap:wrap;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:3px;margin-bottom:12px}
+  .seg button{border:none;background:none;padding:7px 12px;border-radius:7px;color:var(--ink2);cursor:pointer}
+  .seg button.on{background:var(--chip);color:var(--chipTxt)}
+  .seg button em{font-style:normal;margin-left:6px;color:var(--muted)}
+  .seg button.on em{color:inherit}
+  .mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+  .mini div{background:var(--bg);border-radius:8px;padding:10px 12px}
+  .mini p{margin:0;font-size:12px;color:var(--muted)}
+  .mini b{display:block;font-size:17px;font-weight:500;margin-top:2px}
+  .tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;margin-left:6px;color:var(--warn);background:color-mix(in srgb,var(--warn) 18%,transparent);white-space:nowrap}
+  .tscroll{overflow-x:auto}
+  .tscroll table{min-width:560px}
+  .vacio{color:var(--muted);text-align:center;padding:24px 0;font-size:13px}
   .empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:40px 20px;text-align:center;color:var(--ink2)}
   .empty h2{font-size:17px;font-weight:500;margin:0 0 6px;color:var(--ink)}
   .src{max-width:520px;margin:18px auto 0;text-align:left}
@@ -134,7 +155,7 @@
 <div id="tip"></div>
 
 <script>
-const DASH_VERSION = '2.2.0';
+const DASH_VERSION = '2.3.0';
 
 /* ================= Formatos y fechas ================= */
 const MXN = n => (n<0?'-':'') + '$' + Math.round(Math.abs(n||0)).toLocaleString('es-MX');
@@ -171,8 +192,12 @@ const ALIAS = {'Corte deseado':'Categoría'};
 const CORTES_COCCION = ['Pierna','Nuca','Aldilla','Costilla','Buche','Maciza','Chamorro','Codillo'];
 const CORTES_CARNE = ['Surtido','Maciza','Pierna','Chamorro','Buche','Aldilla','Nuca','Costilla','Cuerito','No especificó'];
 
-let RAW = null, FUENTE = '', TAB = 'resumen', FILTRO = null;
+let RAW = null, FUENTE = '', TAB = 'resumen', FILTRO = null, TABLA = 'Ventas';
+let SERVICIO = null; // {version, tz} del servicio en vivo; null si los datos vienen de un Excel
 let CURSOR = null;   // viernes de la semana elegida (semana y 4 semanas) o 'aaaa-mm' (mes)
+
+// Producto para análisis: los renglones de Surtido repartidos por corte (versión 2.2) cuentan como Surtido
+function prodKey(r){ return r[4]==='Surtido' ? 'Surtido' : (r[3] || '-'); }
 
 function kgCarne(r){
   if(r[2] !== 'Carne') return 0;
@@ -214,7 +239,7 @@ async function cargarServicio(cfg){
     const res = await fetch(u, {signal: ctrl.signal});
     let data; try{ data = await res.json(); }catch(e){ throw new Error('la URL no responde como el servicio (revisa que termine en /exec)'); }
     if(!data.ok) throw new Error(data.error || 'error del servicio');
-    return data.datos;
+    return {datos: data.datos, version: data.version || '', tz: data.tz || ''};
   }catch(e){
     if(e.name === 'AbortError') throw new Error('el servicio tardó demasiado');
     if(e instanceof TypeError) throw new Error('sin conexión con el servicio');
@@ -296,7 +321,7 @@ function etiquetaRango(R){
 /* ================= Métricas ================= */
 function pasaFiltro(r){
   if(!FILTRO) return true;
-  return FILTRO.campo==='cat' ? r[2]===FILTRO.valor : r[3]===FILTRO.valor;
+  return FILTRO.campo==='cat' ? r[2]===FILTRO.valor : prodKey(r)===FILTRO.valor;
 }
 
 function metricas(a, b){
@@ -528,37 +553,199 @@ function pagos(m){
     l.map(([k,v])=>`<div class="lg"><span class="sw" style="background:${COL[k]||'var(--muted)'}"></span><span style="flex:1">${esc(k)}</span><span>${MXN(v)} · ${PCT(v/m.total)}</span></div>`).join('');
 }
 
-function avisoCostos(m){
-  if(FILTRO || !m.sinCostos.length) return '';
-  return `<div class="aviso"><b>Costos incompletos:</b> ${m.sinCostos.length===1?'la semana':'las semanas'} del ${m.sinCostos.map(s=>`vie ${corto(s)}`).join(', ')} ${m.sinCostos.length===1?'tiene':'tienen'} ventas pero no insumos capturados. La utilidad de ${m.sinCostos.length===1?'esa semana':'esas semanas'} no es confiable hasta que se registren.</div>`;
+
+/* ================= Qué revisar: alertas por pestaña ================= */
+// Umbrales acordados. Cambia aquí si alguna alerta sale demasiado seguido o muy poco.
+const UMBRAL = {
+  prodPct: 0.20,     // producto sube o cae 20% o más…
+  prodPeso: 0.03,    // …y pesa al menos 3% de la venta…
+  prodMonto: 300,    // …o cambia más de $300
+  ticketPct: 0.10,   // ticket promedio ±10%
+  ventaPct: 0.10,    // venta total ±10%
+  carneVenta: 0.55,  // carne arriba de 55% de la venta
+  precioKg: 0.05,    // precio de compra por kilo ±5%
+  margenPts: 3,      // margen ±3 puntos vs promedio de 4 semanas
+  costoPct: 0.15,    // costo total ±15%
+  rendPts: 8,        // rendimiento de la carne ±8 puntos vs 4 semanas previas
+  horaMin: 9         // ventas antes de esta hora = probable desfase de horario
+};
+const SEV_ORDEN = {dn:0, wa:1, up:2};
+const SEV_IC = {dn:'▼', wa:'!', up:'▲'};
+const flag = (sev, html) => ({sev, html});
+const pctTxt = p => `${Math.abs(p*100).toFixed(0)}%`;
+const diaCorto = s => `${DIAS[dow(s.slice(0,10))].toLowerCase()} ${corto(s.slice(0,10))}`;
+const normTxt = s => String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();
+const verMenor = (v, ref) => { const a = String(v||'0').split('.').map(Number), b = ref.split('.').map(Number); for(let i=0;i<b.length;i++){ if((a[i]||0)!==b[i]) return (a[i]||0) < b[i]; } return false; };
+
+function tarjetaAlertas(tab, lista, R){
+  // Máximo 5, de lo más grave a lo positivo; si hay algo positivo, siempre se muestra al menos uno
+  const orden = lista.filter(Boolean).sort((a,b)=>SEV_ORDEN[a.sev]-SEV_ORDEN[b.sev]);
+  const malas = orden.filter(f=>f.sev!=='up'), buenas = orden.filter(f=>f.sev==='up');
+  const l = malas.slice(0, buenas.length ? 4 : 5).concat(buenas).slice(0,5);
+  const cuerpo = l.length
+    ? l.map(f=>`<div class="fl"><span class="ic ${f.sev}" aria-hidden="true">${SEV_IC[f.sev]}</span><span>${f.html}</span></div>`).join('')
+    : '<p class="note" style="margin:0">Todo en orden en este periodo.</p>';
+  return `<div class="card" style="margin-bottom:12px"><h3>Qué revisar · ${tab} <small>vs vie ${corto(R.pa)} – jue ${corto(R.pb)}</small></h3>${cuerpo}</div>`;
 }
 
-/* ================= Qué revisar ================= */
-function queRevisar(m, ant, R){
+/* Renglones de Surtido repartidos por la v2.2 (uno por corte) → una sola venta para mostrarlos.
+   No cambia totales; solo agrupa los renglones seguidos del mismo ticket. */
+const CORTES_REPARTO = ['Pierna','Buche','Nuca','Aldilla','Costilla'];
+function juntarSurtido(rows){
+  const out = []; let g = null;
+  const cerrar = () => { if(!g) return; const b = g.f[0].slice(); b[3] = 'Surtido'; b[4] = 'Surtido';
+    b[5] = Math.round(g.f.reduce((s,r)=>s+num(r[5]),0)*1000)/1000; b[7] = g.f.reduce((s,r)=>s+num(r[7]),0); out.push(b); g = null; };
+  rows.forEach(r=>{
+    const corte = r[4]==='Surtido' && r[2]==='Carne' && CORTES_REPARTO.includes(r[3]);
+    if(!corte){ cerrar(); out.push(r); return; }
+    if(g && (g.t!==r[1] || g.c[r[3]])) cerrar();
+    if(!g) g = {t:r[1], c:{}, f:[]};
+    g.c[r[3]] = true; g.f.push(r);
+  });
+  cerrar();
+  return out;
+}
+
+/* Tickets idénticos a otro capturado menos de 60 s antes (posible doble toque al cobrar) */
+function doblesCaptura(V){
+  const tk = new Map();
+  V.forEach(r=>{ if(!r[1]) return; const o = tk.get(r[1]) || {f:r[0], l:[], t:0}; o.l.push(prodKey(r)+':'+num(r[7])); o.t += num(r[7]); tk.set(r[1], o); });
+  const lista = [...tk.entries()].map(([id,o])=>({id, f:o.f, t:o.t, firma:o.l.sort().join('|'), ms: Date.parse(o.f.replace(' ','T'))})).filter(x=>isFinite(x.ms)).sort((a,b)=>a.ms-b.ms);
+  const dobles = [];
+  for(let i=1;i<lista.length;i++) if(lista[i].firma===lista[i-1].firma && lista[i].ms-lista[i-1].ms <= 60000) dobles.push(lista[i]);
+  return dobles;
+}
+
+/* Mismo concepto y mismo monto dos veces en el periodo */
+function duplicados(rows, nombreFn, montoIdx){
+  const m = new Map();
+  rows.forEach(r=>{ const monto = num(r[montoIdx]); if(!(monto>0)) return; const k = normTxt(nombreFn(r))+'|'+monto; const o = m.get(k) || {nombre:nombreFn(r), monto, rows:[]}; o.rows.push(r); m.set(k,o); });
+  return [...m.values()].filter(o=>o.rows.length>1);
+}
+const dupInsumos = I => duplicados(I, r=>r[2]||r[1], 6);
+const dupGastos = G => duplicados(G, r=>r[2]||r[1], 3);
+
+function precioPorCorte(I){
+  const o = {};
+  I.filter(r=>r[1]==='Carne' && CORTES_COCCION.includes(r[2])).forEach(r=>{ o[r[2]] = o[r[2]] || {kg:0,c:0}; o[r[2]].kg += num(r[3]); o[r[2]].c += num(r[6]); });
+  return o;
+}
+
+function alertasVentas(m, ant){
   const out = [];
-  const sem = porSemana(addDays(R.b, -27), R.b).filter(x=>x.ok && x.total>0);
-  if(!FILTRO && m.I.length && m.total>0){
-    const mg = m.utilidad/m.total;
-    if(sem.length >= 2){
-      const prom = sem.reduce((s,x)=>s+x.utilidad/x.total,0)/sem.length;
-      const dif = (mg - prom)*100;
-      if(Math.abs(dif) >= 3) out.push(`El margen del periodo (<b>${PCT(mg,1)}</b>) está ${dif>0?'arriba':'abajo'} de tu promedio de las últimas 4 semanas (${PCT(prom,1)}) por <b>${Math.abs(dif).toFixed(1)} puntos</b>.`);
-    }
-    const pctCarne = m.carne/m.total;
-    if(pctCarne > 0.55) out.push(`La carne se lleva el <b>${PCT(pctCarne)}</b> de la venta. Revisa precios de compra o de venta.`);
+  if(ant.total > 0){
+    const a = new Map(agrupar(ant.V, prodKey, r=>num(r[7]))), b = new Map(agrupar(m.V, prodKey, r=>num(r[7])));
+    const movs = [];
+    new Set([...a.keys(), ...b.keys()]).forEach(k=>{
+      const va = a.get(k)||0, vb = b.get(k)||0, d = vb - va;
+      const peso = Math.max(m.total ? vb/m.total : 0, va/ant.total);
+      const p = va > 0 ? d/va : Infinity;
+      if(Math.abs(p) >= UMBRAL.prodPct && (peso >= UMBRAL.prodPeso || Math.abs(d) >= UMBRAL.prodMonto)) movs.push({k, va, vb, d, p});
+    });
+    const catDe = new Map(ant.V.concat(m.V).map(r=>[prodKey(r), r[2]]));
+    movs.forEach(x=>{ if(['Medio','Litro','Vaso'].includes(x.k) && catDe.get(x.k)) x.k = `${catDe.get(x.k)} (${x.k.toLowerCase()})`; });
+    const bajas = movs.filter(x=>x.d<0).sort((x,y)=>x.d-y.d), subidas = movs.filter(x=>x.d>0).sort((x,y)=>y.d-x.d);
+    if(bajas[0]){ const x = bajas[0];
+      out.push(flag('dn', `<b>${esc(x.k)}</b> cayó <b>${pctTxt(x.p)}</b> (${MXN(x.va)} → ${MXN(x.vb)})${x.vb && m.total ? ` y es el ${PCT(x.vb/m.total)} de la venta` : ''}.`)); }
+    if(bajas.length > 1) out.push(flag('dn', bajas.slice(1,3).map(x=>`<b>${esc(x.k)} −${pctTxt(x.p)}</b>`).join(' y ') + ' vs el periodo anterior.'));
+    if(subidas.length) out.push(flag('up', subidas.slice(0,2).map(x=>`<b>${esc(x.k)}</b> ${x.va ? `subió de ${MXN(x.va)} a <b>${MXN(x.vb)}</b>` : `aparece con <b>${MXN(x.vb)}</b>`}`).join(' y ') + '.'));
+  } else if(m.total > 0){
+    out.push(flag('wa', 'Sin ventas en el periodo anterior para comparar productos.'));
   }
-  // Precio de compra por corte vs periodo anterior
-  const precio = I => { const o = {}; I.filter(r=>r[1]==='Carne' && CORTES_COCCION.includes(r[2])).forEach(r=>{ o[r[2]] = o[r[2]] || {kg:0,c:0}; o[r[2]].kg += num(r[3]); o[r[2]].c += num(r[6]); }); return o; };
-  const pa = precio(m.I), pb = precio(ant.I);
-  Object.keys(pa).forEach(k=>{ if(pb[k] && pa[k].kg && pb[k].kg){ const a1 = pa[k].c/pa[k].kg, b1 = pb[k].c/pb[k].kg, d = a1/b1-1;
-    if(Math.abs(d) >= 0.05) out.push(`${d>0?'Subió':'Bajó'} el precio de compra de <b>${esc(k)}</b> ${Math.abs(d*100).toFixed(0)}% (${MXN(b1)} → ${MXN(a1)} por kilo).`); } });
-  const ef = m.V.filter(r=>r[8]==='Efectivo').reduce((s,r)=>s+num(r[7]),0);
-  if(m.total && ef/m.total > 0.85) out.push(`El <b>${PCT(ef/m.total)}</b> se cobra en efectivo: cuadra la caja al cierre de cada día.`);
-  const prods = agrupar(m.V, r=>r[3], r=>num(r[7]));
-  if(prods.length && m.total && prods[0][1]/m.total > 0.5) out.push(`<b>${esc(prods[0][0])}</b> hace el ${PCT(prods[0][1]/m.total)} de la venta: que nunca falte.`);
-  if(m.P.length) out.push(`Se registraron <b>${m.P.length} ventas perdidas</b>${(()=>{ const c = agrupar(m.P, r=>r[1], ()=>1)[0]; return c ? `, sobre todo de ${esc(c[0])}` : ''; })()}.`);
-  if(m.sinCostos.length && !FILTRO) out.push(`Faltan insumos de ${m.sinCostos.length} semana${m.sinCostos.length>1?'s':''}; captúralos para ver la utilidad real.`);
-  return out.length ? `<ul class="insights">${out.slice(0,5).map(x=>`<li>${x}</li>`).join('')}</ul>` : '<p class="note">Todo en orden en este periodo.</p>';
+  const tp = m.tickets ? m.total/m.tickets : 0, tpa = ant.tickets ? ant.total/ant.tickets : 0;
+  if(tp && tpa){
+    const p = tp/tpa - 1;
+    if(Math.abs(p) >= UMBRAL.ticketPct){
+      const dt = m.tickets/ant.tickets - 1;
+      const lectura = Math.abs(dt) < 0.05 ? (p<0 ? ': la gente llevó menos, no vinieron menos' : ': la gente llevó más con los mismos clientes')
+                                          : ` (tickets ${dt>=0?'+':'−'}${pctTxt(dt)})`;
+      out.push(flag(p<0?'dn':'up', `<b>Ticket promedio</b> ${p<0?'bajó':'subió'} <b>${pctTxt(p)}</b> (${MXN(tpa)} → ${MXN(tp)})${lectura}.`));
+    }
+  }
+  if(m.P.length){
+    const c = agrupar(m.P, r=>r[1]||'Sin categoría', ()=>1)[0]; const kg = m.P.reduce((s,r)=>s+num(r[2]),0);
+    out.push(flag('wa', `<b>${m.P.length} ${m.P.length===1?'venta perdida':'ventas perdidas'}</b>${c?`, sobre todo de ${esc(c[0])}`:''}${kg?` (${kg.toFixed(2)} kg)`:''}: revisa si conviene producir más.`));
+  } else if(ant.P.length){
+    out.push(flag('wa', `<b>0 ventas perdidas</b> registradas (${ant.P.length} en el periodo anterior). Si se acabó algo, captúralo para medir faltantes.`));
+  }
+  return out;
+}
+
+function alertasCostos(m, ant, R){
+  if(FILTRO) return [flag('wa', 'Quita el filtro para ver las alertas de costos.')];
+  const out = [];
+  if(m.sinCostos.length) out.push(flag('dn', `${m.sinCostos.length===1?'La semana':'Las semanas'} del ${m.sinCostos.map(s=>'vie '+corto(s)).join(', ')} ${m.sinCostos.length===1?'tiene':'tienen'} ventas pero <b>no insumos capturados</b>: la utilidad no es confiable.`));
+  if(m.total && m.I.length){
+    const p = m.carne/m.total;
+    if(p > UMBRAL.carneVenta) out.push(flag('dn', `<b>Carne</b> = <b>${PCT(p)}</b> de la venta (${MXN(m.carne)} de ${MXN(m.total)}). Arriba de ${PCT(UMBRAL.carneVenta)} es alerta.`));
+  }
+  const pa = precioPorCorte(m.I), pb = precioPorCorte(ant.I), cambios = [];
+  Object.keys(pa).forEach(k=>{ if(pb[k] && pa[k].kg && pb[k].kg){ const a1 = pa[k].c/pa[k].kg, b1 = pb[k].c/pb[k].kg, d = a1/b1 - 1; if(Math.abs(d) >= UMBRAL.precioKg) cambios.push({k, a1, b1, d}); } });
+  cambios.sort((x,y)=>Math.abs(y.d)-Math.abs(x.d)).forEach(x=>out.push(flag(x.d>0?'dn':'up', `${x.d>0?'Subió':'Bajó'} el precio de <b>${esc(x.k)}</b> ${pctTxt(x.d)} (${MXN(x.b1)} → ${MXN(x.a1)} por kilo).`)));
+  if(!cambios.length && Object.keys(pa).length && Object.keys(pb).length) out.push(flag('up', 'Precios de compra por kilo sin cambios de 5% o más.'));
+  if(m.kgComp > 0 && m.kgVend > 0){
+    const rend = m.kgVend/m.kgComp;
+    const prev = porSemana(addDays(R.a, -28), addDays(R.a, -1)).filter(x=>x.kgComp>0 && x.kgVend>0);
+    if(prev.length >= 2){
+      const pr = prev.reduce((s,x)=>s+x.kgVend/x.kgComp,0)/prev.length, dif = (rend-pr)*100;
+      if(dif <= -UMBRAL.rendPts) out.push(flag('wa', `<b>Rendimiento</b> de ${PCT(rend)} vs ${PCT(pr)} en las 4 semanas previas: compraste ${m.kgComp.toFixed(0)} kg en crudo; revisa cuánto sobró o si hubo merma.`));
+      else if(dif >= UMBRAL.rendPts) out.push(flag('up', `<b>Rendimiento</b> de ${PCT(rend)} vs ${PCT(pr)} en las 4 semanas previas.`));
+    }
+  }
+  const huecos = porSemana(R.pa, R.b).filter(x=>x.total>0 && x.I.length && (x.otros + x.gastos)===0).map(x=>x.s);
+  if(huecos.length) out.push(flag('wa', `${huecos.length===1?'La semana':'Las semanas'} del ${huecos.map(s=>'vie '+corto(s)).join(', ')} no ${huecos.length===1?'tiene':'tienen'} <b>otros insumos ni gastos</b> capturados: su margen sale inflado.`));
+  const sinSueldo = porSemana(R.a, R.b).filter(x=>x.total>0 && !x.S.length).map(x=>x.s);
+  if(sinSueldo.length) out.push(flag('wa', `Sin <b>sueldos</b> capturados en la semana del ${sinSueldo.map(s=>'vie '+corto(s)).join(', ')}.`));
+  if(ant.costos > 0 && m.costos > 0){
+    const p = m.costos/ant.costos - 1;
+    if(Math.abs(p) >= UMBRAL.costoPct) out.push(flag(p>0?'wa':'up', `<b>Costo total</b> ${p>0?'subió':'bajó'} ${pctTxt(p)} (${MXN(ant.costos)} → ${MXN(m.costos)}).`));
+  }
+  return out;
+}
+
+function alertasDatos(m, R){
+  const out = [];
+  if(SERVICIO && verMenor(SERVICIO.version, '2.3')) out.push(flag('dn', `El servicio de Apps Script está en la <b>versión ${esc(SERVICIO.version||'anterior')}</b>: publica el <code>Code.gs</code> 2.3.0 (Gestionar implementaciones → ✏️ → Nueva versión). Mientras, las horas pueden salir desfasadas.`));
+  const V0 = enRango(RAW.Ventas, R.a, R.b).filter(r=>r[2]!=='Regalo');
+  const temprano = V0.filter(r=>{ const h = parseInt(r[0].slice(11,13),10); return isFinite(h) && h < UMBRAL.horaMin && r[0].slice(11,19)!=='00:00:00'; });
+  if(temprano.length) out.push(flag('dn', `<b>${temprano.length} ${temprano.length===1?'venta':'ventas'} antes de las ${UMBRAL.horaMin}:00</b>. Si no abriste a esa hora, las horas vienen desfasadas: revisa la versión del servicio y la zona horaria de la hoja.`));
+  const noOp = agrupar(V0.filter(r=>![6,0].includes(dow(r[0].slice(0,10)))), r=>r[0].slice(0,10), r=>num(r[7]));
+  if(noOp.length) out.push(flag('wa', `Ventas en día no operativo: ${noOp.map(([d,v])=>`<b>${diaCorto(d)}, ${MXN(v)}</b>`).join(' · ')}. ¿Pruebas o venta real?`));
+  dupInsumos(m.I).forEach(g=>out.push(flag('wa', `Posible <b>duplicado en Insumos</b>: ${esc(g.nombre)} por ${MXN(g.monto)} ${g.rows.map(r=>`el ${diaCorto(r[0])}${r[7]?` (${esc(r[7])})`:''}`).join(' y ')}.`)));
+  dupGastos(m.G).forEach(g=>out.push(flag('wa', `Posible <b>duplicado en Gastos</b>: ${esc(g.nombre)} por ${MXN(g.monto)} ${g.rows.map(r=>`el ${diaCorto(r[0])}`).join(' y ')}.`)));
+  const dobles = doblesCaptura(V0);
+  if(dobles.length) out.push(flag('wa', `<b>${dobles.length} ${dobles.length===1?'ticket idéntico':'tickets idénticos'}</b> a otro cobrado menos de un minuto antes (${dobles.slice(0,3).map(t=>`${diaCorto(t.f)} ${t.f.slice(11,16)} · ${MXN(t.t)}`).join(', ')}): ¿doble toque al cobrar?`));
+  const otro = m.I.filter(r=>/^otros?$/i.test(String(r[2]).trim()));
+  if(otro.length) out.push(flag('wa', `<b>${otro.length} ${otro.length===1?'insumo':'insumos'}</b> con producto "Otro" (${MXN(otro.reduce((s,r)=>s+num(r[6]),0))}): no entran al rendimiento de la carne.`));
+  const sinCosto = m.I.filter(r=>!(num(r[6])>0));
+  if(sinCosto.length) out.push(flag('wa', `<b>${sinCosto.length} ${sinCosto.length===1?'insumo':'insumos'} sin costo</b> capturado: ${sinCosto.slice(0,3).map(r=>esc(r[2])).join(', ')}.`));
+  const sinPago = V0.filter(r=>!r[8]).length;
+  if(sinPago) out.push(flag('wa', `<b>${sinPago} ${sinPago===1?'venta':'ventas'} sin método de pago</b>.`));
+  if(SERVICIO && SERVICIO.tz && SERVICIO.tz!=='America/Mexico_City') out.push(flag('wa', `La hoja está en la zona horaria <b>${esc(SERVICIO.tz)}</b>: ejecuta <code>ajustarZonaHoraria()</code> en Apps Script.`));
+  if(!out.length) out.push(flag('up', 'Captura sin problemas detectados: horas normales, sin duplicados y todas las ventas con método de pago.'));
+  return out;
+}
+
+function alertasResumen(m, ant, R){
+  const out = [];
+  if(!FILTRO && m.I.length && m.total > 0){
+    const mg = m.utilidad/m.total;
+    const sem = porSemana(addDays(R.a, -28), addDays(R.a, -1)).filter(x=>x.ok && x.total>0);
+    const prom = sem.length >= 2 ? sem.reduce((s,x)=>s+x.utilidad/x.total,0)/sem.length : null;
+    if(mg < 0) out.push(flag('dn', `Margen de <b>${PCT(mg,1)}</b>: los costos superaron a la venta por ${MXN(-m.utilidad)}${prom!=null?` (promedio de las 4 semanas previas: ${PCT(prom,1)})`:''}.`));
+    else if(prom != null && Math.abs(mg-prom)*100 >= UMBRAL.margenPts) out.push(flag(mg>prom?'up':'dn', `Margen de <b>${PCT(mg,1)}</b>, ${mg>prom?'arriba':'abajo'} del promedio de las 4 semanas previas (${PCT(prom,1)}) por <b>${(Math.abs(mg-prom)*100).toFixed(1)} puntos</b>.`));
+  }
+  if(ant.total > 0){
+    const p = m.total/ant.total - 1;
+    if(Math.abs(p) >= UMBRAL.ventaPct) out.push(flag(p<0?'dn':'up', `Venta <b>${p<0?'−':'+'}${(Math.abs(p)*100).toFixed(1)}%</b>: ${MXN(m.total)} vs ${MXN(ant.total)}${m.tickets===ant.tickets?`, con los mismos ${m.tickets} tickets`:` (${m.tickets} tickets vs ${ant.tickets})`}.`));
+  }
+  // Lo más importante de las otras pestañas
+  const primera = l => l.filter(f=>f.sev!=='up').sort((a,b)=>SEV_ORDEN[a.sev]-SEV_ORDEN[b.sev])[0];
+  [primera(alertasDatos(m, R)), primera(alertasCostos(m, ant, R)), primera(alertasVentas(m, ant))].forEach(f=>{ if(f && !out.some(o=>o.html===f.html)) out.push(f); });
+  const prom = d => { const dd = m.dias.filter(x=>dow(x)===d); return dd.length ? m.V.filter(r=>dd.includes(r[0].slice(0,10))).reduce((s,r)=>s+num(r[7]),0)/dd.length : 0; };
+  const sab = prom(6), dom = prom(0);
+  if(sab > 0 && dom > 0) out.push(flag('up', `<b>${dom>sab?'Domingo':'Sábado'}</b> fue el día más fuerte: ${MXN(Math.max(sab,dom))} vs ${MXN(Math.min(sab,dom))}${m.dias.length>2?' en promedio':''}.`));
+  return out;
 }
 
 /* ================= Vistas ================= */
@@ -572,14 +759,13 @@ function vResumen(m, ant, R){
   const porDow = [6,0].map(d=>{ const dd = m.dias.filter(x=>dow(x)===d); const t = m.V.filter(r=>dd.includes(r[0].slice(0,10))).reduce((s,r)=>s+num(r[7]),0); return [DIAS_L[d] + (dd.length>1?` (prom. ${dd.length} días)`:''), dd.length ? t/dd.length : 0]; }).filter(x=>x[1]>0);
   const pico = agrupar(m.V.filter(r=>r[0].length>12), r=>`${DIAS_L[dow(r[0].slice(0,10))]} ${parseInt(r[0].slice(11,13),10)}:00`, r=>num(r[7]))[0];
   return `
-  ${avisoCostos(m)}
+  ${tarjetaAlertas('Resumen', alertasResumen(m, ant, R), R)}
   <div class="kpis">
     <div class="kpi hl"><p class="l">Ventas</p><p class="v">${MXN(m.total)}</p>${delta(m.total, ant.total)}</div>
     <div class="kpi"><p class="l">Utilidad</p><p class="v">${costosOk ? MXN(m.utilidad) : '—'}</p>${costosOk ? delta(m.utilidad, ant.I.length ? ant.utilidad : 0) : `<p class="d">${FILTRO ? 'Quita el filtro para verla' : 'Faltan insumos capturados'}</p>`}</div>
     <div class="kpi"><p class="l">Margen</p><p class="v">${costosOk ? PCT(margen,1) : '—'}</p><p class="d">${prom4!=null ? `Promedio 4 semanas: ${PCT(prom4,1)}` : 'Sin promedio de 4 semanas'}</p></div>
     <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${MXN(m.tickets ? m.total/m.tickets : 0)}</p><p class="d">${m.tickets.toLocaleString('es-MX')} tickets</p></div>
   </div>
-  <div class="card" style="margin-bottom:12px"><h3>Qué revisar</h3>${queRevisar(m, ant, R)}</div>
   <div class="g2">
     <div class="card"><h3>Venta y utilidad por semana <small>${document.getElementById('periodo').value==='semana' ? 'últimas 8 semanas, resaltada la elegida' : semVentana.length+' semanas'}</small></h3>${ventaUtilidad(semVentana, R)}</div>
     <div class="card"><h3>De la venta a la utilidad</h3>${FILTRO ? '<p class="note">Quita el filtro para ver la utilidad.</p>' : cascada(m)}</div>
@@ -592,19 +778,19 @@ function vResumen(m, ant, R){
   <p class="note">Semana del negocio: viernes a jueves. Utilidad = ventas − carne − otros insumos − gastos − sueldos. Comparación contra vie ${corto(R.pa)} – jue ${corto(R.pb)}.</p>`;
 }
 
-function vVentas(m, ant){
+function vVentas(m, ant, R){
   const porHora = {}; m.V.forEach(r=>{ const h = parseInt(r[0].slice(11,13),10); if(isFinite(h)) porHora[h] = (porHora[h]||0) + num(r[7]); });
   const hs = Object.keys(porHora).map(Number).sort((a,b)=>a-b);
   const nd = Math.max(m.dias.length, 1);
   const pH = hs.length ? Array.from({length: hs[hs.length-1]-hs[0]+1}, (_,i)=>hs[0]+i).map(h=>({label:`${h}:00`, v:(porHora[h]||0)/nd})) : [];
   // Ranking con regla 80/20
   const prod = new Map();
-  m.V.forEach(r=>{ const k = r[3]||'-'; const o = prod.get(k) || {cat:r[2], v:0, kg:0, pz:0}; o.v += num(r[7]); o.kg += kgCarne(r); if(r[4]==='Piezas' || (!r[4] && r[2]!=='Carne')) o.pz += num(r[5]); prod.set(k,o); });
+  m.V.forEach(r=>{ const k = prodKey(r); const o = prod.get(k) || {cat:r[2], v:0, kg:0, pz:0}; o.v += num(r[7]); o.kg += kgCarne(r); if(r[4]==='Piezas' || (!r[4] && r[2]!=='Carne')) o.pz += num(r[5]); prod.set(k,o); });
   const prods = [...prod.entries()].sort((a,b)=>b[1].v-a[1].v);
   let acum = 0, corte = -1;
   prods.forEach(([p,o],i)=>{ acum += o.v; o.acum = m.total ? acum/m.total : 0; if(corte<0 && o.acum>=0.8) corte = i; });
   // Tickets
-  const tk = new Map(); m.V.forEach(r=>{ const o = tk.get(r[1]) || {f:r[0], n:0, t:0, p:r[8]}; o.n++; o.t += num(r[7]); tk.set(r[1], o); });
+  const tk = new Map(); juntarSurtido(m.V).forEach(r=>{ const o = tk.get(r[1]) || {f:r[0], n:0, t:0, p:r[8]}; o.n++; o.t += num(r[7]); tk.set(r[1], o); });
   const tks = [...tk.values()];
   const lineas = tks.length ? tks.reduce((s,x)=>s+x.n,0)/tks.length : 0;
   const grandes = tks.slice().sort((a,b)=>b.t-a.t).slice(0,5);
@@ -613,6 +799,7 @@ function vVentas(m, ant){
   m.P.forEach(r=>{ const k = r[1]||'Sin categoría'; const o = vp.get(k) || {n:0, kg:0, mt:0, pz:0}; o.n++; o.kg += num(r[2]); o.mt += num(r[4]); o.pz += num(r[5]); vp.set(k,o); });
   const regalo = m.regalos.reduce((s,r)=>s+num(r[5]),0);
   return `
+  ${tarjetaAlertas('Ventas', alertasVentas(m, ant), R)}
   <div class="kpis">
     <div class="kpi hl"><p class="l">Ventas</p><p class="v">${MXN(m.total)}</p>${delta(m.total, ant.total)}</div>
     <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${MXN(m.tickets ? m.total/m.tickets : 0)}</p>${delta(m.tickets ? m.total/m.tickets : 0, ant.tickets ? ant.total/ant.tickets : 0)}</div>
@@ -662,7 +849,7 @@ function vCostos(m, ant, R){
   const sPer = agrupar(m.S, r=>r[1]||'-', r=>num(r[4]));
   const fila = (n, v, cls) => `<tr class="${cls||''}"><td>${n}</td><td class="r">${MXN(v)}</td><td class="r" style="color:var(--muted)">${m.total?PCT(v/m.total):''}</td></tr>`;
   return `
-  ${avisoCostos(m)}
+  ${tarjetaAlertas('Costos', alertasCostos(m, ant, R), R)}
   ${FILTRO ? '<p class="note" style="margin:-4px 0 10px">El filtro solo aplica a ventas; los costos se muestran completos.</p>' : ''}
   <div class="kpis">
     <div class="kpi"><p class="l">Costo total</p><p class="v">${MXN(m.costos)}</p>${delta(m.costos, ant.costos, 'periodo anterior', true)}</div>
@@ -689,7 +876,20 @@ function vCostos(m, ant, R){
   </div>`;
 }
 
-function vDatos(m, R){
+const TABLAS = [['Ventas','Ventas'],['Insumos','Insumos'],['Gastos','Gastos'],['Sueldos','Sueldos'],['VentasPerdidas','V. perdidas']];
+const LIM_FILAS = 300;
+const fechaCelda = s => { const t = s.slice(11,16); return diaCorto(s) + (t && s.slice(11,19)!=='00:00:00' ? ` · ${t}` : ''); };
+const cant = v => { const n = num(v); return n ? (+n.toFixed(3)).toLocaleString('es-MX') : '–'; };
+const tag = t => `<span class="tag">${t}</span>`;
+
+function verTabla(t){ TABLA = t; render(); }
+
+function filasTabla(t, m){
+  if(t==='Ventas') return juntarSurtido(m.V);
+  return {Insumos:m.I, Gastos:m.G, Sueldos:m.S, VentasPerdidas:m.P}[t] || [];
+}
+
+function vDatos(m, ant, R){
   const all = RAW.Ventas;
   const sinModo = all.filter(r=>!r[4] && r[2]!=='Regalo').length;
   const sinPago = all.filter(r=>!r[8]).length;
@@ -697,33 +897,75 @@ function vDatos(m, R){
   const fechas = all.map(r=>r[0].slice(0,10)).sort();
   const semS = new Set(all.map(r=>semanaDe(r[0].slice(0,10)))), semI = new Set(RAW.Insumos.map(r=>semanaDe(r[0].slice(0,10)))), semN = new Set(RAW.Sueldos.map(r=>semanaDe(r[0].slice(0,10))));
   const faltaI = [...semS].filter(s=>!semI.has(s)).sort(), faltaN = [...semS].filter(s=>!semN.has(s)).sort();
-  const ult = m.V.slice().sort((a,b)=>a[0]<b[0]?1:-1).slice(0,40);
+  const repartidos = all.filter(r=>r[4]==='Surtido' && CORTES_REPARTO.includes(r[3])).length;
+
+  if(!TABLAS.some(([k])=>k===TABLA)) TABLA = 'Ventas';
+  const seg = TABLAS.map(([k,t])=>`<button class="${k===TABLA?'on':''}" onclick="verTabla('${k}')">${t}<em>${filasTabla(k, m).length}</em></button>`).join('');
+  const filas = filasTabla(TABLA, m).slice().sort((a,b)=>a[0]<b[0]?1:a[0]>b[0]?-1:0);
+  const vista = filas.slice(0, LIM_FILAS);
+  const mini = l => `<div class="mini">${l.map(([t,v])=>`<div><p>${t}</p><b>${v}</b></div>`).join('')}</div>`;
+  let kp = '', cab = [], der = [], cuerpo = '';
+
+  if(TABLA==='Ventas'){
+    const temprano = new Set(vista.filter(r=>{ const h = parseInt(r[0].slice(11,13),10); return isFinite(h) && h < UMBRAL.horaMin; }));
+    const dobles = new Set(doblesCaptura(m.V).map(x=>x.id));
+    kp = mini([['Venta', MXN(m.total)], ['Tickets', m.tickets.toLocaleString('es-MX')], ['Renglones', filas.length.toLocaleString('es-MX')]]);
+    cab = ['Fecha','Producto','Modo','Cantidad','Total','Pago']; der = [3,4];
+    cuerpo = vista.map(r=>[fechaCelda(r[0]) + (temprano.has(r) ? tag('¿hora?') : ''), esc(prodKey(r)) + (dobles.has(r[1]) ? tag('¿doble?') : ''), `<span style="color:var(--ink2)">${esc(r[4]||'–')}</span>`, cant(r[5]), MXN(r[7]), esc(r[8]||'–')]);
+  } else if(TABLA==='Insumos'){
+    const dup = new Set(dupInsumos(m.I).flatMap(g=>g.rows));
+    kp = mini([['Total', MXN(m.carne + m.otros)], ['Carne', MXN(m.carne)], ['Otros', MXN(m.otros)]]);
+    cab = ['Fecha','Producto','Cantidad','$/u','Costo','Proveedor']; der = [2,3,4];
+    cuerpo = vista.map(r=>[fechaCelda(r[0]), `${esc(r[2])}${dup.has(r)?tag('¿dup?'):''}<span style="color:var(--muted)"> · ${esc(r[1])}</span>`, cant(r[3]) + (/kilo/i.test(r[4]) ? ' kg' : ''), num(r[5]) ? MXN(r[5]) : '–', num(r[6]) ? MXN(r[6]) : tag('sin costo'), esc(r[7]||'–')]);
+  } else if(TABLA==='Gastos'){
+    const dup = new Set(dupGastos(m.G).flatMap(g=>g.rows));
+    kp = mini([['Total', MXN(m.gastos)], ['% de venta', m.total ? PCT(m.gastos/m.total,1) : '—'], ['Renglones', m.G.length]]);
+    cab = ['Fecha','Categoría','Descripción','Monto','Proveedor']; der = [3];
+    cuerpo = vista.map(r=>[fechaCelda(r[0]), esc(r[1]||'–'), esc(r[2]||'–') + (dup.has(r)?tag('¿dup?'):''), MXN(r[3]), esc(r[4]||'–')]);
+  } else if(TABLA==='Sueldos'){
+    kp = mini([['Total', MXN(m.sueldos)], ['Personas', new Set(m.S.map(r=>normTxt(r[1]))).size], ['Días pagados', cant(m.S.reduce((s,r)=>s+num(r[3]),0))]]);
+    cab = ['Fecha','Nombre','Puesto','Días','Pagado']; der = [3,4];
+    cuerpo = vista.map(r=>[fechaCelda(r[0]), esc(r[1]||'–'), esc(r[2]||'–'), cant(r[3]), MXN(r[4])]);
+  } else {
+    kp = mini([['Registros', m.P.length], ['Kilos', m.P.reduce((s,r)=>s+num(r[2]),0).toFixed(2)], ['Periodo anterior', ant.P.length]]);
+    cab = ['Fecha','Categoría','Kilos','Piezas','Monto','Motivo']; der = [2,3,4];
+    cuerpo = vista.map(r=>[fechaCelda(r[0]), esc(r[1]||'–'), cant(r[2]), cant(r[5]), num(r[4]) ? MXN(r[4]) : '–', esc(r[3]||'–')]);
+  }
+  const tabla = filas.length
+    ? `<div class="tscroll"><table><tr>${cab.map((h,i)=>`<th class="${der.includes(i)?'r':''}">${h}</th>`).join('')}</tr>
+       ${cuerpo.map(c=>`<tr>${c.map((v,i)=>`<td class="${der.includes(i)?'r':''}">${v}</td>`).join('')}</tr>`).join('')}</table></div>
+       ${filas.length > LIM_FILAS ? `<p class="note">Mostrando los ${LIM_FILAS} más recientes de ${filas.length.toLocaleString('es-MX')}. Descarga el CSV para verlos todos.</p>` : ''}`
+    : `<div class="vacio">Sin registros de ${TABLAS.find(([k])=>k===TABLA)[1].toLowerCase()} en este periodo</div>`;
+
   return `
-  <div class="g2">
-    <div class="card"><h3>Calidad de los datos <small>todo el histórico</small></h3>
-      <table>
-        <tr><td>Rango de fechas</td><td class="r">${corto(fechas[0])} – ${corto(fechas[fechas.length-1])}</td></tr>
-        ${Object.keys(ENC).map(k=>`<tr><td>Renglones en ${k}</td><td class="r">${RAW[k].length.toLocaleString('es-MX')}</td></tr>`).join('')}
-        <tr><td>Semanas con ventas pero sin insumos</td><td class="r">${faltaI.length ? faltaI.map(s=>'vie '+corto(s)).join(', ') : '0'}</td></tr>
-        <tr><td>Semanas con ventas pero sin sueldos</td><td class="r">${faltaN.length ? faltaN.map(s=>'vie '+corto(s)).join(', ') : '0'}</td></tr>
-        <tr><td>Ventas sin modo de captura <span style="color:var(--muted)">(versión anterior de la app)</span></td><td class="r">${sinModo}</td></tr>
-        <tr><td>Ventas sin método de pago</td><td class="r">${sinPago}</td></tr>
-        <tr><td>Ventas con total en cero</td><td class="r">${cero}</td></tr>
-      </table>
-      <p class="note">Los renglones de "Regalo" no cuentan como venta.</p>
-      <button class="btn" style="margin-top:12px" onclick="descargarCSV()">Descargar ventas del periodo (CSV)</button></div>
-    <div class="card"><h3>Últimas ventas del periodo <small>${esc(etiquetaRango(R))}</small></h3>
-      <table><tr><th>Fecha</th><th>Producto</th><th>Modo</th><th class="r">Total</th><th>Pago</th></tr>
-      ${ult.map(r=>`<tr><td>${esc(r[0].slice(5,16))}</td><td>${esc(r[3])}</td><td style="color:var(--ink2)">${esc(r[4]||'–')}</td><td class="r">${MXN(r[7])}</td><td>${esc(r[8])}</td></tr>`).join('')}</table></div>
-  </div>`;
+  ${tarjetaAlertas('Datos', alertasDatos(m, R), R)}
+  <div class="card" style="margin-bottom:12px"><h3>${TABLAS.find(([k])=>k===TABLA)[1]} del periodo <small>${esc(etiquetaRango(R))}${TABLA==='Ventas' && FILTRO ? ' · con filtro' : ''}</small></h3>
+    <div class="seg" role="tablist" aria-label="Tabla a mostrar">${seg}</div>
+    ${kp}${tabla}
+    <button class="btn" style="margin-top:12px" onclick="descargarCSV('${TABLA}')">Descargar ${TABLAS.find(([k])=>k===TABLA)[1].toLowerCase()} del periodo (CSV)</button>
+  </div>
+  <div class="card"><h3>Calidad de los datos <small>todo el histórico</small></h3>
+    <table>
+      <tr><td>Rango de fechas</td><td class="r">${corto(fechas[0])} – ${corto(fechas[fechas.length-1])}</td></tr>
+      ${Object.keys(ENC).map(k=>`<tr><td>Renglones en ${k}</td><td class="r">${RAW[k].length.toLocaleString('es-MX')}</td></tr>`).join('')}
+      <tr><td>Semanas con ventas pero sin insumos</td><td class="r">${faltaI.length ? faltaI.map(s=>'vie '+corto(s)).join(', ') : '0'}</td></tr>
+      <tr><td>Semanas con ventas pero sin sueldos</td><td class="r">${faltaN.length ? faltaN.map(s=>'vie '+corto(s)).join(', ') : '0'}</td></tr>
+      <tr><td>Renglones de Surtido repartidos por corte <span style="color:var(--muted)">(se juntan con consolidarSurtido)</span></td><td class="r">${repartidos.toLocaleString('es-MX')}</td></tr>
+      <tr><td>Ventas sin modo de captura <span style="color:var(--muted)">(versión anterior de la app)</span></td><td class="r">${sinModo}</td></tr>
+      <tr><td>Ventas sin método de pago</td><td class="r">${sinPago}</td></tr>
+      <tr><td>Ventas con total en cero</td><td class="r">${cero}</td></tr>
+      ${SERVICIO ? `<tr><td>Servicio de Apps Script</td><td class="r">v${esc(SERVICIO.version||'?')} · ${esc(SERVICIO.tz||'zona sin dato')}</td></tr>` : ''}
+    </table>
+    <p class="note">Los renglones de "Regalo" no cuentan como venta.</p></div>`;
 }
 
-function descargarCSV(){
-  const R = rango(); const rows = enRango(RAW.Ventas, R.a, R.b);
-  const csv = [ENC.Ventas].concat(rows).map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+function descargarCSV(t){
+  t = t || 'Ventas';
+  const R = rango(); const rows = enRango(RAW[t], R.a, R.b);
+  const csv = [ENC[t]].concat(rows).map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['﻿'+csv], {type:'text/csv'}));
-  a.download = `ventas_${R.a}_${R.b}.csv`; a.click();
+  a.download = `${t.toLowerCase()}_${R.a}_${R.b}.csv`; a.click();
 }
 
 /* ================= Render ================= */
@@ -755,7 +997,7 @@ function render(){
   document.getElementById('subTxt').textContent = `vie ${corto(R.a)} – jue ${corto(R.b)} · ${R.semanas} semana${R.semanas>1?'s':''} · ${diasV.length<=4 && diasV.length ? 'ventas ' + diasV.join(', ') : diasV.length + ' días con venta'} · costos de viernes a jueves`;
   document.getElementById('filtroBox').innerHTML = FILTRO ? `<span class="filtro">Filtrado por ${FILTRO.campo==='cat'?'categoría':'producto'}: <b>${esc(FILTRO.valor)}</b> <button onclick="FILTRO=null;render()" aria-label="Quitar filtro">✕</button></span>` : '';
   if(!m.V.length && TAB!=='datos' && TAB!=='costos'){ main.innerHTML = `<div class="empty"><h2>Sin ventas entre vie ${corto(R.a)} y jue ${corto(R.b)}</h2><p>Usa las flechas o elige otro periodo arriba.</p></div>`; return; }
-  main.innerHTML = TAB==='resumen' ? vResumen(m, ant, R) : TAB==='ventas' ? vVentas(m, ant) : TAB==='costos' ? vCostos(m, ant, R) : vDatos(m, R);
+  main.innerHTML = TAB==='resumen' ? vResumen(m, ant, R) : TAB==='ventas' ? vVentas(m, ant, R) : TAB==='costos' ? vCostos(m, ant, R) : vDatos(m, ant, R);
 }
 
 function mover(n){
@@ -797,15 +1039,17 @@ async function conectar(){
 async function desdeServicio(c){
   document.getElementById('main').innerHTML = `<div class="empty"><p>Cargando datos de tu hoja…</p></div>`;
   try{
-    RAW = normalizar(await cargarServicio(c));
-    const h = new Date(); FUENTE = `En vivo · ${pad(h.getHours())}:${pad(h.getMinutes())}`;
+    const d = await cargarServicio(c);
+    SERVICIO = {version: d.version, tz: d.tz};
+    RAW = normalizar(d.datos);
+    const h = new Date(); FUENTE = `En vivo · servicio v${d.version || '?'} · ${pad(h.getHours())}:${pad(h.getMinutes())}`;
     CURSOR = null; render();
   }catch(e){ RAW = null; render(); pantallaFuente('No se pudo conectar: ' + e.message); }
 }
 
 async function usarExcel(f){
   document.getElementById('main').innerHTML = `<div class="empty"><p>Leyendo ${esc(f.name)}…</p></div>`;
-  try{ RAW = normalizar(await leerExcel(f)); FUENTE = `Archivo: ${f.name}`; CURSOR = null; render(); }
+  try{ SERVICIO = null; RAW = normalizar(await leerExcel(f)); FUENTE = `Archivo: ${f.name}`; CURSOR = null; render(); }
   catch(e){ RAW = null; render(); pantallaFuente('No se pudo leer el archivo: ' + e.message); }
 }
 

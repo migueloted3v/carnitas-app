@@ -41,7 +41,7 @@ Además incluye un **tablero ejecutivo** (`carnitasdashboard.html`) para revisar
 - **Precios por kilo, medio y cuarto** desde la pestaña `Precios`, visibles en cada botón: ¾ = medio + cuarto, 1¼ = kilo + cuarto, 1½ = kilo + medio (gramos y monto se calculan con el precio del kilo)
 - **Piezas** para Gorditas, Tacos, Frijoles charros, Bebida y Torta, con el campo vacío y teclado numérico (sin un "1" que borrar)
 - **Pollo** entero o medio (botones Medio · 1 · 1½ · 2 u otra cantidad)
-- **Surtido** con reparto automático entre cortes según lo comprado en las últimas 8 semanas; el redondeo se ajusta para que la suma cuadre exacto con lo cobrado
+- **Surtido** como un producto más: se guarda en un solo renglón con lo que se cobró (kilos, gramos o monto), sin repartos estimados entre cortes
 - **Ticket en vivo** con ✕ para quitar productos antes de cobrar
 - **Tacos regalados** por ticket (opcional, vacío cuenta como cero)
 - **Venta perdida** por categoría: en kilos (¼, ½, ¾, 1 kg), piezas o monto, según el tipo de producto
@@ -70,10 +70,11 @@ Además incluye un **tablero ejecutivo** (`carnitasdashboard.html`) para revisar
 - **Semana del negocio: viernes a jueves.** Las ventas de sábado y domingo se cruzan con los insumos, gastos y sueldos de esos 7 días; los periodos siempre son semanas completas
 - Filtros: *Semana* (con flechas), *Últimas 4 semanas*, *Mes* (semanas cuyo sábado cae en el mes), *Todo* y *Personalizado*
 - **Utilidad = ventas − carne − otros insumos − gastos − sueldos**, con margen y promedio de 4 semanas
-- *Resumen*: KPIs, **Qué revisar** (observaciones automáticas), venta y utilidad por semana con margen, cascada de la venta a la utilidad, mezcla por categoría, sábado vs domingo, cobro
+- **Qué revisar en cada pestaña**: hasta 5 alertas ordenadas de lo más grave (▼) a lo positivo (▲), con umbrales configurables en `UMBRAL`
+- *Resumen*: KPIs, alertas principales de todas las pestañas, venta y utilidad por semana con margen, cascada de la venta a la utilidad, mezcla por categoría, sábado vs domingo, cobro
 - *Ventas*: mapa de calor día × hora, venta por hora, ranking de productos con regla 80/20, productos por ticket, tickets más grandes, ventas perdidas
 - *Costos*: costo por semana, estado de resultados, evolución del precio por kilo por corte, compras por proveedor, costo de carne por kilo vendido, rendimiento, punto de equilibrio semanal, gastos y nómina
-- *Datos*: calidad de captura (semanas sin insumos o sin sueldos) y descarga CSV
+- *Datos*: **selector de tabla** (Ventas, Insumos, Gastos, Sueldos, Ventas perdidas) con indicadores y renglones marcados (`¿dup?`, `¿doble?`, `¿hora?`); alertas de captura (duplicados, doble cobro, ventas fuera de horario o en días no operativos, servicio desactualizado); calidad del histórico y descarga CSV de cualquier tabla
 - **Clic para filtrar** por categoría o producto; botón de **tema claro/oscuro** que se recuerda
 - Lee en vivo del servicio o de un Excel descargado de la hoja
 
@@ -180,6 +181,7 @@ Todo vive en **tu** Google Drive. La app no tiene servidor propio ni guarda tus 
 
 | Versión | Cambios |
 |---|---|
+| **2.3.0** | Surtido se guarda en un solo renglón (sin reparto por porcentajes) · servicio: `ajustarZonaHoraria()`, `revisarSurtido()` y `consolidarSurtido()` para juntar el histórico, y `ping`/`todo` informan la zona horaria · tablero: alertas *Qué revisar* en las 4 pestañas, selector de tablas en *Datos*, aviso si el servicio está desactualizado, Surtido repartido se agrupa al mostrarlo · app: aviso en Ajustes si la hoja no está en hora de México |
 | **2.2.1** | Servicio: las fechas se leen con la zona horaria de la propia hoja; corrige insumos capturados a mano que caían en la semana anterior y horas de venta recorridas 6 horas · acepta fechas escritas como texto (25/09/2026) |
 | **2.2.0** | Semana del negocio de viernes a jueves en tablero y app · margen con gastos incluidos · vista *Semana* en la app · tablero con tema claro/oscuro, clic para filtrar, *Qué revisar*, mapa de calor, ranking 80/20, evolución del precio por kilo, compras por proveedor y punto de equilibrio · nueva acción `rango` en el servicio |
 | **2.1.1** | Se quita el código QR (las cámaras no copian texto simple); la CLABE se muestra más grande y agrupada en bloques · el aviso de versiones distintas solo compara MAYOR.MENOR |

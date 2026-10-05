@@ -356,7 +356,7 @@
 <div id="modalRoot"></div>
 
 <script>
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '2.3.0';
 
 /* =========================================================
    Catálogo
@@ -396,9 +396,6 @@ const PRECIOS_DEFAULT = {
   "Torta":[55]
 };
 
-// Cortes que se promedian para armar "Surtido", en base a lo comprado en Insumos
-const CORTES_SURTIDO = ["Pierna","Buche","Nuca","Aldilla","Costilla"];
-const VENTANA_SURTIDO_DIAS = 56; // 8 semanas
 
 const ENC = {
   Ventas:['Fecha','Ticket','Categoría','Producto','Modo','Cantidad','Precio unitario','Total','Método de pago'],
@@ -434,13 +431,13 @@ let precios = {};
 Object.keys(PRECIOS_DEFAULT).forEach(p=>precios[p]=normPrecio(PRECIOS_DEFAULT[p]));
 Object.entries(leerJSON('carnitas_precios_v2', {})).forEach(([p,v])=>{ const x = normPrecio(v); if(x) precios[p]=x; });
 let cuenta = leerJSON('carnitas_cuenta', []);
+try{ localStorage.removeItem('carnitas_surtido_dist'); }catch(e){} // mezcla de Surtido de la v2.2 (ya no se usa)
 let cobro = {metodo:null, paga:'exacto'};
 let outbox = leerJSON('carnitas_outbox', []);
 let ticket = [];
 let catActiva = Object.keys(CATS)[0];
 let vistaActual = 'inicio';
 let capturasHoy = {insumos:[], gastos:[], sueldos:[]};
-let distribucionSurtidoActual = null;
 let sincronizando = false;
 let modoCaptura = null;
 let fraccionSel = null;
@@ -775,14 +772,10 @@ function renderGrid(){
     const d = document.createElement('div');
     d.className = 'prod';
     d.innerHTML = `${esc(p)}<span class="sub">${sub}</span>`;
-    d.onclick = async ()=>{
+    d.onclick = ()=>{
       document.querySelectorAll('.prod').forEach(el=>el.classList.remove('selected'));
       d.classList.add('selected');
       modoCaptura = null;
-      if(p === 'Surtido'){
-        document.getElementById('qtypanel').innerHTML = `<div class="panel"><h3>Calculando mezcla de Surtido…</h3></div>`;
-        await calcularDistribucionSurtido();
-      }
       abrirCantidad(p);
     };
     g.appendChild(d);
@@ -802,50 +795,10 @@ function precioFraccion(p, q){
   return ent*v.k + resto;
 }
 
-// Qué % de "Surtido" corresponde a cada corte, según lo comprado en Insumos
-// (categoría Carne) en las últimas 8 semanas. Se cachea por día.
-// Si no hay señal o datos, usa el último cálculo guardado o reparte en partes iguales.
-async function calcularDistribucionSurtido(forzar){
-  const cache = leerJSON('carnitas_surtido_dist', null);
-  if(!forzar && cache && cache.calculadoEn === hoy() && cache.distribucion){
-    distribucionSurtidoActual = cache.distribucion;
-    return cache.distribucion;
-  }
-  const fallbackIgual = Object.fromEntries(CORTES_SURTIDO.map(c=>[c, 1/CORTES_SURTIDO.length]));
-  if(!servicioListo()){
-    distribucionSurtidoActual = (cache && cache.distribucion) || fallbackIgual;
-    return distribucionSurtidoActual;
-  }
-  try{
-    const data = await apiGet('insumos', null, 6000);
-    const limiteStr = sumarDias(hoy(), -VENTANA_SURTIDO_DIAS);
-    const sumas = Object.fromEntries(CORTES_SURTIDO.map(c=>[c,0]));
-    (data.filas || []).forEach(row=>{
-      const [fecha, categoria, producto, cantidad] = row;
-      if(categoria==='Carne' && CORTES_SURTIDO.includes(producto) && String(fecha).slice(0,10) >= limiteStr){
-        sumas[producto] += num(cantidad);
-      }
-    });
-    const total = Object.values(sumas).reduce((a,b)=>a+b,0);
-    const distribucion = total>0 ? Object.fromEntries(CORTES_SURTIDO.map(c=>[c, sumas[c]/total])) : fallbackIgual;
-    guardarJSON('carnitas_surtido_dist', {calculadoEn: hoy(), distribucion});
-    distribucionSurtidoActual = distribucion;
-  }catch(e){
-    distribucionSurtidoActual = (cache && cache.distribucion) || fallbackIgual;
-  }
-  return distribucionSurtidoActual;
-}
-
-function textoDistribucionSurtido(dist){
-  if(!dist) return '';
-  return CORTES_SURTIDO.map(c=>`${c} ${Math.round((dist[c]||0)*100)}%`).join(' · ');
-}
-
 function abrirCantidad(producto){
   const tipo = CATS[catActiva].tipo;
   const panel = document.getElementById('qtypanel');
   const p = jsq(producto);
-  const nota = producto==='Surtido' ? `<p class="nota">${esc(textoDistribucionSurtido(distribucionSurtidoActual))}</p>` : '';
 
   if(tipo==='pollo'){
     panel.innerHTML = `
@@ -889,7 +842,6 @@ function abrirCantidad(producto){
   panel.innerHTML = `
     <div class="panel">
       <h3>${esc(producto)} · ${fmt(precioDe(producto))} el kilo</h3>
-      ${nota}
       <div class="seg">${modos.map(m=>`<button class="${m===modoCaptura?'on':''}" onclick="modoCaptura='${m}';abrirCantidad('${p}')">${m}</button>`).join('')}</div>
       ${cuerpo}
     </div>`;
@@ -917,16 +869,14 @@ function validarPrecio(producto){
 
 function agregarKilo(producto, frac){
   const precio = validarPrecio(producto); if(!precio) return;
-  const dist = producto==='Surtido' ? distribucionSurtidoActual : null;
-  ticket.push({categoria:catActiva, producto, modo:'Fracción', cantidad:frac, precioUnit:precio, total:precioFraccion(producto, frac), distribucion:dist});
+  ticket.push({categoria:catActiva, producto, modo:'Fracción', cantidad:frac, precioUnit:precio, total:precioFraccion(producto, frac)});
   cerrarPanel(); renderTicket();
 }
 function agregarGramos(producto){
   const g = num(val('gInput'));
   if(g<=0){ toast('Captura los gramos', true); return; }
   const precio = validarPrecio(producto); if(!precio) return;
-  const dist = producto==='Surtido' ? distribucionSurtidoActual : null;
-  ticket.push({categoria:catActiva, producto, modo:'Gramos', cantidad:Math.round(g), precioUnit:precio, total:precio*g/1000, distribucion:dist});
+  ticket.push({categoria:catActiva, producto, modo:'Gramos', cantidad:Math.round(g), precioUnit:precio, total:precio*g/1000});
   cerrarPanel(); renderTicket();
 }
 function agregarMonto(producto){
@@ -934,8 +884,7 @@ function agregarMonto(producto){
   if(m<=0){ toast('Captura el monto', true); return; }
   const precio = validarPrecio(producto); if(!precio) return;
   const kg = m/precio;
-  const dist = producto==='Surtido' ? distribucionSurtidoActual : null;
-  ticket.push({categoria:catActiva, producto, modo:'Monto', cantidad:m, kgEquivalente: Math.round(kg*1000)/1000, precioUnit:precio, total:m, distribucion:dist});
+  ticket.push({categoria:catActiva, producto, modo:'Monto', cantidad:m, kgEquivalente: Math.round(kg*1000)/1000, precioUnit:precio, total:m});
   cerrarPanel(); renderTicket();
 }
 function agregarPollo(producto, q){
@@ -1087,22 +1036,8 @@ function finalizarVenta(metodo){
   const fecha = fechaHoraSheets();
   const rows = [];
   items.forEach(it=>{
-    if(it.producto === 'Surtido' && it.distribucion){
-      const kgTotal = it.modo==='Monto' ? it.kgEquivalente : (it.modo==='Gramos' ? it.cantidad/1000 : it.cantidad);
-      const cortes = CORTES_SURTIDO.filter(c => (it.distribucion[c]||0) > 0);
-      const totalRedondo = Math.round(it.total);
-      let asignado = 0;
-      cortes.forEach((corte, idx)=>{
-        const pct = it.distribucion[corte];
-        const kgCorte = Math.round(kgTotal*pct*1000)/1000;
-        // El último corte absorbe el redondeo para que la suma cuadre con lo cobrado
-        const totalCorte = idx === cortes.length-1 ? totalRedondo - asignado : Math.round(it.total*pct);
-        asignado += totalCorte;
-        rows.push([fecha, ticketId, it.categoria, corte, 'Surtido', kgCorte, Math.round(it.precioUnit), totalCorte, metodo]);
-      });
-    } else {
-      rows.push([fecha, ticketId, it.categoria, it.producto, it.modo, it.cantidad, Math.round(it.precioUnit), Math.round(it.total), metodo]);
-    }
+    // Surtido se guarda como cualquier otra carne: un renglón con lo que se cobró
+    rows.push([fecha, ticketId, it.categoria, it.producto, it.modo, it.cantidad, Math.round(it.precioUnit), Math.round(it.total), metodo]);
   });
   if(regalados>0){
     const precioTaco = precioDe('Taco');
@@ -1226,7 +1161,8 @@ async function probarConexion(){
   try{
     const r = await apiGet('ping');
     if(dot){ dot.className = 'dot ok'; txt.textContent = `Conectado a "${r.hoja}"`; }
-    if(ver) ver.textContent = `App v${APP_VERSION} · Servicio v${r.version}` + (r.version.split('.').slice(0,2).join('.')!==APP_VERSION.split('.').slice(0,2).join('.') ? ' (versiones distintas: actualiza el script)' : '');
+    if(ver) ver.textContent = `App v${APP_VERSION} · Servicio v${r.version}` + (r.version.split('.').slice(0,2).join('.')!==APP_VERSION.split('.').slice(0,2).join('.') ? ' (versiones distintas: actualiza el script)' : '')
+      + (r.tz && r.tz!=='America/Mexico_City' ? ` · Hoja en zona ${r.tz}: ejecuta ajustarZonaHoraria()` : '');
     return true;
   }catch(e){
     if(dot){ dot.className = 'dot bad'; txt.textContent = 'Sin conexión: ' + e.message; }
@@ -1393,7 +1329,7 @@ function renderSemana(act, ant, nPend){
   const porDia = diasVenta.map(d=>[`${DIA3[diaSem(d)].replace(/^./,x=>x.toUpperCase())} ${fechaCorta(d)}`, act.V.filter(x=>x[2]!=='Regalo' && String(x[0]).startsWith(d)).reduce((s,x)=>s+num(x[7]),0)]);
   const cats = Object.entries(r.porCat).sort((x,y)=>y[1]-x[1]);
   const topCats = cats.slice(0,4); const resto = cats.slice(4).reduce((s,x)=>s+x[1],0); if(resto>0) topCats.push(['Otros', resto]);
-  const prods = Object.entries(act.V.filter(x=>x[2]!=='Regalo').reduce((o,x)=>{ o[x[3]] = (o[x[3]]||0) + num(x[7]); return o; },{})).sort((x,y)=>y[1]-x[1]).slice(0,5);
+  const prods = Object.entries(act.V.filter(x=>x[2]!=='Regalo').reduce((o,x)=>{ const k = prodKey(x); o[k] = (o[k]||0) + num(x[7]); return o; },{})).sort((x,y)=>y[1]-x[1]).slice(0,5);
   const colores = {Efectivo:'#F85E00', Tarjeta:'#9FB6C4', Transferencia:'#6F889A'};
   const pagos = Object.entries(r.porPago).sort((x,y)=>y[1]-x[1]);
   const horaPico = Object.entries(act.V.filter(x=>x[2]!=='Regalo').reduce((o,x)=>{ const k = `${DIA3[diaSem(String(x[0]).slice(0,10))]} ${String(x[0]).slice(11,13)}:00`; o[k]=(o[k]||0)+num(x[7]); return o; },{})).sort((x,y)=>y[1]-x[1])[0];
@@ -1421,6 +1357,9 @@ function renderSemana(act, ant, nPend){
     </div>
     ${nPend?`<p class="hint" style="margin-top:10px">Incluye ${nPend} renglones que aún no se envían a la hoja.</p>`:''}`;
 }
+
+// Los renglones de Surtido repartidos por la versión 2.2 (Producto = corte, Modo = Surtido) cuentan como Surtido
+function prodKey(r){ return r[4]==='Surtido' ? 'Surtido' : (r[3] || '-'); }
 
 function kgCarne(r){
   // r: [Fecha, Ticket, Categoría, Producto, Modo, Cantidad, Precio, Total, Método]
@@ -1522,7 +1461,7 @@ setInterval(()=>{ if(outbox.length) enviarPendientes(); }, 60000);
 window.addEventListener('load', ()=>{
   document.getElementById('verInicio').textContent = `v${APP_VERSION}`;
   renderChips(); renderGrid(); renderTicket(); updateBadge();
-  if(servicioListo()){ cargarPrecios(); cargarCuenta(); enviarPendientes(); calcularDistribucionSurtido(); }
+  if(servicioListo()){ cargarPrecios(); cargarCuenta(); enviarPendientes(); }
 });
 </script>
 </body>
