@@ -1,12 +1,12 @@
 <div align="center">
 
-# 🥩 Carnitas App
+# 🥩 Carnitas Estilo Clay · App
 
 **Sistema de punto de venta y control financiero para negocio de carnitas de fin de semana**
 
 Captura ventas, insumos, gastos y sueldos desde el celular, sin servidor ni costos de hosting, sincronizado directo a Google Sheets.
 
-[![Versión](https://img.shields.io/badge/versión-2.2.1-F85E00)]()
+[![Versión](https://img.shields.io/badge/versión-2.4.0-E36414)]()
 [![Static Site](https://img.shields.io/badge/hosting-GitHub%20Pages-24292e?logo=github)](https://pages.github.com/)
 [![No Build](https://img.shields.io/badge/build-none-brightgreen)]()
 [![Backend](https://img.shields.io/badge/backend-Google%20Sheets%20%2B%20Apps%20Script-34A853?logo=googlesheets&logoColor=white)]()
@@ -29,6 +29,10 @@ Carnitas App reemplazó una hoja de cálculo manual y una app de terceros como s
 <td width="20%" align="center">📊<br><b>Ventas</b><br><sub>Por día o por semana, con margen</sub></td>
 </tr>
 </table>
+
+**Cotizaciones para eventos** (v2.4): se cotiza por persona con paquete y extras, con IVA opcional si el cliente pide factura. Cada cotización recibe folio `COT-AA-####`, pasa por Borrador → Enviada → Confirmada (anticipo de 50%) → Liquidada → Convertida en venta, y se puede marcar como Rechazada con motivo. El margen estimado solo se ve en la app. Se guarda en la pestaña `Cotizaciones`.
+
+La app usa la identidad de **Carnitas Estilo Clay**: paleta «Cobre y Noche» (Naranja Cazo `#E36414`, Azul Noche `#1B263B`, Ámbar `#F2A541`, Manteca `#FFF8F0`, Cobre `#B84A00`), letras Kanit y Archivo, y el escudo de la marca como ícono.
 
 Además incluye un **tablero ejecutivo** (`carnitasdashboard.html`) para revisar el negocio por semana o por mes desde la computadora.
 
