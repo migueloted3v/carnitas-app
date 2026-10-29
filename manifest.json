@@ -1,13 +1,18 @@
 {
-  "name": "Carnitas App",
-  "short_name": "Carnitas",
-  "version": "2.3.0",
+  "name": "Carnitas Estilo Clay",
+  "short_name": "Clay",
+  "version": "2.4.0",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#153243",
-  "theme_color": "#153243",
+  "background_color": "#1B263B",
+  "theme_color": "#1B263B",
   "icons": [
-    { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
