@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1B263B">
+<link rel="stylesheet" href="icons/icons.css">
 <style>
   :root{
     /* Paleta de marca «Cobre y Noche» (Manual de Identidad Carnitas Estilo Clay) */
@@ -295,6 +296,19 @@
     .crow .cest{grid-column:2;grid-row:1;justify-self:end}
     .crow .nx{text-align:right}
   }
+
+  /* ---------- Íconos propios (icons/icons.svg + icons/icons.css) ----------
+     Los tokens del set apuntan a la paleta oficial de la app para no tener dos fuentes de color */
+  :root{--clay-orange:var(--accent);--clay-cream:var(--text);--clay-navy:var(--bg);--clay-card:var(--card);--clay-border:var(--border)}
+  button.navcard{width:100%;color:var(--text);font-size:clamp(15px,1.8vw,20px)}
+  .navcard .icon-badge{margin:0 auto 10px}
+  .navcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  @media (min-width:900px){.navcard .icon-badge{width:88px;height:96px}}
+  header h1{display:flex;align-items:center;gap:8px}
+  #hicon{width:clamp(24px,2.6vw,32px);height:clamp(24px,2.6vw,32px)}
+  #hicon.hidden{display:none}
+  .cottabs .nueva{display:inline-flex;align-items:center;gap:6px}
+  .cottabs .nueva .icon{--icon-fill:var(--on-accent);--icon-stroke:var(--text)}
 </style>
 </head>
 <body>
@@ -304,7 +318,7 @@
   <img class="brandiso" src="logo_c.png" alt="" aria-hidden="true">
   <button id="backbtn" class="hidden" onclick="irInicio()" aria-label="Regresar">‹</button>
   <div>
-    <h1 id="hstate">Carnitas Estilo Clay</h1>
+    <h1><svg id="hicon" class="icon icon--md hidden" aria-hidden="true"><use/></svg><span id="hstate">Carnitas Estilo Clay</span></h1>
     <p id="hsub" style="font-size:12px;color:var(--muted);margin:2px 0 0">Sábado y domingo</p>
   </div>
   <div id="hspacer"></div>
@@ -319,12 +333,12 @@
   <div id="view-inicio">
     <div class="brandhero"><svg viewBox="50 10 615 668" role="img" aria-label="Carnitas Estilo Clay"><use href="#crest-g"/></svg></div>
     <div class="navgrid">
-      <div class="navcard" onclick="irVista('ventas')"><span class="ic">🥩</span>Ventas</div>
-      <div class="navcard" onclick="irVista('cotizaciones')"><span class="ic">📝</span>Cotizaciones</div>
-      <div class="navcard" onclick="irVista('insumos')"><span class="ic">🛒</span>Insumos</div>
-      <div class="navcard" onclick="irVista('gastos')"><span class="ic">🧾</span>Gastos</div>
-      <div class="navcard" onclick="irVista('sueldos')"><span class="ic">👷</span>Sueldos</div>
-      <div class="navcard" onclick="irVista('dia')"><span class="ic">📊</span>Ventas · día y semana</div>
+      <button type="button" class="navcard" onclick="irVista('ventas')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-ventas" x="16" y="18" width="48" height="48"/></svg>Ventas</button>
+      <button type="button" class="navcard" onclick="irVista('cotizaciones')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-cotizaciones" x="16" y="18" width="48" height="48"/></svg>Cotizaciones</button>
+      <button type="button" class="navcard" onclick="irVista('insumos')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-insumos" x="16" y="18" width="48" height="48"/></svg>Insumos</button>
+      <button type="button" class="navcard" onclick="irVista('gastos')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-gastos" x="16" y="18" width="48" height="48"/></svg>Gastos</button>
+      <button type="button" class="navcard" onclick="irVista('sueldos')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-sueldos" x="16" y="18" width="48" height="48"/></svg>Sueldos</button>
+      <button type="button" class="navcard" onclick="irVista('dia')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-ventas-semana" x="16" y="18" width="48" height="48"/></svg>Ventas · día y semana</button>
     </div>
     <p class="ver" id="verInicio"></p>
   </div>
@@ -357,7 +371,7 @@
   <div id="view-cotizaciones" class="hidden">
     <div class="cottabs">
       <button id="ct_lista" class="on" onclick="irCot('lista')">Mis cotizaciones</button>
-      <button class="nueva" onclick="nuevaCot()">+ Nueva cotización</button>
+      <button type="button" class="nueva" onclick="nuevaCot()"><svg class="icon icon--sm" aria-hidden="true"><use href="icons/icons.svg#icon-cotizaciones"/></svg>Nueva cotización</button>
     </div>
 
     <div id="cot-lista">
@@ -521,7 +535,7 @@
 <div id="modalRoot"></div>
 
 <script>
-const APP_VERSION = '2.4.1';
+const APP_VERSION = '2.4.2';
 
 /* =========================================================
    Catálogo
@@ -579,6 +593,10 @@ const TITULOS = {
   dia:['Ventas','Por día o por semana (viernes a jueves)'],
   cotizaciones:['Cotizaciones','Eventos · precio por persona']
 };
+
+/* Ícono de cada módulo (símbolos de icons/icons.svg) */
+const SPRITE = 'icons/icons.svg';
+const ICONOS = {ventas:'icon-ventas', cotizaciones:'icon-cotizaciones', insumos:'icon-insumos', gastos:'icon-gastos', sueldos:'icon-sueldos', dia:'icon-ventas-semana'};
 
 const TIMEOUT_MS = 15000;
 
@@ -764,6 +782,9 @@ function irVista(v){
   });
   document.getElementById('backbtn').classList.toggle('hidden', v==='inicio');
   document.getElementById('hstate').textContent = TITULOS[v][0];
+  const hicon = document.getElementById('hicon');
+  hicon.classList.toggle('hidden', !ICONOS[v]);
+  if(ICONOS[v]) hicon.firstElementChild.setAttribute('href', SPRITE + '#' + ICONOS[v]);
   document.getElementById('hsub').textContent = TITULOS[v][1];
   if(v==='insumos'){ document.getElementById('ins_fecha').value = hoy(); toggleInsumoCategoria(); renderLista('insumos'); }
   if(v==='gastos'){ document.getElementById('ga_fecha').value = hoy(); renderLista('gastos'); }
@@ -861,7 +882,7 @@ function renderListaCot(){
     <div class="ckpi"><small>Margen estimado</small><b>${marProm==null ? '—' : Math.round(marProm)+'%'}</b><span>objetivo ${COT_CFG.margenObj}%</span></div>`;
   const el = document.getElementById('cq_lista');
   if(!lista.length){
-    el.innerHTML = `<div class="cotvacio">Aún no hay cotizaciones. Toca <b>+ Nueva cotización</b> para hacer la primera.</div>`;
+    el.innerHTML = `<div class="cotvacio">Aún no hay cotizaciones. Toca <b>Nueva cotización</b> para hacer la primera.</div>`;
   } else {
     el.innerHTML = `<div class="crow h"><span>Folio</span><span>Cliente</span><span>Evento</span><span>Pers.</span><span>Total</span><span>Estado</span><span>Siguiente paso</span></div>` +
       lista.map(c=>{
