@@ -308,7 +308,14 @@
   #hicon{width:clamp(24px,2.6vw,32px);height:clamp(24px,2.6vw,32px)}
   #hicon.hidden{display:none}
   .cottabs .nueva{display:inline-flex;align-items:center;gap:6px}
-  .cottabs .nueva .icon{--icon-fill:var(--on-accent);--icon-stroke:var(--text)}
+  .cottabs .nueva .icon,.paysel button.on .icon{--icon-fill:var(--on-accent);--icon-stroke:var(--text)}
+  header .hset{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0}
+  header .hset .icon{width:clamp(24px,2.4vw,28px);height:clamp(24px,2.4vw,28px)}
+  .lostbtn,.paysel button{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  #cuentaSide .icon{vertical-align:-6px;margin-right:8px}
+  .paysel button{gap:6px}
+  .tkbar .bank{display:inline-flex;align-items:center;justify-content:center}
+  .icon--inline{width:1.25em;height:1.25em;vertical-align:-.3em;--icon-sw:3.6}
 </style>
 </head>
 <body>
@@ -322,7 +329,7 @@
     <p id="hsub" style="font-size:12px;color:var(--muted);margin:2px 0 0">Sábado y domingo</p>
   </div>
   <div id="hspacer"></div>
-  <button onclick="openSettings()" aria-label="Ajustes">⚙</button>
+  <button type="button" class="hset" onclick="openSettings()" aria-label="Ajustes"><svg class="icon icon--muted" aria-hidden="true"><use href="icons/icons.svg#icon-ajustes"/></svg></button>
 </header>
 
 <button id="pendbadge" class="badge hidden" onclick="enviarAhora()"></button>
@@ -347,14 +354,14 @@
     <div class="row2">
       <div class="colmain">
         <div class="chips" id="chips"></div>
-        <button class="lostbtn" onclick="abrirVentaPerdida()">📉 ¿Se te fue un cliente? Registrar venta perdida</button>
+        <button class="lostbtn" onclick="abrirVentaPerdida()"><svg class="icon icon--sm" aria-hidden="true"><use href="icons/icons.svg#icon-venta-perdida"/></svg>¿Se te fue un cliente? Registrar venta perdida</button>
         <div class="grid" id="grid"></div>
         <div id="qtypanel"></div>
       </div>
       <div id="ticket">
         <div class="tkbar">
           <button class="sum" onclick="toggleTicket()"><small id="tkcount">Ticket · sin productos</small><b id="tktotalBar">$0</b> <span id="tkarrow" style="color:var(--muted);font-size:12px">▲</span></button>
-          <button class="bank" onclick="abrirCuenta()" aria-label="Datos para transferencia">🏦</button>
+          <button class="bank" onclick="abrirCuenta()" aria-label="Datos para transferencia"><svg class="icon icon--sm" aria-hidden="true"><use href="icons/icons.svg#icon-transferencia"/></svg></button>
           <button id="cobrar" onclick="abrirCobro()">Cobrar</button>
         </div>
         <div class="tkdetail">
@@ -363,7 +370,7 @@
         </div>
         <div class="tktotal"><span>Total</span><span id="ticketTotal">$0</span></div>
         <button id="cobrarSide" class="addbtn" style="margin-top:0;padding:clamp(13px,1.8vw,18px);font-size:clamp(15px,1.5vw,18px)" onclick="abrirCobro()">Cobrar</button>
-        <button id="cuentaSide" class="addbtn alt" onclick="abrirCuenta()">🏦 Datos para transferencia</button>
+        <button id="cuentaSide" class="addbtn alt" onclick="abrirCuenta()"><svg class="icon icon--sm" aria-hidden="true"><use href="icons/icons.svg#icon-transferencia"/></svg>Datos para transferencia</button>
       </div>
     </div>
   </div>
@@ -1524,9 +1531,9 @@ function abrirCobro(){
           <div>
             <label style="margin-top:0">Método de pago</label>
             <div class="paysel">
-              <button id="pm_Efectivo" onclick="elegirMetodo('Efectivo')">💵 Efectivo</button>
-              <button id="pm_Tarjeta" onclick="elegirMetodo('Tarjeta')">💳 Tarjeta</button>
-              <button id="pm_Transferencia" onclick="elegirMetodo('Transferencia')">🏦 Transf.</button>
+              <button id="pm_Efectivo" onclick="elegirMetodo('Efectivo')"><svg class="icon icon--sm" aria-hidden="true"><use href="icons/icons.svg#icon-efectivo"/></svg>Efectivo</button>
+              <button id="pm_Tarjeta" onclick="elegirMetodo('Tarjeta')"><svg class="icon icon--sm" aria-hidden="true"><use href="icons/icons.svg#icon-tarjeta"/></svg>Tarjeta</button>
+              <button id="pm_Transferencia" onclick="elegirMetodo('Transferencia')"><svg class="icon icon--sm" aria-hidden="true"><use href="icons/icons.svg#icon-transferencia"/></svg>Transf.</button>
             </div>
             <label>¿Cuántos tacos se regalaron en este ticket? (opcional)</label>
             <input type="number" id="regaloInput" placeholder="Ej. 0" min="0" inputmode="numeric">
@@ -1623,7 +1630,7 @@ function finalizarVenta(metodo){
    ========================================================= */
 function datosCuentaHTML(){
   const filas = (cuenta||[]).filter(r=>r[0] && String(r[1]||'').trim());
-  if(!filas.length) return `<div class="msg" style="padding:14px">Aún no hay datos de cuenta. Llena la pestaña <b>Cuenta</b> de tu hoja y toca ⚙ → Sincronizar precios y cuenta.</div>`;
+  if(!filas.length) return `<div class="msg" style="padding:14px">Aún no hay datos de cuenta. Llena la pestaña <b>Cuenta</b> de tu hoja y toca <svg class="icon icon--inline" aria-hidden="true"><use href="icons/icons.svg#icon-ajustes"/></svg> <b>Ajustes</b> → Sincronizar precios y cuenta.</div>`;
   // La CLABE va primero y en grande; el resto en el orden de la hoja
   const orden = filas.slice().sort((x,y)=>(/clabe/i.test(y[0])?1:0)-(/clabe/i.test(x[0])?1:0));
   return `<div class="cta">${orden.map(([c,v])=>`<div class="dato ${/clabe/i.test(c)?'big':''}"><small>${esc(c)}</small><b>${esc(/clabe/i.test(c)?formatoClabe(v):v)}</b></div>`).join('')}</div>`;
@@ -1774,7 +1781,7 @@ async function irDia(fecha){
 
   if(!servicioListo()){
     const filas = locales.filter(r=>String(r[0]).slice(0,10)===fecha);
-    if(!filas.length){ body.innerHTML = `<div class="msg">Configura el servicio en ⚙ Ajustes para ver tus ventas.</div>`; return; }
+    if(!filas.length){ body.innerHTML = `<div class="msg">Configura el servicio en <svg class="icon icon--inline" aria-hidden="true"><use href="icons/icons.svg#icon-ajustes"/></svg> <b>Ajustes</b> para ver tus ventas.</div>`; return; }
     renderDia(filas, [], filas.length);
     return;
   }
@@ -1823,7 +1830,7 @@ async function irSemana(vie){
   const enSem = (r, a, b) => { const d = String(r[0]).slice(0,10); return d>=a && d<=b; };
   const pend = {};
   ['Ventas','Insumos','Gastos','Sueldos'].forEach(h=>pend[h] = outbox.filter(i=>i.sheet===h).flatMap(i=>i.rows));
-  if(!servicioListo()){ body.innerHTML = `<div class="msg">Configura el servicio en ⚙ Ajustes para ver tus ventas.</div>`; return; }
+  if(!servicioListo()){ body.innerHTML = `<div class="msg">Configura el servicio en <svg class="icon icon--inline" aria-hidden="true"><use href="icons/icons.svg#icon-ajustes"/></svg> <b>Ajustes</b> para ver tus ventas.</div>`; return; }
   const miPeticion = ++diaPeticion;
   body.innerHTML = `<div class="msg">Cargando la semana…</div>`;
   try{

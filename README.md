@@ -187,7 +187,7 @@ Todo vive en **tu** Google Drive. La app no tiene servidor propio ni guarda tus 
 
 | Versión | Cambios |
 |---|---|
-| **2.4.2** | Íconos propios estilo Clay (`icons/icons.svg`): insignia en el menú principal, ícono del módulo en el encabezado y en *Nueva cotización*; reemplazan los emojis. Los colores del set toman la paleta oficial de la app |
+| **2.4.2** | Íconos propios estilo Clay (`icons/icons.svg`): insignia en el menú principal, ícono del módulo en el encabezado y en *Nueva cotización*; 5 íconos de apoyo (venta perdida, transferencia, efectivo, tarjeta, ajustes). Ya no quedan emojis en la app. Los colores del set toman la paleta oficial de la app |
 | **2.3.0** | Surtido se guarda en un solo renglón (sin reparto por porcentajes) · servicio: `ajustarZonaHoraria()`, `revisarSurtido()` y `consolidarSurtido()` para juntar el histórico, y `ping`/`todo` informan la zona horaria · tablero: alertas *Qué revisar* en las 4 pestañas, selector de tablas en *Datos*, aviso si el servicio está desactualizado, Surtido repartido se agrupa al mostrarlo · app: aviso en Ajustes si la hoja no está en hora de México |
 | **2.2.1** | Servicio: las fechas se leen con la zona horaria de la propia hoja; corrige insumos capturados a mano que caían en la semana anterior y horas de venta recorridas 6 horas · acepta fechas escritas como texto (25/09/2026) |
 | **2.2.0** | Semana del negocio de viernes a jueves en tablero y app · margen con gastos incluidos · vista *Semana* en la app · tablero con tema claro/oscuro, clic para filtrar, *Qué revisar*, mapa de calor, ranking 80/20, evolución del precio por kilo, compras por proveedor y punto de equilibrio · nueva acción `rango` en el servicio |
