@@ -1,7 +1,7 @@
 {
   "name": "Carnitas Estilo Clay",
   "short_name": "Clay",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",

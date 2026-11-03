@@ -1,0 +1,84 @@
+/* =========================================================
+   Íconos · Carnitas Estilo Clay
+   Requiere: icons/icons.svg (sprite)
+   ========================================================= */
+
+:root {
+  --clay-orange: #F26A1B;
+  --clay-cream:  #FFF1E2;
+  --clay-navy:   #1D263A;
+  --clay-card:   #262F48;
+  --clay-border: #34405E;
+}
+
+/* ---------- Base: presentación TRAZO ----------
+   Uso: encabezados, botones, barra inferior, listas */
+.icon {
+  --icon-fill:   var(--clay-orange);
+  --icon-stroke: var(--clay-cream);
+  --icon-sw: 3;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Tamaños */
+.icon--sm { width: 24px; height: 24px; --icon-sw: 3.6; } /* compensa el trazo en tamaño chico */
+.icon--md { width: 32px; height: 32px; }
+.icon--lg { width: 52px; height: 52px; }
+
+/* Estado deshabilitado / inactivo (p. ej. pestañas no seleccionadas) */
+.icon--muted {
+  --icon-fill:   #4A5878;
+  --icon-stroke: #B8C0D6;
+}
+
+/* ---------- Presentación INSIGNIA ----------
+   Uso: tarjetas del menú principal.
+   Escudo naranja + glifo crema con trazo marino */
+.icon-badge {
+  --badge-fill:   var(--clay-orange);
+  --badge-stroke: #FFFFFF;
+  --icon-fill:    var(--clay-cream);
+  --icon-stroke:  var(--clay-navy);
+  --icon-sw: 3;
+  width: 66px;
+  height: 72px;      /* proporción 80:88 */
+  flex-shrink: 0;
+  display: block;
+}
+.icon-badge--lg { width: 88px; height: 96px; }
+
+/* ---------- Tarjeta del menú principal ---------- */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (min-width: 720px) {
+  .menu-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.menu-card {
+  min-height: 148px;
+  padding: 18px 10px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--clay-card);
+  border: 1px solid var(--clay-border);
+  border-radius: 18px;
+  color: #FFFFFF;
+  font: 600 16px/1.2 'Kanit', system-ui, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease, border-color .12s ease;
+}
+.menu-card:hover  { border-color: var(--clay-orange); }
+.menu-card:active { transform: scale(.97); }
+.menu-card:focus-visible { outline: 3px solid var(--clay-orange); outline-offset: 2px; }

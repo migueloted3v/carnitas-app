@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Sprite de íconos · Carnitas Estilo Clay
+    Grid 48x48 · trazo 3 px · puntas y uniones redondeadas
+    Colores controlados por variables CSS (ver icons.css):
+      icon-fill    relleno de la forma principal
+      icon-stroke  trazo y detalles sólidos
+      icon-sw      grosor del trazo
+      badge-fill / badge-stroke  colores del escudo
+  -->
+
+  <!-- Escudo de la presentación Insignia (viewBox 80x88) -->
+  <symbol id="icon-badge" viewBox="0 0 80 88">
+    <path d="M8 12 Q40 2 72 12 L72 46 Q72 70 40 84 Q8 70 8 46 Z"
+      style="fill:var(--badge-fill,#F26A1B);stroke:var(--badge-stroke,#FFFFFF);stroke-width:3.5;stroke-linejoin:round"/>
+  </symbol>
+
+  <!-- Ventas · cazo de cobre -->
+  <symbol id="icon-ventas" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:none" d="M6.5 22 h-3 a3 3 0 0 0 0 6 h4 M41.5 22 h3 a3 3 0 0 1 0 6 h-4"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M5 18 h38 l-3 14 a10 10 0 0 1 -10 8 h-12 a10 10 0 0 1 -10 -8 Z"/>
+      <path style="fill:none" d="M3 18 h42"/>
+      <path style="fill:none" d="M17 12 q-2 -3 0 -6 M24 12 q-2 -3 0 -6 M31 12 q-2 -3 0 -6"/>
+      <path style="fill:none" d="M13 25 h5"/>
+    </g>
+  </symbol>
+
+  <!-- Cotizaciones · portapapeles con palomita -->
+  <symbol id="icon-cotizaciones" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M14 9 h20 a3 3 0 0 1 3 3 v28 a3 3 0 0 1 -3 3 h-20 a3 3 0 0 1 -3 -3 v-28 a3 3 0 0 1 3 -3 Z"/>
+      <path style="fill:var(--icon-stroke,#FFF1E2)" d="M19 5 h10 a2 2 0 0 1 2 2 v4 h-14 v-4 a2 2 0 0 1 2 -2 Z"/>
+      <path style="fill:none" d="M17 20 h14 M17 26 h14 M17 32 h7"/>
+      <path style="fill:none" d="M27 35 l3 3 l5 -6"/>
+    </g>
+  </symbol>
+
+  <!-- Insumos · carrito de supermercado -->
+  <symbol id="icon-insumos" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:none" d="M3 8 h5 l1.5 6"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M9.5 14 h33 l-3.6 14.5 a2.5 2.5 0 0 1 -2.4 1.9 h-22.6 a2.5 2.5 0 0 1 -2.4 -2 Z"/>
+      <path style="fill:none" d="M20 14 v16 M31 14 v16"/>
+      <path style="fill:none" d="M13 30.5 l0.8 4.5 h23"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M14 40 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 Z M30 40 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 Z"/>
+    </g>
+  </symbol>
+
+  <!-- Gastos · cartera con flecha de salida -->
+  <symbol id="icon-gastos" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M10 15 h26 a4 4 0 0 1 4 4 v18 a4 4 0 0 1 -4 4 h-26 a4 4 0 0 1 -4 -4 v-18 a4 4 0 0 1 4 -4 Z"/>
+      <path style="fill:none" d="M31 24 h9 v9 h-9 a4.5 4.5 0 0 1 0 -9 Z"/>
+      <path style="fill:none" d="M20 11 v-8 M15 8 l5 -5 l5 5"/>
+    </g>
+  </symbol>
+
+  <!-- Sueldos · trabajador con moneda -->
+  <symbol id="icon-sueldos" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M16 14 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M9 42 v-5 a13 13 0 0 1 26 0 v5 Z"/>
+      <path style="fill:none" d="M18 32 h8 v10"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M30 35 a7 7 0 1 0 14 0 a7 7 0 1 0 -14 0 Z"/>
+      <path style="fill:none" d="M37 31 v8"/>
+    </g>
+  </symbol>
+
+  <!-- Ventas · día y semana · calendario con barras -->
+  <symbol id="icon-ventas-semana" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M11 10 h26 a4 4 0 0 1 4 4 v24 a4 4 0 0 1 -4 4 h-26 a4 4 0 0 1 -4 -4 v-24 a4 4 0 0 1 4 -4 Z"/>
+      <path style="fill:none" d="M7 18 h34 M16 6 v7 M32 6 v7"/>
+      <path style="fill:none" d="M15 35 v-6 M21 35 v-10 M27 35 v-4 M33 35 v-12"/>
+    </g>
+  </symbol>
+
+  <!-- ===== Íconos de apoyo (v2.4.2) · mismo grid y trazo ===== -->
+
+  <!-- Venta perdida · gráfica a la baja -->
+  <symbol id="icon-venta-perdida" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M8 8 h32 a4 4 0 0 1 4 4 v24 a4 4 0 0 1 -4 4 h-32 a4 4 0 0 1 -4 -4 v-24 a4 4 0 0 1 4 -4 Z"/>
+      <path style="fill:none" d="M11 16 l9 9 l6 -5 l11 11"/>
+      <path style="fill:none" d="M37 23 v8 h-8"/>
+    </g>
+  </symbol>
+
+  <!-- Transferencia · banco -->
+  <symbol id="icon-transferencia" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M24 5 L43 15 H5 Z"/>
+      <path style="fill:none" d="M11 20 v13 M19.5 20 v13 M28.5 20 v13 M37 20 v13"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M5 37 h38 v5 h-38 Z"/>
+    </g>
+  </symbol>
+
+  <!-- Efectivo · billete -->
+  <symbol id="icon-efectivo" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:none" d="M8 14 v-4 h34 a2 2 0 0 1 2 2 v20 h-3"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M7 14 h31 a3 3 0 0 1 3 3 v18 a3 3 0 0 1 -3 3 h-31 a3 3 0 0 1 -3 -3 v-18 a3 3 0 0 1 3 -3 Z"/>
+      <path style="fill:none" d="M17.5 26 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 Z"/>
+      <path style="fill:none" d="M10 20 h0.01 M35 32 h0.01"/>
+    </g>
+  </symbol>
+
+  <!-- Tarjeta · tarjeta bancaria -->
+  <symbol id="icon-tarjeta" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M8 10 h32 a4 4 0 0 1 4 4 v20 a4 4 0 0 1 -4 4 h-32 a4 4 0 0 1 -4 -4 v-20 a4 4 0 0 1 4 -4 Z"/>
+      <path style="fill:var(--icon-stroke,#FFF1E2)" d="M4 17 h40 v6 h-40 Z"/>
+      <path style="fill:none" d="M10 31 h9 M24 31 h4"/>
+    </g>
+  </symbol>
+
+  <!-- Ajustes · controles deslizables -->
+  <symbol id="icon-ajustes" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:none" d="M6 12 h36 M6 24 h36 M6 36 h36"/>
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M11.5 12 a4.5 4.5 0 1 0 9 0 a4.5 4.5 0 1 0 -9 0 Z M26.5 24 a4.5 4.5 0 1 0 9 0 a4.5 4.5 0 1 0 -9 0 Z M15.5 36 a4.5 4.5 0 1 0 9 0 a4.5 4.5 0 1 0 -9 0 Z"/>
+    </g>
+  </symbol>
+</svg>
