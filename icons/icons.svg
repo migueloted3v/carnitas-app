@@ -122,4 +122,13 @@
       <path style="fill:var(--icon-fill,#F26A1B)" d="M11.5 12 a4.5 4.5 0 1 0 9 0 a4.5 4.5 0 1 0 -9 0 Z M26.5 24 a4.5 4.5 0 1 0 9 0 a4.5 4.5 0 1 0 -9 0 Z M15.5 36 a4.5 4.5 0 1 0 9 0 a4.5 4.5 0 1 0 -9 0 Z"/>
     </g>
   </symbol>
+
+  <!-- Asuetos · calendario con estrella (día festivo) -->
+  <symbol id="icon-asuetos" viewBox="0 0 48 48">
+    <g style="stroke:var(--icon-stroke,#FFF1E2);stroke-width:var(--icon-sw,3);stroke-linecap:round;stroke-linejoin:round">
+      <path style="fill:var(--icon-fill,#F26A1B)" d="M11 10 h26 a4 4 0 0 1 4 4 v24 a4 4 0 0 1 -4 4 h-26 a4 4 0 0 1 -4 -4 v-24 a4 4 0 0 1 4 -4 Z"/>
+      <path style="fill:none" d="M7 18 h34 M16 6 v7 M32 6 v7"/>
+      <path style="fill:var(--icon-stroke,#FFF1E2)" d="M24 22.5 l2.6 5.2 5.7 .8 -4.1 4 1 5.7 -5.2 -2.7 -5.2 2.7 1 -5.7 -4.1 -4 5.7 -.8 Z"/>
+    </g>
+  </symbol>
 </svg>

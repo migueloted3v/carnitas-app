@@ -1,6 +1,6 @@
 # Íconos · Carnitas Estilo Clay
 
-Set de 11 íconos propios (6 de módulos + 5 de apoyo), derivados del logo (trazo grueso, naranja, crema y marino), con dos presentaciones:
+Set de 12 íconos propios (7 de módulos + 5 de apoyo), derivados del logo (trazo grueso, naranja, crema y marino), con dos presentaciones:
 
 | Presentación | Dónde se usa | Clase CSS |
 |---|---|---|
@@ -43,6 +43,7 @@ En el `<head>` de `index.html`:
 | Gastos | `icon-gastos` | Cartera con flecha de salida | 🧾 |
 | Sueldos | `icon-sueldos` | Trabajador con moneda | 👷 |
 | Ventas · día y semana | `icon-ventas-semana` | Calendario con barras | 📊 |
+| Asuetos y pronóstico | `icon-asuetos` | Calendario con estrella (festivo) | — |
 | Venta perdida | `icon-venta-perdida` | Gráfica a la baja | 📉 |
 | Transferencia | `icon-transferencia` | Banco | 🏦 |
 | Efectivo | `icon-efectivo` | Billetes | 💵 |
