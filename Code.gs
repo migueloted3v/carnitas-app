@@ -1,6 +1,6 @@
 /**
  * Carnitas App — servicio web (Google Apps Script)
- * Versión: 2.4.0
+ * Versión: 2.5.0
  *
  * Vive pegado a la hoja "Carnitas Ventas" (Extensiones → Apps Script).
  * La app y el tablero le mandan y le piden datos con una clave; así la app
@@ -19,7 +19,7 @@
  *   - consolidarSurtido()   hace un respaldo de la hoja y junta cada Surtido repartido en un solo renglón.
  */
 
-const SCRIPT_VERSION = '2.4.0';
+const SCRIPT_VERSION = '2.5.0';
 const TZ = 'America/Mexico_City'; // respaldo si la hoja no tiene zona horaria
 
 // Las fechas se leen y escriben SIEMPRE con la zona horaria de la propia hoja
@@ -45,7 +45,10 @@ const HOJAS = {
   Cotizaciones:   ['Folio','ID','Creada','Actualizada','Estado','Cliente','WhatsApp','Ocasión','Fecha evento','Horario',
                    'Ubicación','Zona','Personas','Precio por persona','Extras','Cazo','Facturar','Subtotal','IVA','Total',
                    'Anticipo','Saldo','Costo estimado','Margen estimado','Válida hasta','Anticipo pagado','Método anticipo',
-                   'Fecha anticipo','Saldo pagado','Método saldo','Fecha saldo','Motivo rechazo','Ticket venta','Notas']
+                   'Fecha anticipo','Saldo pagado','Método saldo','Fecha saldo','Motivo rechazo','Ticket venta','Notas'],
+  // Días de asueto (festivos, puentes, vacaciones) que mueven la venta del fin de semana.
+  // Un renglón por periodo. La app los usa para el pronóstico semanal.
+  Asuetos:        ['Fecha inicio','Fecha fin','Nombre','Tipo','Impacto estimado (%)','Considerar','Notas','ID','Actualizado']
 };
 
 // Renglones que se crean en la pestaña Cuenta (el valor lo llenas tú en la hoja)
@@ -83,6 +86,8 @@ function doGet(e) {
       case 'insumos':  return responder({ ok: true, filas: leer('Insumos') });
       case 'cuenta':   return responder({ ok: true, filas: leer('Cuenta') });
       case 'cotizaciones': return responder({ ok: true, columnas: HOJAS.Cotizaciones, filas: leer('Cotizaciones') });
+      case 'asuetos':  return responder({ ok: true, columnas: HOJAS.Asuetos, filas: leerAsuetos_() });
+      case 'semanal':  return responder({ ok: true, semanas: ventasSemanales(p.desde) });
       case 'rango':    return responder({ ok: true, datos: porRango(p.desde, p.hasta) });
       case 'ventas':   return responder({ ok: true, filas: ventasPorFechas(p.fechas) });
       case 'todo':     return responder({ ok: true, version: SCRIPT_VERSION, tz: tzHoja(), datos: leerTodo() });
@@ -102,6 +107,7 @@ function doPost(e) {
     if (body.action === 'initPrecios')  return responder(inicializarPrecios(body.precios));
     if (body.action === 'initCuenta')   return responder(inicializarCuenta());
     if (body.action === 'guardarCotizacion') return responder(guardarCotizacion(body.cot));
+    if (body.action === 'guardarAsuetos')    return responder(guardarAsuetos(body.asuetos, body.borrar));
     return responder({ ok: false, error: 'Acción no reconocida' });
   } catch (err) {
     return responder({ ok: false, error: String(err.message || err) });
@@ -291,6 +297,115 @@ function guardarCotizacion(cot) {
 
 function ahoraTexto_() { return Utilities.formatDate(new Date(), tzHoja(), 'yyyy-MM-dd HH:mm:ss'); }
 
+/* ---------- Días de asueto ---------- */
+
+/**
+ * Crea, actualiza o borra días de asueto (se buscan por ID).
+ * asuetos = [{ 'ID': ..., 'Nombre': ..., 'Fecha inicio': 'aaaa-mm-dd', ... }]
+ * borrar  = ['id1', 'id2']
+ * Mandar dos veces lo mismo no duplica: el renglón se sobreescribe.
+ */
+function guardarAsuetos(asuetos, borrar) {
+  asuetos = Array.isArray(asuetos) ? asuetos : [];
+  borrar = Array.isArray(borrar) ? borrar.map(String) : [];
+  const enc = HOJAS.Asuetos;
+  const col = nombre => enc.indexOf(nombre);
+  const iso = /^\d{4}-\d{2}-\d{2}$/;
+  asuetos.forEach(a => {
+    if (!a || !a['ID']) throw new Error('Asueto sin ID');
+    if (!String(a['Nombre'] || '').trim()) throw new Error('Asueto sin nombre');
+    if (!iso.test(String(a['Fecha inicio'])) || !iso.test(String(a['Fecha fin']))) throw new Error('Fechas de asueto inválidas: ' + a['Nombre']);
+    if (String(a['Fecha fin']) < String(a['Fecha inicio'])) throw new Error('La fecha fin es anterior al inicio: ' + a['Nombre']);
+  });
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const sh = asegurarHoja('Asuetos');
+    const ids = () => {
+      const n = Math.max(sh.getLastRow() - 1, 0);
+      return n ? sh.getRange(2, col('ID') + 1, n, 1).getValues().map(r => String(r[0])) : [];
+    };
+    let guardados = 0, borrados = 0;
+    asuetos.forEach(a => {
+      const datos = Object.assign({}, a, { 'Actualizado': ahoraTexto_() });
+      const renglon = enc.map(h => {
+        const v = datos[h] == null ? '' : datos[h];
+        if (h === 'Fecha inicio' || h === 'Fecha fin' || h === 'Actualizado') return aFecha(String(v));
+        if (h === 'Impacto estimado (%)') return v === '' ? '' : Number(v);
+        return v;
+      });
+      const fila = ids().indexOf(String(a['ID']));
+      const destino = fila >= 0 ? fila + 2 : sh.getLastRow() + 1;
+      sh.getRange(destino, 1, 1, enc.length).setValues([renglon]);
+      sh.getRange(destino, 1, 1, 2).setNumberFormat('yyyy-mm-dd');
+      guardados++;
+    });
+    // Se borra de abajo hacia arriba para que no se recorran los renglones
+    const actuales = ids();
+    actuales.map((id, i) => ({ id: id, fila: i + 2 }))
+      .filter(x => borrar.indexOf(x.id) >= 0)
+      .sort((a, b) => b.fila - a.fila)
+      .forEach(x => { sh.deleteRow(x.fila); borrados++; });
+    return { ok: true, guardados: guardados, borrados: borrados };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Asuetos con fechas en aaaa-mm-dd aunque se hayan capturado a mano en la hoja. */
+function leerAsuetos_() {
+  return leer('Asuetos').map(r => {
+    r[0] = String(r[0]).slice(0, 10);
+    r[1] = String(fechaTexto(r[1]) || r[0]).slice(0, 10);
+    return r;
+  });
+}
+
+/**
+ * Venta por semana de negocio (viernes a jueves), para el pronóstico.
+ * No cuenta Regalo (tacos regalados) ni Evento (cotizaciones convertidas):
+ * el pronóstico es de la venta de mostrador del fin de semana.
+ * Devuelve [{ semana: 'aaaa-mm-dd' (viernes), venta, tickets, kg, dias }]
+ */
+function ventasSemanales(desde) {
+  const filtro = /^\d{4}-\d{2}-\d{2}$/.test(String(desde || '')) ? String(desde) : '';
+  const out = {};
+  leer('Ventas').forEach(r => {
+    const d = String(r[0]).slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || (filtro && d < filtro)) return;
+    if (r[2] === 'Regalo' || r[2] === 'Evento') return;
+    const sem = viernesDe_(d);
+    const s = out[sem] || (out[sem] = { semana: sem, venta: 0, tickets: {}, kg: 0, dias: {} });
+    s.venta += Number(r[7]) || 0;
+    if (r[1]) s.tickets[r[1]] = true;
+    s.kg += kgCarne_(r);
+    s.dias[d] = true;
+  });
+  return Object.keys(out).sort().map(k => {
+    const s = out[k];
+    return { semana: k, venta: Math.round(s.venta), tickets: Object.keys(s.tickets).length,
+             kg: Math.round(s.kg * 100) / 100, dias: Object.keys(s.dias).length };
+  });
+}
+
+/** Viernes que abre la semana de negocio de una fecha aaaa-mm-dd. */
+function viernesDe_(iso) {
+  const p = iso.split('-').map(Number);
+  const f = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+  f.setUTCDate(f.getUTCDate() - ((f.getUTCDay() - 5 + 7) % 7));
+  return f.toISOString().slice(0, 10);
+}
+
+/** Kilos de carne de un renglón de Ventas (misma regla que la app). */
+function kgCarne_(r) {
+  if (r[2] !== 'Carne') return 0;
+  const modo = r[4], cant = Number(r[5]) || 0, precio = Number(r[6]) || 0, total = Number(r[7]) || 0;
+  if (modo === 'Fracción' || modo === 'Surtido') return cant;
+  if (modo === 'Gramos') return cant / 1000;
+  if (modo === 'Monto' || modo === 'Dinero') return precio > 0 ? total / precio : 0;
+  return 0;
+}
+
 /* ---------- Lectura ---------- */
 
 function leer(nombre) {
@@ -342,7 +457,7 @@ function diagnosticarFechas() {
   Logger.log('Celda A' + fila + ' se ve como: ' + txt);
   Logger.log('Valor interno (UTC): ' + (v instanceof Date ? v.toISOString() : v));
   Logger.log('Con la zona de la hoja: ' + (v instanceof Date ? Utilities.formatDate(v, tzHoja(), 'yyyy-MM-dd HH:mm:ss') : v));
-  Logger.log('Lo que entrega el servicio 2.3.1: ' + fechaCelda(v, txt));
+  Logger.log('Lo que entrega el servicio ' + SCRIPT_VERSION + ': ' + fechaCelda(v, txt));
 }
 
 /** Fecha capturada como texto (25/09/2026, 25-9-2026 o 2026-09-25) → aaaa-mm-dd. */
