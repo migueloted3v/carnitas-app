@@ -6,7 +6,7 @@
 
 Captura ventas, insumos, gastos y sueldos desde el celular, sin servidor ni costos de hosting, sincronizado directo a Google Sheets.
 
-[![Versión](https://img.shields.io/badge/versión-2.5.0-E36414)]()
+[![Versión](https://img.shields.io/badge/versión-2.6.0-E36414)]()
 [![Static Site](https://img.shields.io/badge/hosting-GitHub%20Pages-24292e?logo=github)](https://pages.github.com/)
 [![No Build](https://img.shields.io/badge/build-none-brightgreen)]()
 [![Backend](https://img.shields.io/badge/backend-Google%20Sheets%20%2B%20Apps%20Script-34A853?logo=googlesheets&logoColor=white)]()
@@ -32,7 +32,7 @@ Carnitas App reemplazó una hoja de cálculo manual y una app de terceros como s
 
 **Cotizaciones para eventos** (v2.4): se cotiza por persona con paquete y extras, con IVA opcional si el cliente pide factura. Cada cotización recibe folio `COT-AA-####`, pasa por Borrador → Enviada → Confirmada (anticipo de 50%) → Liquidada → Convertida en venta, y se puede marcar como Rechazada con motivo. El margen estimado solo se ve en la app. Se guarda en la pestaña `Cotizaciones`.
 
-**Asuetos y pronóstico** (v2.5): alta, edición y borrado de días de asueto (festivos, puentes, vacaciones) en la pestaña `Asuetos`, con precarga de los festivos oficiales de México (Ley Federal del Trabajo, art. 74) y Semana Santa. Un asueto marca la semana de negocio cuyo sábado o domingo cae dentro de su periodo. El pronóstico de las próximas 8 semanas parte de la mediana de las últimas 6 semanas normales y la ajusta en las semanas de asueto con: el impacto que captures tú → el histórico del mismo asueto en años previos → la mediana de todos los asuetos pasados (con pocos datos, el ajuste se acerca a 0% para no sobrerreaccionar). También estima los kilos de carne a vender. La vista Semana avisa cuando la semana fue de asueto.
+**Planear la semana** (v2.6, antes *Asuetos y pronóstico*): calcula la venta esperada del fin de semana y el **pedido sugerido de carne cruda**. El pedido es igual a los kilos a vender multiplicados por los kilos crudos que realmente compras por cada kilo vendido. Ese factor es la mediana de 8 semanas y descuenta la carne que sobró. El calendario de **fechas atípicas** (pestaña `Asuetos`) marca cada fecha como ▼ baja, ▲ sube o ? por confirmar, y le da dos impactos: el que dicen tus datos y el que decides tú, que es el que se usa. Después del fin de semana, la app te pide confirmar si la próxima vez usas lo que realmente pasó. El calendario se puede precargar con los festivos de la LFT, Semana Santa, las fechas publicadas de la SEP y de San Luis Potosí, y fechas comerciales como el Día de las Madres y el Día del Padre. Tus fechas propias pueden repetirse cada año. El **cierre del domingo** registra la carne cocida que sobró en la pestaña `Cierres`. El apartado también compara cada fecha contra la misma del año anterior.
 
 La app usa la identidad de **Carnitas Estilo Clay**: paleta «Cobre y Noche» (Naranja Cazo `#E36414`, Azul Noche `#1B263B`, Ámbar `#F2A541`, Manteca `#FFF8F0`, Cobre `#B84A00`), letras Kanit y Archivo, y el escudo de la marca como ícono.
 
@@ -160,7 +160,8 @@ carnitas-app/
 | Precios | Producto · Precio · Precio medio · Precio cuarto |
 | Cuenta | Campo · Valor (CLABE, beneficiario, institución, celular) |
 | Cotizaciones | Un renglón por cotización (folio, cliente, evento, importes, pagos y estado) |
-| Asuetos | Fecha inicio · Fecha fin · Nombre · Tipo · Impacto estimado (%) · Considerar · Notas · ID · Actualizado |
+| Asuetos | Fecha inicio · Fecha fin · Nombre · Tipo · Impacto estimado (%) · Considerar · Notas · ID · Actualizado · Efecto · Repetir · Fuente · Real (%) · Revisado |
+| Cierres | Fecha · Carne sobrante (kg) · Notas |
 
 ---
 
@@ -191,6 +192,7 @@ Todo vive en **tu** Google Drive. La app no tiene servidor propio ni guarda tus 
 
 | Versión | Cambios |
 |---|---|
+| **2.6.0** | **Planear la semana**: pedido sugerido de carne cruda con el factor real de compra contra venta (descuenta lo que sobró), venta esperada con rango y comparación con hace un año · fechas atípicas con efecto ▼/▲/?, impacto de tus datos contra el tuyo y aviso para revisar después del fin de semana · fechas propias que se repiten cada año · precarga ampliada (SEP 2025-2026, FENAPO, Xantolo, Día del Maestro de Primaria SLP, regreso a clases, Día de las Madres y Día del Padre) · cierre del domingo con la carne sobrante (pestaña `Cierres`) · pestaña Histórico con compra contra venta · servicio: `semanal` trae kilos comprados y sobrantes |
 | **2.5.0** | Apartado **Asuetos y pronóstico**: pestaña `Asuetos` con alta/edición/borrado y precarga de festivos de México (con su puente) · pronóstico semanal de venta y kilos de carne ajustado por asueto (impacto capturado, histórico del mismo asueto o promedio de asuetos, con encogimiento hacia 0% cuando hay pocos datos) · tabla de asuetos pasados vs. fin de semana normal · aviso de semana de asueto en la vista Semana · servicio: acciones `asuetos`, `semanal` y `guardarAsuetos` · ícono `icon-asuetos` |
 | **2.4.2** | Íconos propios estilo Clay (`icons/icons.svg`): insignia en el menú principal, ícono del módulo en el encabezado y en *Nueva cotización*; 5 íconos de apoyo (venta perdida, transferencia, efectivo, tarjeta, ajustes). Ya no quedan emojis en la app. Los colores del set toman la paleta oficial de la app |
 | **2.3.0** | Surtido se guarda en un solo renglón (sin reparto por porcentajes) · servicio: `ajustarZonaHoraria()`, `revisarSurtido()` y `consolidarSurtido()` para juntar el histórico, y `ping`/`todo` informan la zona horaria · tablero: alertas *Qué revisar* en las 4 pestañas, selector de tablas en *Datos*, aviso si el servicio está desactualizado, Surtido repartido se agrupa al mostrarlo · app: aviso en Ajustes si la hoja no está en hora de México |

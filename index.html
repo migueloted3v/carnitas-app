@@ -328,7 +328,6 @@
   .ptabla small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
   .ptabla tr.asu td{background:rgba(227,100,20,.10)}
   .ptabla td.down{color:var(--bad)} .ptabla td.up{color:var(--good)}
-  .asutag{display:inline-block;background:var(--accent-dark);color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;margin:1px 0}
   .mut{color:var(--muted)}
   .asubtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .asubtns .addbtn{margin-top:0;font-size:13px}
@@ -350,6 +349,44 @@
   .nota{background:var(--card);border:1px solid var(--accent-dark);border-left:4px solid var(--accent);border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:10px}
   .nota b{color:var(--accent-light);font-weight:500}
   @media (max-width:760px), (orientation:portrait){ .asugrid{grid-template-columns:1fr} }
+  /* v2.6 · Planear la semana */
+  .plantabs{max-width:520px;margin:0 auto 12px}
+  .echip{display:inline-flex;align-items:center;gap:3px;border-radius:12px;padding:2px 9px;font-size:11px;font-weight:600;white-space:nowrap;margin:1px 0}
+  .echip.baja{background:rgba(255,138,128,.16);color:#FFB3AB;border:1px solid rgba(255,138,128,.45)}
+  .echip.sube{background:rgba(127,212,155,.15);color:#A6E8BC;border:1px solid rgba(127,212,155,.45)}
+  .echip.conf{background:rgba(174,184,201,.12);color:var(--muted);border:1px solid var(--border)}
+  .src{font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:0 6px;white-space:nowrap}
+  .kpi.buy{background:var(--accent);border-color:var(--accent)}
+  .kpi.buy .l,.kpi.buy .d,.kpi.buy .v{color:var(--on-accent)}
+  .kpi.buy .v{font-weight:700}
+  .why{font-size:13px}
+  .why .r{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+  .why .r:last-child{border-bottom:0}
+  .why .r>span:first-child{color:var(--muted)}
+  .why .r small{color:var(--muted);font-size:10.5px}
+  .why .r.tot{font-weight:700;color:var(--accent-light)}
+  .why .r.tot>span:first-child{color:var(--accent-light)}
+  .ptabla tr.sel td{background:rgba(227,100,20,.24);font-weight:600}
+  .ptabla tbody tr{cursor:pointer}
+  .filtros{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 2px}
+  .filtros .dchip{font-size:12px;padding:5px 11px}
+  .asurow .i{text-align:right}
+  .asurow .i small{display:block;color:var(--muted);font-size:10.5px;margin-top:2px}
+  .nota.revisar{border-color:var(--accent-light)}
+  .revrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--border);margin-top:8px}
+  .revrow .t{flex:1;min-width:160px;font-size:13px}
+  .revrow .t small{display:block;color:var(--muted)}
+  .revrow .cmp{font-size:13px}
+  .revrow .acc{display:flex;gap:6px}
+  .mini{border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:8px;padding:7px 10px;font-size:12px}
+  .mini.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+  .b.down,b.down{color:var(--bad)} b.up{color:var(--good)}
+  .prelista .rowline>span:last-child{display:flex;gap:6px;align-items:center}
+  .dbar .fecha .echip{font-size:10.5px}
+  @media (max-width:760px), (orientation:portrait){
+    .ptabla .cv,.ptabla .yy{display:none}
+    .kpis .kpi.buy{grid-column:auto}
+  }
 </style>
 </head>
 <body>
@@ -380,7 +417,7 @@
       <button type="button" class="navcard" onclick="irVista('gastos')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-gastos" x="16" y="18" width="48" height="48"/></svg>Gastos</button>
       <button type="button" class="navcard" onclick="irVista('sueldos')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-sueldos" x="16" y="18" width="48" height="48"/></svg>Sueldos</button>
       <button type="button" class="navcard" onclick="irVista('dia')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-ventas-semana" x="16" y="18" width="48" height="48"/></svg>Ventas · día y semana</button>
-      <button type="button" class="navcard wide" onclick="irVista('asuetos')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-asuetos" x="16" y="18" width="48" height="48"/></svg>Asuetos y pronóstico</button>
+      <button type="button" class="navcard wide" onclick="irVista('asuetos')"><svg class="icon-badge" viewBox="0 0 80 88" aria-hidden="true"><use href="icons/icons.svg#icon-badge"/><use href="icons/icons.svg#icon-asuetos" x="16" y="18" width="48" height="48"/></svg>Planear compra · fechas</button>
     </div>
     <p class="ver" id="verInicio"></p>
   </div>
@@ -579,7 +616,7 @@
 <div id="modalRoot"></div>
 
 <script>
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.6.0';
 
 /* =========================================================
    Catálogo
@@ -636,7 +673,7 @@ const TITULOS = {
   sueldos:['Sueldos','Pagos a ayudantes'],
   dia:['Ventas','Por día o por semana (viernes a jueves)'],
   cotizaciones:['Cotizaciones','Eventos · precio por persona'],
-  asuetos:['Asuetos y pronóstico','Festivos y puentes que mueven la venta del fin de semana']
+  asuetos:['Planear la semana','Cuánto vas a vender y cuánta carne pedir']
 };
 
 /* Ícono de cada módulo (símbolos de icons/icons.svg) */
@@ -1953,7 +1990,7 @@ function renderSemana(act, ant, nPend){
 
   const asuSem = asuetosDeSemana(semanaActual);
   body.innerHTML = `
-    ${asuSem.length ? `<div class="nota"><b>Semana de asueto:</b> ${esc(asuSem.map(x=>x.nombre).join(', '))} (${esc(asuSem.map(rangoTxt).join(', '))}). Tómalo en cuenta al comparar con la semana anterior.</div>` : ''}
+    ${asuSem.length ? `<div class="nota"><b>Semana con fecha atípica:</b> ${esc(asuSem.map(x=>`${x.nombre} (${x.efecto==='Sube'?'sube':x.efecto==='Baja'?'baja':'por confirmar'})`).join(', '))} · ${esc(asuSem.map(rangoTxt).join(', '))}. Tómalo en cuenta al comparar con la semana anterior.</div>` : ''}
     ${!costosOk && r.total>0 ? `<div class="aviso"><b>Costos incompletos:</b> hay ventas pero no hay insumos capturados de vie ${fechaCorta(semanaActual)} a jue ${fechaCorta(sumarDias(semanaActual,6))}. La utilidad no es confiable hasta que se registren.</div>` : ''}
     <div class="kpis sem">
       <div class="kpi main"><p class="l">Venta de la semana</p><p class="v">${fmt(r.total)}</p>${deltaTxt(r.total, a.total, 'semana anterior')}</div>
@@ -2071,48 +2108,63 @@ function renderDia(filasDia, filasAnt, nPend){
 }
 
 /* =========================================================
-   Días de asueto y pronóstico semanal
-   - Un asueto es un periodo (inicio–fin). Marca la semana de negocio
-     (viernes a jueves) cuyo sábado o domingo cae dentro del periodo.
-   - Pronóstico = venta base × factor de asueto.
-     · Venta base: mediana de las últimas 6 semanas normales (sin asueto,
-       con al menos 2 días de venta). La mediana no se deja jalar por una
-       semana atípica.
-     · Factor: lo que el dueño capture como impacto estimado; si no hay,
-       el histórico de ese mismo asueto en años previos; si no, la mediana
-       de todos los asuetos pasados. Con pocas observaciones el factor se
-       acerca a 1 (sin efecto) para no sobrerreaccionar a un solo dato.
+   Planear la semana: fechas atípicas y pedido de carne (v2.6)
+   - Una "fecha" es un periodo (inicio–fin) que mueve la venta: puentes,
+     vacaciones, Día de las Madres… Marca la semana de negocio (vie→jue)
+     cuyo sábado o domingo cae dentro del periodo.
+   - Cada fecha tiene DOS impactos:
+       · Datos: lo que dice el historial (misma fecha en años previos o,
+         si no hay, la mediana de fechas con el mismo efecto). Con pocos
+         datos se encoge hacia 0% para no sobrerreaccionar.
+       · Tú: el que decide el dueño. Si existe, manda.
+     Después del fin de semana la app compara lo que decidió contra lo
+     que pasó y le pide confirmar qué usar la próxima vez.
+   - Venta base = mediana de las últimas 6 semanas normales.
+   - Pedido sugerido = kilos a vender × kilos crudos que realmente se
+     compran por kilo vendido (mediana de las últimas 8 semanas, restando
+     la carne que sobró cuando se capturó el cierre).
    ========================================================= */
-const ASU_COLS = ['Fecha inicio','Fecha fin','Nombre','Tipo','Impacto estimado (%)','Considerar','Notas','ID','Actualizado'];
-const ASU_TIPOS = ['Oficial','Tradicional','Puente','Vacaciones','Local','Otro'];
-const PRON_CFG = {semanasBase: 6, minBase: 3, previasHist: 4, minPrevias: 2, kGlobal: 2, kClave: 1, horizonte: 8};
-let asuetos = leerJSON('carnitas_asuetos', []);
+const ASU_EFECTOS = ['Baja','Sube','Por confirmar'];
+const ASU_FUENTES = ['Mía','Oficial LFT','SEP','San Luis','Comercial','Tradicional'];
+const ASU_REPETIR = ['No','Misma fecha','Mismo día de la semana'];
+const PRON_CFG = {semanasBase: 6, minBase: 3, previasHist: 4, minPrevias: 2, kGlobal: 2, kClave: 1, horizonte: 8,
+                  semanasCompra: 8, mermaSobrante: 1.4, diasRevision: 120, umbralRevision: 5};
+let asuetos = leerJSON('carnitas_asuetos', []).map(normAsu);
 let semanal = leerJSON('carnitas_semanal', null); // {t, semanas}
-let asuCargando = false;
+let planTab = 'plan', planSem = null, calFiltro = 'todas';
 
+function normAsu(a){
+  a = Object.assign({efecto:'', repetir:'No', fuente:'Mía', real:null, revisado:''}, a);
+  if(!ASU_EFECTOS.includes(a.efecto)) a.efecto = a.impacto>0 ? 'Sube' : (a.impacto<0 || /Oficial|Puente|Vacaciones/.test(a.tipo||'')) ? 'Baja' : 'Por confirmar';
+  return a;
+}
 function claveAsueto(nombre){
   return String(nombre||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\d+/g,'').replace(/[^a-z]+/g,' ').trim();
 }
+function numONull(v){ if(v===''||v==null) return null; const n = Number(v); return isFinite(n) ? n : null; }
 function asuDeFila(r){
-  const imp = r[4]===''||r[4]==null ? null : Number(r[4]);
-  return {inicio: String(r[0]).slice(0,10), fin: String(r[1]||r[0]).slice(0,10), nombre: String(r[2]||''), tipo: String(r[3]||'Otro'),
-    impacto: isFinite(imp) ? imp : null, considerar: !/^no$/i.test(String(r[5]||'Sí').trim()), notas: String(r[6]||''), id: String(r[7]||'')};
+  const fuente = String(r[11]||'') || ({Oficial:'Oficial LFT', Tradicional:'Tradicional'}[r[3]] || 'Mía');
+  return normAsu({inicio: String(r[0]).slice(0,10), fin: String(r[1]||r[0]).slice(0,10), nombre: String(r[2]||''), tipo: String(r[3]||''),
+    impacto: numONull(r[4]), considerar: !/^no$/i.test(String(r[5]||'Sí').trim()), notas: String(r[6]||''), id: String(r[7]||''),
+    efecto: String(r[9]||''), repetir: String(r[10]||'No'), fuente, real: numONull(r[12]), revisado: String(r[13]||'')});
 }
 function asuAObjeto(a){
-  return {'Fecha inicio': a.inicio, 'Fecha fin': a.fin, 'Nombre': a.nombre, 'Tipo': a.tipo,
-    'Impacto estimado (%)': a.impacto==null ? '' : a.impacto, 'Considerar': a.considerar ? 'Sí' : 'No', 'Notas': a.notas||'', 'ID': a.id};
+  return {'Fecha inicio': a.inicio, 'Fecha fin': a.fin, 'Nombre': a.nombre, 'Tipo': a.fuente || a.tipo || '',
+    'Impacto estimado (%)': a.impacto==null ? '' : a.impacto, 'Considerar': a.considerar ? 'Sí' : 'No', 'Notas': a.notas||'', 'ID': a.id,
+    'Efecto': a.efecto, 'Repetir': a.repetir||'No', 'Fuente': a.fuente||'', 'Real (%)': a.real==null ? '' : a.real, 'Revisado': a.revisado||''};
 }
 
-/* ---------- Festivos de México ---------- */
+/* ---------- Calendario precargado ---------- */
 function isoDe(y, m, d){ return fechaLocal(new Date(y, m-1, d)); }
-function enesimoLunes(y, m, n){ const d1 = new Date(y, m-1, 1).getDay(); return isoDe(y, m, 1 + ((8 - d1) % 7) + 7*(n-1)); }
+function enesimoDia(y, m, dow, n){ const d1 = new Date(y, m-1, 1).getDay(); return isoDe(y, m, 1 + ((dow - d1 + 7) % 7) + 7*(n-1)); }
+function enesimoLunes(y, m, n){ return enesimoDia(y, m, 1, n); }
 function pascua(y){ // Domingo de Pascua (algoritmo gregoriano anónimo)
   const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3),
         h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451),
         mes=Math.floor((h+l-7*m+114)/31), dia=((h+l-7*m+114)%31)+1;
   return isoDe(y, mes, dia);
 }
-// Periodo que se siente en el fin de semana según el día en que cae el festivo
+// Periodo que se siente en el fin de semana según el día en que cae la fecha
 function periodoFestivo(iso){
   const w = diaSem(iso);
   if(w===1) return [sumarDias(iso,-2), iso];          // lunes: puente sáb–lun
@@ -2126,35 +2178,74 @@ function periodoFestivo(iso){
 const GRUPOS_FESTIVOS = [
   {id:'oficial', nombre:'Descanso obligatorio (Ley Federal del Trabajo, art. 74)', on:true},
   {id:'santa', nombre:'Semana Santa (jueves a domingo de Pascua)', on:true},
+  {id:'sep', nombre:'Calendario SEP publicado (vacaciones, puentes, regreso a clases)', on:true},
+  {id:'comercial', nombre:'Fechas que suben la venta (Día de las Madres, Día del Padre)', on:true},
+  {id:'sanluis', nombre:'San Luis Potosí (FENAPO, Xantolo, Día del Maestro de Primaria)', on:true},
   {id:'tradicional', nombre:'Día de Muertos y Virgen de Guadalupe', on:false},
-  {id:'vacaciones', nombre:'Vacaciones de fin de año (24 dic – 1 ene)', on:false}
+  {id:'vacaciones', nombre:'Fin de año (24 dic – 1 ene)', on:false}
 ];
+// Fechas con fuente pública que no se pueden calcular (cambian cada año). Solo las ya publicadas.
+const FECHAS_PUBLICADAS = {
+  2026: [
+    ['sep','vacaciones-semana-santa','Vacaciones de Semana Santa (SEP)','Baja','SEP','2026-03-30','2026-04-10','SEP 2025-2026: 30 mar – 10 abr'],
+    ['sep','dia-del-maestro','Día del Maestro (puente escolar)','Por confirmar','SEP','2026-05-15','2026-05-17','SEP 2025-2026: viernes 15 may sin clases'],
+    ['sep','regreso-a-clases','Regreso a clases y gastos escolares','Baja','SEP','2026-09-05','2026-09-13','Fin de la feria, regreso a clases, colegiaturas y uniformes'],
+    ['sanluis','fenapo','FENAPO','Por confirmar','San Luis','2026-08-07','2026-08-30','Feria Nacional Potosina 2026: 7 – 30 ago'],
+    ['sanluis','maestro-primaria-slp','Día del Maestro de Primaria (SLP)','Por confirmar','San Luis','2026-10-03','2026-10-05','SEGE: lunes 5 oct sin clases en primaria'],
+    ['sanluis','xantolo','Xantolo (megapuente escolar SLP)','Baja','San Luis','2026-10-29','2026-11-02','Gobierno de SLP: 29 oct – 2 nov sin clases']
+  ]
+};
 function festivosMX(y){
   const L = [];
-  const add = (grupo, clave, nombre, tipo, iso, periodo) => {
+  const add = (grupo, clave, nombre, efecto, fuente, iso, periodo, notas) => {
     const [ini, fin] = periodo || periodoFestivo(iso);
-    L.push({grupo, id:`mx-${clave}-${y}`, nombre, tipo, inicio: ini, fin, impacto:null, considerar:true, notas:`Precargado · festivo ${etiquetaFecha(iso).toLowerCase()}`});
+    L.push({grupo, id:`mx-${clave}-${y}`, nombre, tipo: fuente, fuente, efecto, repetir:'No', inicio: ini, fin, impacto:null, considerar:true,
+      notas: notas || `Precargado · ${etiquetaFecha(iso).toLowerCase()}`, real:null, revisado:''});
   };
-  add('oficial','anio-nuevo','Año Nuevo','Oficial', isoDe(y,1,1));
-  add('oficial','constitucion','Día de la Constitución','Oficial', enesimoLunes(y,2,1));
-  add('oficial','juarez','Natalicio de Benito Juárez','Oficial', enesimoLunes(y,3,3));
-  add('oficial','trabajo','Día del Trabajo','Oficial', isoDe(y,5,1));
-  add('oficial','independencia','Día de la Independencia','Oficial', isoDe(y,9,16));
-  if((y-2024)%6===0) add('oficial','transmision','Transmisión del Poder Ejecutivo','Oficial', isoDe(y,10,1));
-  add('oficial','revolucion','Día de la Revolución','Oficial', enesimoLunes(y,11,3));
-  add('oficial','navidad','Navidad','Oficial', isoDe(y,12,25));
+  add('oficial','anio-nuevo','Año Nuevo','Baja','Oficial LFT', isoDe(y,1,1));
+  add('oficial','constitucion','Día de la Constitución','Baja','Oficial LFT', enesimoLunes(y,2,1));
+  add('oficial','juarez','Natalicio de Benito Juárez','Baja','Oficial LFT', enesimoLunes(y,3,3));
+  add('oficial','trabajo','Día del Trabajo','Baja','Oficial LFT', isoDe(y,5,1));
+  add('oficial','independencia','Día de la Independencia','Baja','Oficial LFT', isoDe(y,9,16));
+  if((y-2024)%6===0) add('oficial','transmision','Transmisión del Poder Ejecutivo','Baja','Oficial LFT', isoDe(y,10,1));
+  add('oficial','revolucion','Día de la Revolución','Baja','Oficial LFT', enesimoLunes(y,11,3));
+  add('oficial','navidad','Navidad','Baja','Oficial LFT', isoDe(y,12,25));
   const p = pascua(y);
-  add('santa','semana-santa','Semana Santa','Tradicional', sumarDias(p,-3), [sumarDias(p,-3), p]);
-  add('tradicional','muertos','Día de Muertos','Tradicional', isoDe(y,11,2));
-  add('tradicional','guadalupe','Virgen de Guadalupe','Tradicional', isoDe(y,12,12));
-  add('vacaciones','fin-de-anio','Vacaciones de fin de año','Vacaciones', isoDe(y,12,24), [isoDe(y,12,24), isoDe(y+1,1,1)]);
+  add('santa','semana-santa','Semana Santa','Baja','Oficial LFT', sumarDias(p,-3), [sumarDias(p,-3), p], 'Jueves y Viernes Santo');
+  add('comercial','dia-de-las-madres','Día de las Madres','Sube','Comercial', isoDe(y,5,10));
+  add('comercial','dia-del-padre','Día del Padre','Sube','Comercial', enesimoDia(y,6,0,3));
+  add('tradicional','muertos','Día de Muertos','Por confirmar','Tradicional', isoDe(y,11,2));
+  add('tradicional','guadalupe','Virgen de Guadalupe','Por confirmar','Tradicional', isoDe(y,12,12));
+  add('vacaciones','fin-de-anio','Fin de año','Por confirmar','Tradicional', isoDe(y,12,24), [isoDe(y,12,24), isoDe(y+1,1,1)]);
+  (FECHAS_PUBLICADAS[y]||[]).forEach(([g,c,n,e,f,i,fi,no])=>add(g,c,n,e,f,i,[i,fi],no));
   return L;
 }
-
+// Fechas propias que se repiten, proyectadas al año pedido
+function proyectarAnual(a, y){
+  const yA = Number(a.inicio.slice(0,4)); if(y<=yA) return null;
+  const dur = Math.round((new Date(a.fin+'T12:00') - new Date(a.inicio+'T12:00'))/864e5);
+  let ini;
+  if(a.repetir==='Misma fecha') ini = `${y}${a.inicio.slice(4)}`;
+  else { const [,m,d] = a.inicio.split('-').map(Number); ini = enesimoDia(y, m, diaSem(a.inicio), Math.ceil(d/7)); }
+  return Object.assign({}, a, {grupo:'mias', id:`${a.id.replace(/-\d{4}$/,'')}-${y}`, inicio: ini, fin: sumarDias(ini, dur), real:null, revisado:'', impacto:null});
+}
 function festivosPrecarga(anio){
-  if(anio) return festivosMX(anio);
   const y0 = Number(hoy().slice(0,4));
-  return festivosMX(y0).concat(festivosMX(y0+1));
+  const anios = anio ? [anio] : [y0, y0+1];
+  const L = [];
+  anios.forEach(y=>{
+    L.push(...festivosMX(y));
+    asuetos.filter(a=>a.repetir && a.repetir!=='No').forEach(a=>{ const p = proyectarAnual(a, y); if(p) L.push(p); });
+  });
+  // Lo que ya aprendiste de la misma fecha pasa al año siguiente
+  return L.map(f=>{ const d = decisionPrevia(f); return d==null ? f : Object.assign({}, f, {impacto: d}); });
+}
+function decisionPrevia(f){
+  const c = claveAsueto(f.nombre);
+  const prev = asuetos.filter(a=>claveAsueto(a.nombre)===c && a.fin < f.inicio).sort((x,y)=>x.inicio<y.inicio?1:-1)[0];
+  if(!prev) return null;
+  if(prev.revisado==='Real' && prev.real!=null) return prev.real;
+  return prev.impacto;
 }
 
 /* ---------- Modelo ---------- */
@@ -2166,51 +2257,83 @@ function asuetosDeSemana(vie, lista){
 
 function modeloPronostico(semanas, lista, hoyIso){
   const actual = semanaDe(hoyIso);
-  const cerradas = (semanas||[]).filter(s=>s.semana < actual && s.venta > 0);
+  const todas = semanas||[];
+  const porSem = {}; todas.forEach(s=>porSem[s.semana]=s);
+  const cerradas = todas.filter(s=>s.semana < actual && s.venta > 0);
   const marca = s => asuetosDeSemana(s.semana, lista);
-  const normales = cerradas.filter(s=>!marca(s).length && s.dias >= 2);
+  // Las fechas "por confirmar" no sacan la semana de la base: solo se observan
+  const normales = cerradas.filter(s=>!marca(s).some(a=>a.efecto!=='Por confirmar') && s.dias >= 2);
 
-  // Impacto observado de cada asueto pasado vs. las semanas normales previas
+  // Lo que pasó en cada fecha atípica contra las semanas normales previas
   const observados = [];
   cerradas.forEach(s=>{
     const as = marca(s); if(!as.length) return;
     const previas = normales.filter(n=>n.semana < s.semana).slice(-PRON_CFG.previasHist);
     if(previas.length < PRON_CFG.minPrevias) return;
-    const base = mediana(previas.map(n=>n.venta)), baseKg = mediana(previas.map(n=>n.kg));
-    observados.push({semana: s.semana, nombres: as.map(a=>a.nombre), claves: as.map(a=>claveAsueto(a.nombre)),
-      venta: s.venta, base, ratio: s.venta/base, kgRatio: baseKg>0 ? s.kg/baseKg : null});
+    const base = mediana(previas.map(n=>n.venta));
+    observados.push({semana: s.semana, ids: as.map(a=>a.id), nombres: as.map(a=>a.nombre), claves: as.map(a=>claveAsueto(a.nombre)),
+      efectos: as.map(a=>a.efecto), venta: s.venta, kg: s.kg, compraKg: s.compraKg||0, sobranteKg: s.sobranteKg||0, base, ratio: s.venta/base});
   });
-  const nG = observados.length, medG = mediana(observados.map(o=>o.ratio));
-  const fGlobal = nG ? (nG*medG + PRON_CFG.kGlobal)/(nG + PRON_CFG.kGlobal) : 1; // se encoge hacia "sin efecto"
+  const encoger = (obs, k, prior) => (obs.reduce((t,o)=>t+o.ratio,0) + k*prior)/(obs.length + k);
+  const globalDe = ef => { const o = observados.filter(x=>x.efectos.includes(ef)); return o.length ? {f: (o.length*mediana(o.map(x=>x.ratio)) + PRON_CFG.kGlobal)/(o.length+PRON_CFG.kGlobal), n:o.length} : null; };
 
-  function factorDe(as){
-    if(!as.length) return {f:1, fuente:''};
-    const manual = as.filter(a=>a.impacto!=null);
-    if(manual.length){ const imp = Math.min(...manual.map(a=>a.impacto)); return {f: Math.max(0, 1 + imp/100), fuente:'estimado por ti'}; }
-    const claves = as.map(a=>claveAsueto(a.nombre));
-    const propios = observados.filter(o=>o.claves.some(c=>claves.includes(c)));
-    if(propios.length){
-      const f = (propios.reduce((s,o)=>s+o.ratio,0) + PRON_CFG.kClave*fGlobal)/(propios.length + PRON_CFG.kClave);
-      return {f, fuente:`histórico de este asueto (${propios.length})`};
-    }
-    if(nG) return {f: fGlobal, fuente:`promedio de asuetos (${nG})`};
-    return {f:1, fuente:'sin histórico'};
+  // Impacto según los datos (null si no hay con qué calcularlo)
+  function datosDe(a){
+    const c = claveAsueto(a.nombre);
+    const propios = observados.filter(o=>o.claves.includes(c) && !o.ids.includes(a.id) && o.semana < semanaDe(a.inicio));
+    const g = a.efecto==='Por confirmar' ? null : globalDe(a.efecto);
+    if(propios.length) return {f: encoger(propios, PRON_CFG.kClave, g ? g.f : 1), n: propios.length, fuente:`misma fecha (${propios.length})`};
+    if(g) return {f: g.f, n: g.n, fuente:`fechas que ${a.efecto==='Sube'?'suben':'bajan'} (${g.n})`};
+    return null;
+  }
+  // Factor que se usa: el tuyo manda; si no, el de los datos (excepto "por confirmar")
+  function factorDe(a){
+    if(a.impacto!=null) return {f: Math.max(0, 1 + a.impacto/100), fuente:'tú', a};
+    const d = datosDe(a);
+    if(d && a.efecto!=='Por confirmar') return {f: d.f, fuente: d.fuente, a};
+    return {f: 1, fuente: a.efecto==='Por confirmar' ? 'por confirmar' : 'sin datos', a};
+  }
+  function factorSemana(as){
+    if(!as.length) return {f:1, fuente:'', a:null};
+    return as.map(factorDe).sort((x,y)=>Math.abs(y.f-1)-Math.abs(x.f-1))[0];
   }
 
   const ult = normales.slice(-PRON_CFG.semanasBase);
-  const base = ult.length >= PRON_CFG.minBase ? mediana(ult.map(s=>s.venta)) : null;
-  const baseKg = ult.length >= PRON_CFG.minBase ? mediana(ult.map(s=>s.kg)) : null;
-  // Variación típica de una semana normal (desviación absoluta mediana relativa)
+  const ok = ult.length >= PRON_CFG.minBase;
+  const base = ok ? mediana(ult.map(s=>s.venta)) : null;
+  const baseKg = ok ? mediana(ult.map(s=>s.kg)) : null;
   const disp = base ? mediana(ult.map(s=>Math.abs(s.venta - base)))/base : null;
 
-  const futuras = [];
-  for(let i=0; i<PRON_CFG.horizonte; i++){
-    const vie = sumarDias(actual, 7*i), as = asuetosDeSemana(vie, lista), fx = factorDe(as);
-    const venta = base!=null ? base*fx.f : null;
-    futuras.push({semana: vie, asuetos: as, factor: fx.f, fuente: fx.fuente, venta,
-      kg: baseKg!=null ? baseKg*fx.f : null, banda: venta!=null && disp!=null ? venta*disp : null});
+  // Kilos crudos que realmente usas por kilo vendido (descontando lo que sobró)
+  const conCompra = cerradas.filter(s=>s.compraKg>0 && s.kg>0).slice(-PRON_CFG.semanasCompra);
+  const ratios = conCompra.map(s=>Math.max(0, s.compraKg - (s.cierres ? s.sobranteKg*PRON_CFG.mermaSobrante : 0))/s.kg);
+  const factorCompra = mediana(ratios);
+
+  function semana(vie){
+    const as = asuetosDeSemana(vie, lista), fx = factorSemana(as);
+    const venta = base!=null ? base*fx.f : null, kg = baseKg!=null ? baseKg*fx.f : null;
+    const pedido = kg!=null && factorCompra ? kg*factorCompra : null;
+    return {semana: vie, asuetos: as, factor: fx.f, fuente: fx.fuente, principal: fx.a, venta, kg, pedido,
+      banda: venta!=null && disp!=null ? venta*disp : null, bandaKg: pedido!=null && disp!=null ? pedido*disp : null,
+      real: porSem[vie] || null, yoy: haceUnAnio(vie, as)};
   }
-  return {base, baseKg, nBase: ult.length, disp, observados, nG, medG, fGlobal, futuras, normales: normales.length};
+  // Mismo fin de semana del año pasado: la misma fecha atípica o, si no hay, la semana de hace 52
+  function haceUnAnio(vie, as){
+    for(const a of as){
+      const c = claveAsueto(a.nombre);
+      const o = observados.filter(x=>x.claves.includes(c) && x.semana < vie && x.semana >= sumarDias(vie,-400)).pop();
+      if(o) return Object.assign({}, porSem[o.semana], {nota: o.nombres.join(', ')});
+    }
+    const s = porSem[sumarDias(vie,-364)];
+    return s ? Object.assign({}, s, {nota:'misma semana'}) : null;
+  }
+  // Fechas que ya pasaron y piden revisión (tu número contra lo que pasó)
+  const revisar = (lista||asuetos).filter(a=>a.considerar && !a.revisado && a.fin < hoyIso && a.fin >= sumarDias(hoyIso, -PRON_CFG.diasRevision))
+    .map(a=>{ const o = observados.find(x=>x.ids.includes(a.id)); return o ? {a, o, realPct: Math.round((o.ratio-1)*100)} : null; })
+    .filter(Boolean);
+
+  const futuras = []; for(let i=0; i<PRON_CFG.horizonte; i++) futuras.push(semana(sumarDias(actual, 7*i)));
+  return {base, baseKg, nBase: ult.length, disp, observados, factorCompra, nCompra: ratios.length, futuras, semana, datosDe, factorDe, revisar, normales: normales.length};
 }
 
 /* ---------- Datos ---------- */
@@ -2222,12 +2345,12 @@ async function cargarAsuetos(silencio){
     guardarJSON('carnitas_asuetos', asuetos);
     return true;
   }catch(e){
-    if(!silencio) toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.5 para guardar asuetos' : 'No se pudieron cargar los asuetos: ' + e.message, true);
+    if(!silencio) toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.6' : 'No se pudieron cargar las fechas: ' + e.message, true);
     return false;
   }
 }
 async function cargarSemanal(){
-  const d = await apiGet('semanal', {desde: sumarDias(hoy(), -730)}, 30000);
+  const d = await apiGet('semanal', {desde: sumarDias(hoy(), -800)}, 30000);
   semanal = {t: Date.now(), semanas: d.semanas||[]};
   guardarJSON('carnitas_semanal', semanal);
 }
@@ -2236,111 +2359,204 @@ async function guardarAsuetosSrv(lista, borrar){
   await cargarAsuetos(true);
   return r;
 }
+function msgError(e){ return /Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.6' : e.message; }
 
 /* ---------- Vista ---------- */
 let asuPeticion = 0;
 async function irAsuetos(){
-  const body = document.getElementById('asuBody');
-  renderAsuetos();
+  renderPlan();
   if(!servicioListo()) return;
   const mia = ++asuPeticion;
-  if(!semanal) body.querySelector('#asuPron').innerHTML = `<div class="msg">Calculando el pronóstico…</div>`;
-  try{
-    await Promise.all([cargarAsuetos(false), cargarSemanal()]);
-  }catch(e){
-    if(mia===asuPeticion) toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.5 para ver el pronóstico' : 'Sin conexión: se muestra la última copia guardada', true);
-  }
-  if(mia===asuPeticion && vistaActual==='asuetos') renderAsuetos();
+  try{ await Promise.all([cargarAsuetos(false), cargarSemanal()]); }
+  catch(e){ if(mia===asuPeticion) toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.6 para ver el plan' : 'Sin conexión: se muestra la última copia guardada', true); }
+  if(mia===asuPeticion && vistaActual==='asuetos') renderPlan();
 }
+function cambiarPlanTab(t){ planTab = t; renderPlan(); }
+function moverPlanSem(n){ planSem = sumarDias(planSem || semanaDe(hoy()), 7*n); renderPlan(); }
 
 function rangoTxt(a){
   const ini = `${DIA3[diaSem(a.inicio)]} ${fechaCorta(a.inicio)}`;
   const anio = a.fin.slice(0,4)!==hoy().slice(0,4) ? ` ${a.fin.slice(0,4)}` : '';
   return (a.fin===a.inicio ? ini : `${ini} – ${DIA3[diaSem(a.fin)]} ${fechaCorta(a.fin)}`) + anio;
 }
-function pctTxt(f){ const p = (f-1)*100; return `${p>0?'+':p<0?'−':''}${Math.abs(p).toFixed(0)}%`; }
-
-function renderAsuetos(){
-  const body = document.getElementById('asuBody');
-  const h = hoy();
-  const M = modeloPronostico(semanal ? semanal.semanas : [], asuetos, h);
-  const prox = M.futuras.find(f=>f.asuetos.length);
-  const sinServicio = !servicioListo();
-
-  const kpis = `
-    <div class="kpis">
-      <div class="kpi main"><p class="l">Fin de semana normal (base)</p><p class="v">${M.base!=null ? fmt(M.base) : '—'}</p>
-        <p class="d">${M.base!=null ? `Mediana de ${M.nBase} semanas sin asueto` : `Faltan semanas sin asueto (mín. ${PRON_CFG.minBase})`}</p></div>
-      <div class="kpi"><p class="l">Impacto histórico de asuetos</p><p class="v">${M.nG ? pctTxt(M.medG) : '—'}</p>
-        <p class="d">${M.nG ? `${M.nG} fin${M.nG>1?'es':''} de semana · ajuste aplicado ${pctTxt(M.fGlobal)}` : 'Aún sin asuetos con histórico'}</p></div>
-      <div class="kpi"><p class="l">Próximo asueto</p><p class="v" style="font-size:clamp(15px,1.8vw,19px)">${prox ? esc(prox.asuetos[0].nombre) : '—'}</p>
-        <p class="d">${prox ? `Semana del vie ${fechaCorta(prox.semana)}${prox.venta!=null ? ` · ${fmt(prox.venta)}` : ''}` : 'Ninguno en las próximas 8 semanas'}</p></div>
-      <div class="kpi"><p class="l">Asuetos registrados</p><p class="v">${asuetos.length}</p><p class="d">${asuetos.filter(a=>a.fin>=h).length} por venir</p></div>
-    </div>`;
-
-  const filasPron = M.futuras.map(f=>{
-    const asu = f.asuetos.length;
-    return `<tr class="${asu?'asu':''}">
-      <td>vie ${fechaCorta(f.semana)}${f.semana===semanaDe(h)?' <small>(esta)</small>':''}</td>
-      <td>${asu ? f.asuetos.map(a=>`<span class="asutag">${esc(a.nombre)}</span>`).join(' ') : '<span class="mut">Normal</span>'}</td>
-      <td class="num">${f.venta!=null ? fmt(f.venta) : '—'}${f.banda ? `<small>± ${fmtK(f.banda)}</small>` : ''}</td>
-      <td class="num">${f.kg!=null ? f.kg.toFixed(0)+' kg' : '—'}</td>
-      <td class="num">${asu ? `${pctTxt(f.factor)}<small>${esc(f.fuente)}</small>` : '<span class="mut">—</span>'}</td></tr>`;
-  }).join('');
-  const pron = sinServicio && !semanal
-    ? `<div class="msg">Configura el servicio en <b>Ajustes</b> para calcular el pronóstico.</div>`
-    : `<div class="tablawrap"><table class="ptabla"><thead><tr><th>Semana</th><th>Asueto</th><th class="num">Venta</th><th class="num">Carne</th><th class="num">Ajuste</th></tr></thead><tbody>${filasPron}</tbody></table></div>
-       <p class="hint">Venta de mostrador de sábado y domingo (sin eventos ni regalos). Carne = kilos vendidos esperados, útil para la compra del viernes. ± = variación típica de una semana normal.</p>`;
-
-  const ordenados = asuetos.slice().sort((a,b)=>a.inicio<b.inicio?-1:1);
-  const proximos = ordenados.filter(a=>a.fin>=h), pasados = ordenados.filter(a=>a.fin<h).reverse();
-  const filaAsu = a => {
-    const toca = a.considerar && [semanaDe(a.inicio), semanaDe(a.fin)].some(v=>asuetosDeSemana(v,[a]).length) ;
-    return `<button type="button" class="asurow" onclick="editarAsueto('${jsq(a.id)}')">
-      <span class="n"><b>${esc(a.nombre)}</b><small>${rangoTxt(a)} · ${esc(a.tipo)}${!a.considerar?' · no se considera':''}${a.considerar&&!toca?' · no toca fin de semana':''}</small></span>
-      <span class="i">${a.impacto!=null ? `${a.impacto>0?'+':''}${a.impacto}%` : '<span class="mut">auto</span>'}</span></button>`;
-  };
-  const lista = `
-    <div class="asubtns"><button class="addbtn" onclick="editarAsueto()">Agregar asueto</button><button class="addbtn alt" onclick="abrirPrecarga()">Precargar festivos de México</button></div>
-    ${proximos.length ? `<p class="sub">Próximos</p>${proximos.map(filaAsu).join('')}` : `<p class="hint" style="margin:12px 0">Aún no hay asuetos por venir. Empieza con los festivos oficiales.</p>`}
-    ${pasados.length ? `<p class="sub">Pasados</p>${pasados.slice(0,12).map(filaAsu).join('')}` : ''}`;
-
-  const hist = M.observados.length
-    ? `<div class="tablawrap"><table class="ptabla"><thead><tr><th>Semana</th><th>Asueto</th><th class="num">Real</th><th class="num">Normal</th><th class="num">Impacto</th></tr></thead><tbody>
-        ${M.observados.slice().reverse().map(o=>`<tr><td>vie ${fechaCorta(o.semana)}</td><td>${esc(o.nombres.join(', '))}</td><td class="num">${fmt(o.venta)}</td><td class="num">${fmt(o.base)}</td>
-          <td class="num ${o.ratio<1?'down':'up'}">${pctTxt(o.ratio)}</td></tr>`).join('')}</tbody></table></div>`
-    : `<p class="hint">Cuando pase un fin de semana marcado como asueto, aquí verás su venta contra la mediana de las ${PRON_CFG.previasHist} semanas normales previas.</p>`;
-
-  body.innerHTML = `${kpis}
-    <div class="asugrid">
-      <div class="dcard"><h4>Pronóstico · próximas ${PRON_CFG.horizonte} semanas</h4><div id="asuPron">${pron}</div></div>
-      <div class="dcard"><h4>Días de asueto</h4>${lista}</div>
-      <div class="dcard asuhist"><h4>Asuetos pasados vs. fin de semana normal</h4>${hist}
-        <p class="hint">Cómo se ajusta: si capturas un impacto estimado se usa ese; si no, el histórico del mismo asueto en años previos; si no, la mediana de todos los asuetos. Con pocos datos el ajuste se acerca a 0% para no exagerar por un solo fin de semana.</p></div>
-    </div>`;
+function pctTxt(f){ const p = Math.round((f-1)*100); return `${p>0?'+':p<0?'−':''}${Math.abs(p)}%`; }
+function pctNum(p){ return `${p>0?'+':p<0?'−':''}${Math.abs(Math.round(p))}%`; }
+function kgTxt(k){ return k==null ? '—' : `${Math.round(k)} kg`; }
+function chipEfecto(a, txt){
+  const cls = a.efecto==='Sube' ? 'sube' : a.efecto==='Baja' ? 'baja' : 'conf';
+  const ic = a.efecto==='Sube' ? '▲' : a.efecto==='Baja' ? '▼' : '?';
+  return `<span class="echip ${cls}">${ic} ${esc(txt || (a.efecto==='Por confirmar' ? 'Confirmar' : a.efecto))}</span>`;
 }
 
-/* ---------- Alta, edición y borrado ---------- */
+function renderPlan(){
+  const body = document.getElementById('asuBody');
+  const M = modeloPronostico(semanal ? semanal.semanas : [], asuetos, hoy());
+  const tabs = `<div class="seg plantabs">${[['plan','Planear semana'],['cal','Calendario'],['hist','Histórico']].map(([k,t])=>`<button class="${planTab===k?'on':''}" onclick="cambiarPlanTab('${k}')">${t}</button>`).join('')}</div>`;
+  const aviso = !servicioListo() && !semanal ? `<div class="msg">Configura el servicio en <b>Ajustes</b> para planear la semana.</div>` : '';
+  body.innerHTML = tabs + (aviso || (planTab==='cal' ? htmlCalendario(M) : planTab==='hist' ? htmlHistorico(M) : htmlPlan(M)));
+  if(planTab==='plan') document.getElementById('cierre_fecha') && (document.getElementById('cierre_fecha').value = domingoCierre());
+}
+
+function domingoCierre(){ const h = hoy(), w = diaSem(h); return w===0 ? h : sumarDias(h, -w); }
+
+function htmlRevisar(M){
+  if(!M.revisar.length) return '';
+  return `<div class="nota revisar"><b>Revisa ${M.revisar.length===1?'esta fecha':'estas fechas'}:</b> así decides qué número usar la próxima vez.
+    ${M.revisar.map(({a, realPct})=>`<div class="revrow"><span class="t">${esc(a.nombre)} <small>${rangoTxt(a)}</small></span>
+      <span class="cmp">Tú: <b>${a.impacto==null?'sin número':pctNum(a.impacto)}</b> · Pasó: <b class="${realPct<0?'down':'up'}">${pctNum(realPct)}</b></span>
+      <span class="acc"><button class="mini on" onclick="revisarAsueto('${jsq(a.id)}','Real',${realPct})">Usar ${pctNum(realPct)} la próxima</button><button class="mini" onclick="revisarAsueto('${jsq(a.id)}','Mío',${realPct})">${a.impacto==null?'Seguir sin número':'Mantener el mío'}</button></span></div>`).join('')}</div>`;
+}
+
+function htmlPlan(M){
+  const vie = planSem || semanaDe(hoy());
+  const S = M.semana(vie), h = hoy();
+  const pasada = sumarDias(vie, 2) < h;
+  const as = S.asuetos;
+  const etiqueta = as.length ? as.map(a=>chipEfecto(a, a.nombre)).join(' ') : '<span class="mut">Fin de semana normal</span>';
+  const yoy = S.yoy;
+  const pend = outbox.filter(i=>i.sheet==='Cierres').flatMap(i=>i.rows).filter(r=>semanaDe(String(r[0]).slice(0,10))===vie).reduce((t,r)=>t+num(r[1]),0);
+  const sobr = (S.real && S.real.sobranteKg || 0) + pend;
+  const proximas = M.futuras.map(f=>`<tr class="${f.asuetos.length?'asu':''} ${f.semana===vie?'sel':''}" onclick="planSem='${f.semana}';renderPlan()">
+      <td>vie ${fechaCorta(f.semana)}${f.semana===semanaDe(h)?'<small>esta</small>':''}</td>
+      <td>${f.asuetos.length ? f.asuetos.map(a=>chipEfecto(a, a.nombre)).join(' ') : '<span class="mut">Normal</span>'}</td>
+      <td class="num">${f.venta!=null?fmt(f.venta):'—'}</td><td class="num cv">${kgTxt(f.kg)}</td>
+      <td class="num"><b>${kgTxt(f.pedido)}</b>${f.asuetos.length && f.factor===1 ? '<small>sin ajuste</small>' : ''}</td>
+      <td class="num yy">${f.yoy ? kgTxt(f.yoy.compraKg||null) : '<span class="mut">—</span>'}</td></tr>`).join('');
+
+  const pasos = S.venta==null ? `<p class="hint">Faltan semanas normales con ventas (mínimo ${PRON_CFG.minBase}).</p>` : `
+    <div class="why">
+      <div class="r"><span>Fin de semana normal <small>mediana de ${M.nBase} semanas</small></span><b>${fmt(M.base)} · ${kgTxt(M.baseKg)}</b></div>
+      ${S.principal ? `<div class="r"><span>Ajuste por ${esc(S.principal.nombre)} <small>${esc(S.fuente)}</small></span><b>${pctTxt(S.factor)}</b></div>` : ''}
+      <div class="r"><span>Carne a vender</span><b>${kgTxt(S.kg)}</b></div>
+      <div class="r"><span>Kilos crudos por kilo vendido <small>${M.factorCompra ? `mediana de ${M.nCompra} semanas` : 'faltan insumos de carne'}</small></span><b>${M.factorCompra ? '× '+M.factorCompra.toFixed(2) : '—'}</b></div>
+      <div class="r tot"><span>Pedido sugerido</span><span>${S.pedido!=null ? `≈ ${kgTxt(S.pedido)} crudos` : '—'}</span></div>
+    </div>
+    <p class="hint">El factor sale de tus propias compras de cortes que se cocinan entre los kilos vendidos en mostrador. Incluye la merma y la carne de tacos, tortas y gorditas. Cuando capturas lo que sobró, se descuenta (× ${PRON_CFG.mermaSobrante} para pasarlo a crudo).</p>`;
+
+  const otras = as.map(a=>{ const d = M.datosDe(a); return `<div class="r"><span>${esc(a.nombre)}</span><span>Tú: <b>${a.impacto==null?'—':pctNum(a.impacto)}</b> · Datos: <b>${d ? pctTxt(d.f) : '—'}</b>${d?` <small>${esc(d.fuente)}</small>`:''}</span></div>`; }).join('');
+
+  return `${htmlRevisar(M)}
+    <div class="dbar"><button class="nav" onclick="moverPlanSem(-1)" aria-label="Semana anterior">‹</button>
+      <div class="fecha">vie ${fechaCorta(vie)} – jue ${fechaCorta(sumarDias(vie,6))}<small style="display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:3px">${etiqueta}</small></div>
+      <button class="nav" onclick="moverPlanSem(1)" aria-label="Semana siguiente">›</button>
+      <div class="dchips"><button class="dchip ${vie===semanaDe(h)?'on':''}" onclick="planSem=null;renderPlan()">Esta semana</button></div></div>
+    <div class="kpis">
+      <div class="kpi main"><p class="l">${pasada && S.real ? 'Venta real (sáb + dom)' : 'Venta esperada (sáb + dom)'}</p><p class="v">${pasada && S.real ? fmt(S.real.venta) : S.venta!=null ? fmt(S.venta) : '—'}</p>
+        <p class="d">${pasada && S.real && S.venta!=null ? `Se esperaban ${fmt(S.venta)}` : S.banda ? `Rango ${fmt(S.venta-S.banda)} – ${fmt(S.venta+S.banda)}` : 'Sin datos suficientes'}</p></div>
+      <div class="kpi"><p class="l">Carne a vender</p><p class="v">${kgTxt(pasada && S.real ? S.real.kg : S.kg)}</p><p class="d">${pasada && S.real ? 'vendida' : 'cocida, en mostrador'}</p></div>
+      <div class="kpi buy"><p class="l">Pedido sugerido</p><p class="v">${kgTxt(S.pedido)}</p><p class="d">${S.bandaKg ? `carne cruda · ${Math.round(S.pedido-S.bandaKg)}–${Math.round(S.pedido+S.bandaKg)} kg` : 'carne cruda'}</p></div>
+      <div class="kpi"><p class="l">Hace un año</p><p class="v">${yoy ? fmt(yoy.venta) : '—'}</p><p class="d">${yoy ? `${esc(yoy.nota)} · compraste ${kgTxt(yoy.compraKg||null)}${yoy.cierres?` · sobró ${kgTxt(yoy.sobranteKg)}`:''}` : 'Aún sin historial de hace un año'}</p></div>
+    </div>
+    <div class="asugrid">
+      <div class="dcard"><h4>Cómo se calcula</h4>${pasos}${otras ? `<h4 style="margin-top:14px">Impacto de la fecha</h4><div class="why">${otras}</div>` : ''}</div>
+      <div class="dcard"><h4>Cierre del fin de semana</h4>
+        <label>Domingo</label><input type="date" id="cierre_fecha">
+        <label>Carne cocida que sobró (kg)</label><input type="number" id="cierre_kg" inputmode="decimal" step="any" placeholder="Ej. 4.5">
+        <label>Notas</label><input type="text" id="cierre_notas" placeholder="Ej. Sobró maciza, faltó costilla">
+        <button class="addbtn" onclick="guardarCierre()">Guardar cierre</button>
+        <p class="hint">${sobr>0 ? `Esta semana llevas ${sobr.toFixed(1)} kg sobrantes registrados.` : 'Las ventas perdidas por falta de carne ya se capturan en Ventas.'} Con este dato el pedido se corrige solo y el próximo año sabrás cómo te fue.</p></div>
+    </div>
+    <div class="dcard" style="margin-top:10px"><h4>Próximas semanas</h4>
+      <div class="tablawrap"><table class="ptabla"><thead><tr><th>Semana</th><th>Fecha que la mueve</th><th class="num">Venta</th><th class="num cv">Carne vendida</th><th class="num">Pedido crudo</th><th class="num yy">Compraste hace un año</th></tr></thead><tbody>${proximas}</tbody></table></div>
+      <p class="hint">Si dos fechas caen en la misma semana, se usa la de mayor efecto. Las “por confirmar” no mueven el número hasta que les pongas uno. Toca una semana para verla arriba.</p></div>`;
+}
+
+function htmlCalendario(M){
+  const h = hoy();
+  const filtros = [['todas','Todas'],['Baja','▼ Bajan'],['Sube','▲ Suben'],['Por confirmar','? Por confirmar'],['Mía','Mías']];
+  const lista = asuetos.filter(a=>calFiltro==='todas' || (calFiltro==='Mía' ? a.fuente==='Mía' : a.efecto===calFiltro))
+    .sort((x,y)=>x.inicio<y.inicio?-1:1);
+  const prox = lista.filter(a=>a.fin>=h), pas = lista.filter(a=>a.fin<h).reverse();
+  const fila = a => {
+    const d = M.datosDe(a);
+    return `<button type="button" class="asurow" onclick="editarAsueto('${jsq(a.id)}')">
+      <span class="n"><b>${esc(a.nombre)}</b><small>${rangoTxt(a)} · <span class="src">${esc(a.fuente||'Mía')}</span>${a.repetir&&a.repetir!=='No'?' <span class="src">cada año</span>':''}${!a.considerar?' · no se considera':''}</small></span>
+      ${chipEfecto(a)}
+      <span class="i">Tú: <b>${a.impacto==null?'—':pctNum(a.impacto)}</b><small>Datos: ${d ? pctTxt(d.f) : '—'}${a.real!=null?` · pasó ${pctNum(a.real)}`:''}</small></span></button>`;
+  };
+  const porMes = arr => { let mes = ''; return arr.map(a=>{ const m = a.inicio.slice(0,7); const t = m!==mes ? `<p class="sub">${MESES_L[Number(m.slice(5))-1]} ${m.slice(0,4)}</p>` : ''; mes = m; return t + fila(a); }).join(''); };
+  return `${htmlRevisar(M)}
+    <div class="dcard">
+      <div class="asubtns"><button class="addbtn" onclick="editarAsueto()">Agregar fecha</button><button class="addbtn alt" onclick="abrirPrecarga()">Precargar calendario</button></div>
+      <div class="filtros">${filtros.map(([k,t])=>`<button class="dchip ${calFiltro===k?'on':''}" onclick="calFiltro='${k}';renderPlan()">${t}</button>`).join('')}</div>
+      ${prox.length ? porMes(prox) : `<p class="hint" style="margin:12px 0">Sin fechas por venir con este filtro.</p>`}
+      ${pas.length ? `<p class="sub" style="color:var(--muted)">Ya pasaron</p>${pas.slice(0,15).map(fila).join('')}` : ''}
+      <p class="hint" style="margin-top:10px">Tú = el impacto que decides y el que se usa. Datos = lo que dice tu historial de esa misma fecha (o de fechas parecidas). Las fechas sin fuente oficial, como San Luis Rey, agrégalas tú con “Agregar fecha”.</p>
+    </div>`;
+}
+const MESES_L = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function htmlHistorico(M){
+  const obs = M.observados.slice().reverse();
+  const sem = (semanal ? semanal.semanas : []).filter(s=>s.semana < semanaDe(hoy()) && (s.venta>0 || s.compraKg>0)).slice(-12).reverse();
+  return `<div class="dcard"><h4>Fechas atípicas vs. fin de semana normal</h4>
+      ${obs.length ? `<div class="tablawrap"><table class="ptabla"><thead><tr><th>Semana</th><th>Fecha</th><th class="num">Real</th><th class="num">Normal</th><th class="num">Efecto</th></tr></thead><tbody>
+        ${obs.map(o=>`<tr><td>vie ${fechaCorta(o.semana)} ${o.semana.slice(0,4)}</td><td>${esc(o.nombres.join(', '))}</td><td class="num">${fmt(o.venta)}</td><td class="num">${fmt(o.base)}</td><td class="num ${o.ratio<1?'down':'up'}">${pctTxt(o.ratio)}</td></tr>`).join('')}
+      </tbody></table></div>` : `<p class="hint">Cuando pase un fin de semana con fecha atípica, aquí verás su venta contra la mediana de las ${PRON_CFG.previasHist} semanas normales previas.</p>`}
+    </div>
+    <div class="dcard" style="margin-top:10px"><h4>Compra contra venta de carne · últimas 12 semanas</h4>
+      <div class="tablawrap"><table class="ptabla"><thead><tr><th>Semana</th><th class="num">Venta</th><th class="num">Vendida</th><th class="num">Comprada</th><th class="num">Sobró</th><th class="num">Crudo por kg</th></tr></thead><tbody>
+        ${sem.map(s=>`<tr class="${asuetosDeSemana(s.semana).length?'asu':''}"><td>vie ${fechaCorta(s.semana)}</td><td class="num">${fmt(s.venta)}</td><td class="num">${kgTxt(s.kg)}</td><td class="num">${s.compraKg?kgTxt(s.compraKg):'—'}</td><td class="num">${s.cierres?kgTxt(s.sobranteKg):'—'}</td><td class="num">${s.kg>0&&s.compraKg>0?(s.compraKg/s.kg).toFixed(2):'—'}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="hint">Comprada = kilos crudos de cortes que se cocinan (sin manteca, pellet ni cuero). Si “crudo por kg” sube mucho una semana, probablemente pediste de más.</p></div>`;
+}
+
+/* ---------- Acciones ---------- */
+async function revisarAsueto(id, eleccion, realPct){
+  const a = asuetos.find(x=>x.id===id); if(!a) return;
+  const cambios = [Object.assign({}, a, {real: realPct, revisado: eleccion})];
+  if(eleccion==='Real'){
+    // La siguiente vez que aparezca esa misma fecha usa lo que realmente pasó
+    const c = claveAsueto(a.nombre);
+    asuetos.filter(x=>claveAsueto(x.nombre)===c && x.inicio > a.fin).forEach(x=>cambios.push(Object.assign({}, x, {impacto: realPct, efecto: realPct>0?'Sube':realPct<0?'Baja':x.efecto})));
+  }
+  try{
+    await guardarAsuetosSrv(cambios);
+    toast(eleccion==='Real' ? (cambios.length>1 ? 'Listo: la próxima vez se usa ' + pctNum(realPct) : 'Guardado: se usará al precargar el próximo año') : 'Se mantiene tu número');
+    renderPlan();
+  }catch(e){ toast('No se guardó: ' + msgError(e), true); }
+}
+
+function guardarCierre(){
+  const f = val('cierre_fecha'), kg = val('cierre_kg');
+  if(!f){ toast('Elige el domingo del cierre', true); return; }
+  if(kg===''){ toast('Escribe cuántos kilos sobraron (0 si no sobró)', true); return; }
+  if(num(kg) < 0 || num(kg) > 200){ toast('Revisa los kilos', true); return; }
+  encolar('Cierres', [[`${f} 20:00:00`, num(kg), val('cierre_notas').trim()]]);
+  if(semanal){ const s = semanal.semanas.find(x=>x.semana===semanaDe(f)); if(s){ s.sobranteKg = (s.sobranteKg||0) + num(kg); s.cierres = (s.cierres||0)+1; guardarJSON('carnitas_semanal', semanal); } }
+  toast('Cierre guardado');
+  renderPlan();
+}
+
+let efectoSel = 'Baja', repetirSel = 'No';
 function editarAsueto(id){
-  const a = asuetos.find(x=>x.id===id) || {id:'', nombre:'', tipo:'Puente', inicio:'', fin:'', impacto:null, considerar:true, notas:''};
+  const a = asuetos.find(x=>x.id===id) || normAsu({id:'', nombre:'', tipo:'', fuente:'Mía', efecto:'Baja', inicio:'', fin:'', impacto:null, considerar:true, notas:'', repetir:'No'});
+  efectoSel = a.efecto; repetirSel = a.repetir || 'No';
+  const M = modeloPronostico(semanal ? semanal.semanas : [], asuetos, hoy());
+  const d = a.id ? M.datosDe(a) : null;
   document.getElementById('modalRoot').innerHTML = `
     <div class="overlay" onclick="if(event.target===this)cerrarModal()">
       <div class="sheet">
-        <h2>${a.id ? 'Editar asueto' : 'Nuevo asueto'}</h2>
+        <h2>${a.id ? 'Editar fecha' : 'Nueva fecha'}</h2>
         <label>Nombre</label>
-        <input type="text" id="as_nombre" value="${esc(a.nombre)}" placeholder="Ej. Puente de la Revolución">
-        <label>Tipo</label>
-        <select id="as_tipo">${ASU_TIPOS.map(t=>`<option ${t===a.tipo?'selected':''}>${t}</option>`).join('')}</select>
+        <input type="text" id="as_nombre" value="${esc(a.nombre)}" placeholder="Ej. Fiesta de San Luis Rey">
         <div class="sheetcols">
           <div><label>Desde</label><input type="date" id="as_ini" value="${esc(a.inicio)}" onchange="const f=document.getElementById('as_fin'); if(!f.value||f.value<this.value) f.value=this.value; asuAviso()"></div>
           <div><label>Hasta</label><input type="date" id="as_fin" value="${esc(a.fin)}" onchange="asuAviso()"></div>
         </div>
         <p class="hint" id="as_aviso"></p>
-        <label>Impacto estimado en la venta (%)</label>
-        <input type="number" id="as_imp" inputmode="decimal" step="any" value="${a.impacto==null?'':a.impacto}" placeholder="Ej. -20 · vacío = lo calcula el histórico">
-        <label class="xt"><input type="checkbox" id="as_cons" ${a.considerar?'checked':''}>Considerar en el pronóstico</label>
+        <label>¿Qué le pasa a la venta?</label>
+        <div class="seg" id="as_ef">${ASU_EFECTOS.map(e=>`<button type="button" class="${e===efectoSel?'on':''}" onclick="efectoSel='${e}';[...this.parentNode.children].forEach(b=>b.classList.toggle('on',b===this))">${e==='Baja'?'▼ Baja':e==='Sube'?'▲ Sube':'? No sé'}</button>`).join('')}</div>
+        <label>¿Cuánto? (%) · tu decisión</label>
+        <input type="number" id="as_imp" inputmode="decimal" step="any" min="0" value="${a.impacto==null?'':Math.abs(a.impacto)}" placeholder="Ej. 20 · vacío = usar tus datos">
+        <p class="hint">${d ? `Según tus datos: <b>${pctTxt(d.f)}</b> (${esc(d.fuente)}).` : 'Aún no hay datos de esta fecha.'}${a.real!=null ? ` La última vez pasó ${pctNum(a.real)}.` : ''}</p>
+        <label>Se repite</label>
+        <div class="seg" id="as_rep">${ASU_REPETIR.map(r=>`<button type="button" class="${r===repetirSel?'on':''}" onclick="repetirSel='${r}';[...this.parentNode.children].forEach(b=>b.classList.toggle('on',b===this))">${r==='No'?'No':r==='Misma fecha'?'Misma fecha':'Mismo día de la semana'}</button>`).join('')}</div>
+        <label>Fuente</label>
+        <select id="as_fuente">${ASU_FUENTES.map(f=>`<option ${f===(a.fuente||'Mía')?'selected':''}>${f}</option>`).join('')}</select>
+        <label class="xt"><input type="checkbox" id="as_cons" ${a.considerar?'checked':''}>Considerar en el plan</label>
         <label>Notas</label>
-        <input type="text" id="as_notas" value="${esc(a.notas)}" placeholder="Ej. Cerramos el lunes">
+        <input type="text" id="as_notas" value="${esc(a.notas)}" placeholder="Ej. Piden más kilos para comida familiar">
         <button class="addbtn" id="as_guardar" onclick="guardarAsueto('${jsq(a.id)}')">Guardar</button>
         ${a.id ? `<button class="addbtn alt danger" id="as_borrar" onclick="borrarAsueto('${jsq(a.id)}', this)">Borrar</button>` : ''}
         <button class="addbtn alt" onclick="cerrarModal()">Cancelar</button>
@@ -2354,71 +2570,65 @@ function asuAviso(){
   if(!el) return;
   if(!ini){ el.textContent = 'Marca el periodo completo que se siente en el puesto, p. ej. sábado a lunes en un puente.'; return; }
   const sems = []; for(let v = semanaDe(ini); v <= semanaDe(fin); v = sumarDias(v,7)) if(asuetosDeSemana(v,[{inicio:ini, fin, considerar:true}]).length) sems.push(v);
-  el.textContent = sems.length ? `Afecta el fin de semana ${sems.map(v=>`${fechaCorta(sumarDias(v,1))}–${fechaCorta(sumarDias(v,2))}`).join(', ')}.`
-                               : 'Este periodo no incluye sábado ni domingo: no cambia el pronóstico. Si se hace puente, extiéndelo al fin de semana.';
+  el.textContent = sems.length ? `Afecta ${sems.length>1?'los fines de semana':'el fin de semana'} ${sems.map(v=>`${fechaCorta(sumarDias(v,1))}–${fechaCorta(sumarDias(v,2))}`).join(', ')}.`
+                               : 'Este periodo no incluye sábado ni domingo: no cambia el plan. Si se hace puente, extiéndelo al fin de semana.';
 }
 async function guardarAsueto(id){
-  const a = {id: id || ('as-' + nuevoId()), nombre: val('as_nombre').trim(), tipo: val('as_tipo'), inicio: val('as_ini'), fin: val('as_fin') || val('as_ini'),
-    impacto: val('as_imp')==='' ? null : num(val('as_imp')), considerar: document.getElementById('as_cons').checked, notas: val('as_notas').trim()};
-  if(!a.nombre){ toast('Escribe el nombre del asueto', true); return; }
+  const previo = asuetos.find(x=>x.id===id) || {};
+  const mag = val('as_imp')==='' ? null : Math.abs(num(val('as_imp')));
+  const a = Object.assign({}, previo, {id: id || ('as-' + nuevoId()), nombre: val('as_nombre').trim(), inicio: val('as_ini'), fin: val('as_fin') || val('as_ini'),
+    efecto: efectoSel, repetir: repetirSel, fuente: val('as_fuente'), tipo: val('as_fuente'),
+    impacto: efectoSel==='Por confirmar' || mag==null ? null : (efectoSel==='Baja' ? -mag : mag),
+    considerar: document.getElementById('as_cons').checked, notas: val('as_notas').trim()});
+  if(!a.nombre){ toast('Escribe el nombre de la fecha', true); return; }
   if(!a.inicio){ toast('Elige la fecha de inicio', true); return; }
   if(a.fin < a.inicio){ toast('La fecha final es anterior al inicio', true); return; }
-  if(a.impacto!=null && (a.impacto < -100 || a.impacto > 300)){ toast('El impacto debe estar entre -100% y 300%', true); return; }
+  if(mag!=null && (mag > (efectoSel==='Baja' ? 100 : 300))){ toast('Revisa el porcentaje', true); return; }
   const b = document.getElementById('as_guardar'); b.disabled = true; b.textContent = 'Guardando…';
   try{
     await guardarAsuetosSrv([a]);
-    cerrarModal(); toast('Asueto guardado'); renderAsuetos();
-  }catch(e){
-    b.disabled = false; b.textContent = 'Guardar';
-    toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.5' : 'No se guardó: ' + e.message, true);
-  }
+    cerrarModal(); toast('Fecha guardada'); renderPlan();
+  }catch(e){ b.disabled = false; b.textContent = 'Guardar'; toast('No se guardó: ' + msgError(e), true); }
 }
 async function borrarAsueto(id, btn){
   if(!btn.dataset.ok){ btn.dataset.ok = '1'; btn.textContent = 'Toca otra vez para borrar'; setTimeout(()=>{ if(btn.isConnected){ delete btn.dataset.ok; btn.textContent = 'Borrar'; } }, 4000); return; }
   btn.disabled = true; btn.textContent = 'Borrando…';
-  try{
-    await guardarAsuetosSrv([], [id]);
-    cerrarModal(); toast('Asueto borrado'); renderAsuetos();
-  }catch(e){ btn.disabled = false; btn.textContent = 'Borrar'; toast('No se borró: ' + e.message, true); }
+  try{ await guardarAsuetosSrv([], [id]); cerrarModal(); toast('Fecha borrada'); renderPlan(); }
+  catch(e){ btn.disabled = false; btn.textContent = 'Borrar'; toast('No se borró: ' + msgError(e), true); }
 }
 
-/* ---------- Precarga de festivos ---------- */
-let precargaAnio = null;
+/* ---------- Precarga ---------- */
+let precargaAnio = 0;
 function abrirPrecarga(anio){
   const y0 = Number(hoy().slice(0,4));
   precargaAnio = anio==null ? 0 : anio; // 0 = este año y el siguiente
-  const sel = {}; GRUPOS_FESTIVOS.forEach(g=>sel[g.id] = document.getElementById('pg_'+g.id) ? document.getElementById('pg_'+g.id).checked : g.on);
+  const grupos = GRUPOS_FESTIVOS.concat(asuetos.some(a=>a.repetir && a.repetir!=='No') ? [{id:'mias', nombre:'Tus fechas que se repiten cada año', on:true}] : []);
+  const sel = {}; grupos.forEach(g=>{ const el = document.getElementById('pg_'+g.id); sel[g.id] = el ? el.checked : g.on; });
   const ids = new Set(asuetos.map(a=>a.id));
-  const lista = festivosPrecarga(precargaAnio);
-  const elegidos = lista.filter(f=>sel[f.grupo]);
+  const elegidos = festivosPrecarga(precargaAnio).filter(f=>sel[f.grupo]).sort((x,y)=>x.inicio<y.inicio?-1:1);
   const nuevos = elegidos.filter(f=>!ids.has(f.id));
   document.getElementById('modalRoot').innerHTML = `
     <div class="overlay" onclick="if(event.target===this)cerrarModal()">
       <div class="sheet wide">
-        <h2>Precargar festivos de México</h2>
+        <h2>Precargar calendario</h2>
         <div class="seg">${[[0,`${y0} y ${y0+1}`],[y0,String(y0)],[y0+1,String(y0+1)]].map(([y,t])=>`<button class="${y===precargaAnio?'on':''}" onclick="abrirPrecarga(${y})">${t}</button>`).join('')}</div>
         <div class="sheetcols">
-          <div>${GRUPOS_FESTIVOS.map(g=>`<label class="xt"><input type="checkbox" id="pg_${g.id}" ${sel[g.id]?'checked':''} onchange="abrirPrecarga(${precargaAnio})">${esc(g.nombre)}</label>`).join('')}
-            <p class="hint">Los festivos que caen en lunes o viernes se precargan con su puente (el fin de semana pegado). Después puedes editar cada uno o capturar su impacto estimado.</p></div>
-          <div class="prelista">${elegidos.length ? elegidos.map(f=>`<div class="rowline"><span>${esc(f.nombre)}<small>${rangoTxt(f)}</small></span><span class="${ids.has(f.id)?'mut':'nuevo'}">${ids.has(f.id)?'ya está':'nuevo'}</span></div>`).join('') : '<p class="hint">Elige al menos un grupo.</p>'}</div>
+          <div>${grupos.map(g=>`<label class="xt"><input type="checkbox" id="pg_${g.id}" ${sel[g.id]?'checked':''} onchange="abrirPrecarga(${precargaAnio})">${esc(g.nombre)}</label>`).join('')}
+            <p class="hint">Los festivos en lunes o viernes se cargan con su puente. Las fechas de la SEP y de San Luis solo se cargan cuando ya están publicadas. Si una fecha ya tuvo número el año pasado, se trae tu decisión.</p></div>
+          <div class="prelista">${elegidos.length ? elegidos.map(f=>`<div class="rowline"><span>${esc(f.nombre)}<small>${rangoTxt(f)} · ${esc(f.fuente)}${f.impacto!=null?` · ${pctNum(f.impacto)}`:''}</small></span><span>${chipEfecto(f)} <span class="${ids.has(f.id)?'mut':'nuevo'}">${ids.has(f.id)?'ya está':'nuevo'}</span></span></div>`).join('') : '<p class="hint">Elige al menos un grupo.</p>'}</div>
         </div>
-        <button class="addbtn" id="pg_ok" ${nuevos.length?'':'disabled'} onclick="confirmarPrecarga()">${nuevos.length ? `Agregar ${nuevos.length} asueto${nuevos.length>1?'s':''}` : 'Nada nuevo que agregar'}</button>
+        <button class="addbtn" id="pg_ok" ${nuevos.length?'':'disabled'} onclick="confirmarPrecarga()">${nuevos.length ? `Agregar ${nuevos.length} fecha${nuevos.length>1?'s':''}` : 'Nada nuevo que agregar'}</button>
         <button class="addbtn alt" onclick="cerrarModal()">Cancelar</button>
       </div>
     </div>`;
 }
 async function confirmarPrecarga(){
   const ids = new Set(asuetos.map(a=>a.id));
-  const nuevos = festivosPrecarga(precargaAnio).filter(f=>document.getElementById('pg_'+f.grupo).checked && !ids.has(f.id))
+  const nuevos = festivosPrecarga(precargaAnio).filter(f=>{ const el = document.getElementById('pg_'+f.grupo); return el && el.checked && !ids.has(f.id); })
     .map(({grupo, ...a})=>a);
   const b = document.getElementById('pg_ok'); b.disabled = true; b.textContent = 'Guardando…';
-  try{
-    await guardarAsuetosSrv(nuevos);
-    cerrarModal(); toast(`${nuevos.length} asuetos agregados`); renderAsuetos();
-  }catch(e){
-    b.disabled = false; b.textContent = 'Reintentar';
-    toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.5' : 'No se guardó: ' + e.message, true);
-  }
+  try{ await guardarAsuetosSrv(nuevos); cerrarModal(); toast(`${nuevos.length} fechas agregadas`); renderPlan(); }
+  catch(e){ b.disabled = false; b.textContent = 'Reintentar'; toast('No se guardó: ' + msgError(e), true); }
 }
 
 /* =========================================================

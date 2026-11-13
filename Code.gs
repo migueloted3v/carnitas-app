@@ -1,6 +1,6 @@
 /**
  * Carnitas App — servicio web (Google Apps Script)
- * Versión: 2.5.0
+ * Versión: 2.6.0
  *
  * Vive pegado a la hoja "Carnitas Ventas" (Extensiones → Apps Script).
  * La app y el tablero le mandan y le piden datos con una clave; así la app
@@ -19,7 +19,7 @@
  *   - consolidarSurtido()   hace un respaldo de la hoja y junta cada Surtido repartido en un solo renglón.
  */
 
-const SCRIPT_VERSION = '2.5.0';
+const SCRIPT_VERSION = '2.6.0';
 const TZ = 'America/Mexico_City'; // respaldo si la hoja no tiene zona horaria
 
 // Las fechas se leen y escriben SIEMPRE con la zona horaria de la propia hoja
@@ -48,8 +48,15 @@ const HOJAS = {
                    'Fecha anticipo','Saldo pagado','Método saldo','Fecha saldo','Motivo rechazo','Ticket venta','Notas'],
   // Días de asueto (festivos, puentes, vacaciones) que mueven la venta del fin de semana.
   // Un renglón por periodo. La app los usa para el pronóstico semanal.
-  Asuetos:        ['Fecha inicio','Fecha fin','Nombre','Tipo','Impacto estimado (%)','Considerar','Notas','ID','Actualizado']
+  // Impacto estimado (%) = el que decide el dueño. Real (%) = lo que dieron los datos al revisarlo.
+  Asuetos:        ['Fecha inicio','Fecha fin','Nombre','Tipo','Impacto estimado (%)','Considerar','Notas','ID','Actualizado',
+                   'Efecto','Repetir','Fuente','Real (%)','Revisado'],
+  // Cierre del fin de semana: carne cocida que sobró (para afinar el siguiente pedido)
+  Cierres:        ['Fecha','Carne sobrante (kg)','Notas']
 };
+
+// Cortes que se cocinan: los que cuentan para el pedido de carne (sin manteca, pellet ni cuero)
+const CORTES_COCCION = ['Pierna','Nuca','Aldilla','Costilla','Buche','Maciza','Chamorro','Codillo'];
 
 // Renglones que se crean en la pestaña Cuenta (el valor lo llenas tú en la hoja)
 const CAMPOS_CUENTA = ['CLABE','Beneficiario','Institución','Celular (Dimo)'];
@@ -331,7 +338,7 @@ function guardarAsuetos(asuetos, borrar) {
       const renglon = enc.map(h => {
         const v = datos[h] == null ? '' : datos[h];
         if (h === 'Fecha inicio' || h === 'Fecha fin' || h === 'Actualizado') return aFecha(String(v));
-        if (h === 'Impacto estimado (%)') return v === '' ? '' : Number(v);
+        if (h === 'Impacto estimado (%)' || h === 'Real (%)') return v === '' ? '' : Number(v);
         return v;
       });
       const fila = ids().indexOf(String(a['ID']));
@@ -365,7 +372,9 @@ function leerAsuetos_() {
  * Venta por semana de negocio (viernes a jueves), para el pronóstico.
  * No cuenta Regalo (tacos regalados) ni Evento (cotizaciones convertidas):
  * el pronóstico es de la venta de mostrador del fin de semana.
- * Devuelve [{ semana: 'aaaa-mm-dd' (viernes), venta, tickets, kg, dias }]
+ * También trae los kilos crudos comprados de cortes que se cocinan (Insumos) y la
+ * carne cocida que sobró (Cierres), para calcular el pedido sugerido.
+ * Devuelve [{ semana: 'aaaa-mm-dd' (viernes), venta, tickets, kg, dias, compraKg, sobranteKg, cierres }]
  */
 function ventasSemanales(desde) {
   const filtro = /^\d{4}-\d{2}-\d{2}$/.test(String(desde || '')) ? String(desde) : '';
@@ -381,10 +390,29 @@ function ventasSemanales(desde) {
     s.kg += kgCarne_(r);
     s.dias[d] = true;
   });
-  return Object.keys(out).sort().map(k => {
-    const s = out[k];
+  const extra = {};
+  const ex = sem => extra[sem] || (extra[sem] = { compraKg: 0, sobranteKg: 0, cierres: 0 });
+  leer('Insumos').forEach(r => {
+    const d = String(r[0]).slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || (filtro && d < filtro)) return;
+    if (r[1] === 'Carne' && CORTES_COCCION.indexOf(String(r[2])) >= 0) ex(viernesDe_(d)).compraKg += Number(r[3]) || 0;
+  });
+  leer('Cierres').forEach(r => {
+    const d = String(r[0]).slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || (filtro && d < filtro)) return;
+    const e = ex(viernesDe_(d));
+    e.sobranteKg += Number(r[1]) || 0;
+    e.cierres++;
+  });
+  const r2 = x => Math.round(x * 100) / 100;
+  const semanas = {};
+  Object.keys(out).concat(Object.keys(extra)).forEach(k => semanas[k] = true);
+  return Object.keys(semanas).sort().map(k => {
+    const s = out[k] || { venta: 0, tickets: {}, kg: 0, dias: {} };
+    const e = extra[k] || { compraKg: 0, sobranteKg: 0, cierres: 0 };
     return { semana: k, venta: Math.round(s.venta), tickets: Object.keys(s.tickets).length,
-             kg: Math.round(s.kg * 100) / 100, dias: Object.keys(s.dias).length };
+             kg: r2(s.kg), dias: Object.keys(s.dias).length,
+             compraKg: r2(e.compraKg), sobranteKg: r2(e.sobranteKg), cierres: e.cierres };
   });
 }
 
