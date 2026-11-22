@@ -155,7 +155,7 @@
 <div id="tip"></div>
 
 <script>
-const DASH_VERSION = '2.3.0';
+const DASH_VERSION = '2.4.0';
 
 /* ================= Formatos y fechas ================= */
 const MXN = n => (n<0?'-':'') + '$' + Math.round(Math.abs(n||0)).toLocaleString('es-MX');
@@ -217,8 +217,38 @@ function normalizar(datos){
       return f;
     }).filter(r => /^\d{4}-\d{2}-\d{2}/.test(r[0]));
   });
-  out.VentasPerdidas.forEach(r => { if(CORTES_CARNE.includes(r[1])) r[1] = 'Carne'; });
+  out.VentasPerdidas.forEach(r => { r.corte = CORTES_CARNE.includes(r[1]) && r[1]!=='No especificó' ? r[1] : 'Surtido'; if(CORTES_CARNE.includes(r[1])) r[1] = 'Carne'; });
+  // Precios actuales (pestaña Precios) para valorar las ventas perdidas
+  PRECIOS = Object.assign({}, PRECIOS_VP);
+  (datos.Precios || []).forEach(r => { const k = Number(r[1]); if(r[0] && k > 0) PRECIOS[String(r[0]).trim()] = [k, Number(r[2])||null, Number(r[3])||null]; });
   return out;
+}
+
+/* ---------- Venta perdida en dinero (misma regla que la app 2.7) ----------
+   Monto capturado → tal cual · kilos de carne → precio del corte (Surtido si no se dijo) con medio y cuarto
+   · pollos → precio de Pollo · piezas u otros kilos → precio mediano de la categoría. Es un estimado. */
+const PRECIOS_VP = {Surtido:[370,185,95], Maciza:[370,185,95], Pierna:[370,185,95], Chamorro:[370,185,95], Buche:[370,185,95], Nuca:[370,185,95],
+  Aldilla:[400,200,100], Costilla:[400,200,100], Cuerito:[200], Pollo:[200,100], 'Durito botanero':[300], 'Chicharron de cachete':[300],
+  'Chicharrón de lonja':[250], 'Chicharron crakelyn':[300], Tortilla:[30], Refresco:[30], 'Agua de sabor':[50], 'Gorda normal':[20],
+  'Gorda rellena':[35], Taco:[17], Litro:[70], Medio:[35], Vaso:[20], Torta:[55]};
+const PROD_CAT_VP = {Gorditas:['Gorda normal','Gorda rellena'], Tacos:['Taco'], 'Frijoles charros':['Litro','Medio','Vaso'],
+  'Chicharrón':['Durito botanero','Chicharron de cachete','Chicharrón de lonja','Chicharron crakelyn'], Bebida:['Refresco','Agua de sabor'], Tortillas:['Tortilla'], Torta:['Torta']};
+let PRECIOS = Object.assign({}, PRECIOS_VP);
+function precioFracVP(p, q){
+  const v = PRECIOS[p] || PRECIOS.Surtido; const k = v[0], m = v[1] || k/2, c = v[2] || k/4;
+  const ent = Math.floor(q + 1e-9), r = Math.round((q - ent)*100)/100;
+  return ent*k + (r===0 ? 0 : r===0.25 ? c : r===0.5 ? m : r===0.75 ? m + c : r*k);
+}
+function precioCatVP(cat){
+  const ps = (PROD_CAT_VP[cat] || []).map(p => (PRECIOS[p]||[0])[0]).filter(x => x > 0).sort((a,b)=>a-b);
+  if(!ps.length) return 0; const h = Math.floor(ps.length/2); return ps.length%2 ? ps[h] : (ps[h-1]+ps[h])/2;
+}
+function valorPerdida(r){
+  const mt = num(r[4]); if(mt > 0) return mt;
+  const kg = num(r[2]), pz = num(r[5]);
+  if(kg > 0) return r[1]==='Carne' ? precioFracVP(r.corte || 'Surtido', kg) : kg*precioCatVP(r[1]);
+  if(pz > 0) return r[1]==='Pollo' ? precioFracVP('Pollo', pz) : pz*precioCatVP(r[1]);
+  return 0;
 }
 
 /* ================= Fuentes ================= */
@@ -664,7 +694,8 @@ function alertasVentas(m, ant){
   }
   if(m.P.length){
     const c = agrupar(m.P, r=>r[1]||'Sin categoría', ()=>1)[0]; const kg = m.P.reduce((s,r)=>s+num(r[2]),0);
-    out.push(flag('wa', `<b>${m.P.length} ${m.P.length===1?'venta perdida':'ventas perdidas'}</b>${c?`, sobre todo de ${esc(c[0])}`:''}${kg?` (${kg.toFixed(2)} kg)`:''}: revisa si conviene producir más.`));
+    const mt = m.P.reduce((s,r)=>s+valorPerdida(r),0), pct = m.total+mt > 0 ? mt/(m.total+mt) : 0;
+    out.push(flag('wa', `<b>${m.P.length} ${m.P.length===1?'cliente perdido':'clientes perdidos'}</b> ≈ <b>${MXN(mt)}</b> de venta que se fue (${PCT(pct,0)} de la demanda)${c?`, sobre todo de ${esc(c[0])}`:''}${kg?` (${kg.toFixed(2)} kg)`:''}: revisa si conviene producir más.`));
   } else if(ant.P.length){
     out.push(flag('wa', `<b>0 ventas perdidas</b> registradas (${ant.P.length} en el periodo anterior). Si se acabó algo, captúralo para medir faltantes.`));
   }
@@ -796,7 +827,8 @@ function vVentas(m, ant, R){
   const grandes = tks.slice().sort((a,b)=>b.t-a.t).slice(0,5);
   // Ventas perdidas
   const vp = new Map();
-  m.P.forEach(r=>{ const k = r[1]||'Sin categoría'; const o = vp.get(k) || {n:0, kg:0, mt:0, pz:0}; o.n++; o.kg += num(r[2]); o.mt += num(r[4]); o.pz += num(r[5]); vp.set(k,o); });
+  m.P.forEach(r=>{ const k = r[1]||'Sin categoría'; const o = vp.get(k) || {n:0, kg:0, mt:0, pz:0}; o.n++; o.kg += num(r[2]); o.mt += valorPerdida(r); o.pz += num(r[5]); vp.set(k,o); });
+  const vpMonto = [...vp.values()].reduce((s,o)=>s+o.mt,0), vpAnt = ant.P.length, vpDem = m.total + vpMonto;
   const regalo = m.regalos.reduce((s,r)=>s+num(r[5]),0);
   return `
   ${tarjetaAlertas('Ventas', alertasVentas(m, ant), R)}
@@ -805,6 +837,12 @@ function vVentas(m, ant, R){
     <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${MXN(m.tickets ? m.total/m.tickets : 0)}</p>${delta(m.tickets ? m.total/m.tickets : 0, ant.tickets ? ant.total/ant.tickets : 0)}</div>
     <div class="kpi"><p class="l">Productos por ticket</p><p class="v">${lineas.toFixed(1)}</p><p class="d">${m.tickets} tickets</p></div>
     <div class="kpi"><p class="l">Carne vendida</p><p class="v">${m.kgVend.toFixed(1)} kg</p>${delta(m.kgVend, ant.kgVend)}</div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><p class="l">Clientes perdidos</p><p class="v" style="color:var(--bad)">${m.P.length}</p><p class="d">${vpAnt ? `${vpAnt} en el periodo anterior` : 'Sin registros en el periodo anterior'}</p></div>
+    <div class="kpi"><p class="l">Venta perdida (estimada)</p><p class="v" style="color:var(--bad)">${MXN(vpMonto)}</p><p class="d">${m.P.length ? `${MXN(vpMonto/m.P.length)} por cliente` : '—'}</p></div>
+    <div class="kpi"><p class="l">Demanda real</p><p class="v">${MXN(vpDem)}</p><p class="d">ventas + lo que se fue</p></div>
+    <div class="kpi"><p class="l">Demanda no atendida</p><p class="v">${PCT(vpDem>0 ? vpMonto/vpDem : 0, 1)}</p><p class="d">de cada $100 que querían gastar</p></div>
   </div>
   <div class="g2">
     <div class="card"><h3>Venta por día y hora</h3>${mapaCalor(m)}</div>
@@ -818,8 +856,8 @@ function vVentas(m, ant, R){
     <div class="card"><h3>Tickets más grandes</h3>
       <table><tr><th>Fecha</th><th class="r">Productos</th><th class="r">Total</th><th>Pago</th></tr>
       ${grandes.map(x=>`<tr><td>${DIAS[dow(x.f.slice(0,10))]} ${corto(x.f.slice(0,10))} ${esc(x.f.slice(11,16))}</td><td class="r">${x.n}</td><td class="r">${MXN(x.t)}</td><td>${esc(x.p)}</td></tr>`).join('')}</table></div>
-    <div class="card"><h3>Ventas perdidas <small>${m.P.length} registros</small></h3>
-      ${vp.size ? `<table><tr><th>Categoría</th><th class="r">Veces</th><th class="r">Kilos</th><th class="r">Piezas</th><th class="r">Monto</th></tr>
+    <div class="card"><h3>Ventas perdidas <small>${m.P.length} clientes · ${MXN(vpMonto)} estimado</small></h3>
+      ${vp.size ? `<table><tr><th>Categoría</th><th class="r">Veces</th><th class="r">Kilos</th><th class="r">Piezas</th><th class="r">Monto est.</th></tr>
       ${[...vp.entries()].sort((a,b)=>b[1].n-a[1].n).map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.n}</td><td class="r">${o.kg?o.kg.toFixed(2):'–'}</td><td class="r">${o.pz||'–'}</td><td class="r">${o.mt?MXN(o.mt):'–'}</td></tr>`).join('')}</table>` : '<p class="note">Sin ventas perdidas en el periodo</p>'}
       ${regalo ? `<p class="note">Tacos regalados en el periodo: ${regalo}</p>` : ''}</div>
   </div>`;

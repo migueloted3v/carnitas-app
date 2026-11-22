@@ -189,6 +189,23 @@
   .aviso{background:var(--card);border:1px solid var(--bad);border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:10px}
   .aviso b{color:var(--bad);font-weight:500}
   .msg{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;text-align:center;color:var(--muted);font-size:14px}
+  /* Clientes perdidos (v2.7) */
+  .perd{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--bad);border-radius:12px;padding:12px;margin-bottom:10px}
+  .perd h4{font-size:12px;color:var(--muted);font-weight:400;margin:0 0 8px;display:flex;justify-content:space-between;gap:8px}
+  .perd h4 small{font-size:11px}
+  .perd .pk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .perd .pk p{margin:0}
+  .perd .pk .l{font-size:11px;color:var(--muted)}
+  .perd .pk .v{font-size:clamp(18px,2.2vw,24px);font-weight:500;margin-top:2px}
+  .perd .pk .v.bad{color:var(--bad)}
+  .perd .pk .d{font-size:11px;color:var(--muted);margin-top:2px}
+  .perd .dem{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin:12px 0 4px;background:var(--bg)}
+  .perd .dem .a{background:var(--accent)} .perd .dem .p{background:var(--bad)}
+  .perd .leg{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+  .perd .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+  .perd .cols h5{font-size:11px;color:var(--muted);font-weight:400;margin:0 0 6px}
+  .perd .brow .b i{background:var(--bad)}
+  .perd .brow .val{width:74px}
   @media (max-width:760px){
     .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
     .kpis .kpi.main{grid-column:1/-1;text-align:center}
@@ -196,6 +213,7 @@
     .kpis.sem{grid-template-columns:repeat(2,minmax(0,1fr))}
     #barSem .fecha{font-size:14px;min-width:0}
     #barSem .dchips{width:100%;justify-content:center}
+    .perd .cols{grid-template-columns:1fr}
   }
 
   /* ---------- Marca Carnitas Estilo Clay (paleta Cobre y Noche) ---------- */
@@ -616,7 +634,7 @@
 <div id="modalRoot"></div>
 
 <script>
-const APP_VERSION = '2.6.0';
+const APP_VERSION = '2.7.0';
 
 /* =========================================================
    Catálogo
@@ -1402,6 +1420,73 @@ function guardarVentaPerdida(){
   toast('Venta perdida registrada');
 }
 
+/* ---------- Cuánto dinero representa una venta perdida (v2.7) ----------
+   r: [Fecha, Categoría, Kilos estimados, Motivo, Monto estimado, Piezas estimadas]
+   - Si se capturó el monto, se usa tal cual.
+   - Kilos de Carne: precio de Surtido (cortes normales) con medio y cuarto reales.
+   - Pollos: precio de Pollo (entero/medio).
+   - Piezas u otros kilos: precio mediano de los productos de esa categoría.
+   Es un ESTIMADO: el cliente se fue, así que nunca sabremos el ticket exacto. */
+const CORTES_VP = CATS.Carne.productos;
+function catPerdida(r){ const c = String(r[1]||'').trim(); return CORTES_VP.includes(c) ? 'Carne' : (c || 'Sin categoría'); }
+function precioCat(cat){
+  if(cat==='Carne') return precioDe('Surtido');
+  const ps = ((CATS[cat]||{}).productos||[]).map(precioDe).filter(x=>x>0);
+  return mediana(ps) || 0;
+}
+function valorPerdida(r){
+  const monto = num(r[4]); if(monto>0) return monto;
+  const c = catPerdida(r), kilos = num(r[2]), piezas = num(r[5]);
+  const corte = CORTES_VP.includes(String(r[1])) ? String(r[1]) : 'Surtido';
+  if(kilos>0) return c==='Carne' ? precioFraccion(corte, kilos) : kilos*precioCat(c);
+  if(piezas>0) return c==='Pollo' ? precioFraccion('Pollo', piezas) : piezas*precioCat(c);
+  return 0;
+}
+function kgPerdidaCarne(r){
+  if(catPerdida(r)!=='Carne') return 0;
+  const kilos = num(r[2]); if(kilos>0) return kilos;
+  const p = precioDe('Surtido'); return p>0 ? num(r[4])/p : 0;
+}
+function resumirPerdidas(P){
+  const o = {n:0, monto:0, kg:0, porCat:{}, porHora:{}, porMotivo:{}};
+  (P||[]).forEach(r=>{
+    const v = valorPerdida(r), c = catPerdida(r);
+    o.n++; o.monto += v; o.kg += kgPerdidaCarne(r);
+    const pc = o.porCat[c] || (o.porCat[c] = {n:0, v:0}); pc.n++; pc.v += v;
+    const h = parseInt(String(r[0]).slice(11,13),10); if(isFinite(h)) o.porHora[h] = (o.porHora[h]||0) + 1;
+    const m0 = String(r[3]||'').trim(); const m = m0 ? m0.charAt(0).toUpperCase() + m0.slice(1).toLowerCase() : 'Sin motivo';
+    o.porMotivo[m] = (o.porMotivo[m]||0) + 1;
+  });
+  return o;
+}
+// Tarjeta de clientes perdidos para el reporte del día o de la semana
+function htmlPerdidas(P, venta, Pant, txtAnt, sinServicio){
+  if(sinServicio) return `<div class="perd"><h4>Clientes perdidos</h4><p class="hint" style="margin:0">Publica el servicio de Apps Script 2.7 para ver aquí las ventas perdidas (Implementar → Gestionar implementaciones → ✏️ → Nueva versión).</p></div>`;
+  const x = resumirPerdidas(P);
+  if(!x.n) return `<div class="perd" style="border-left-color:var(--good)"><h4>Clientes perdidos</h4><p class="hint" style="margin:0">Sin ventas perdidas registradas. Si se acabó algo o alguien se fue por la fila, regístralo en Nueva venta → “¿Se te fue un cliente?”.</p></div>`;
+  const dem = venta + x.monto, pct = dem>0 ? x.monto/dem*100 : 0;
+  let delta = '';
+  if(Pant){ const n0 = Pant.length; delta = n0 ? `<p class="d">${x.n>=n0?'▲':'▼'} ${Math.abs(x.n-n0)} vs ${txtAnt} (${n0})</p>` : `<p class="d">0 el ${txtAnt}</p>`; }
+  const cats = Object.entries(x.porCat).sort((a,b)=>b[1].n-a[1].n);
+  const maxC = Math.max(...cats.map(c=>c[1].n), 1);
+  const horas = Object.entries(x.porHora).sort((a,b)=>b[1]-a[1]);
+  const motivos = Object.entries(x.porMotivo).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  return `<div class="perd"><h4>Clientes perdidos <small>monto estimado</small></h4>
+    <div class="pk">
+      <div><p class="l">Clientes</p><p class="v bad">${x.n}</p>${delta}</div>
+      <div><p class="l">Venta perdida</p><p class="v bad">${fmt(x.monto)}</p>${x.kg>0?`<p class="d">${x.kg.toFixed(1)} kg de carne</p>`:''}</div>
+      <div><p class="l">Demanda real</p><p class="v">${fmt(dem)}</p><p class="d">no atendida ${pct.toFixed(0)}%</p></div>
+    </div>
+    <div class="dem"><span class="a" style="width:${(100-pct).toFixed(1)}%"></span><span class="p" style="width:${pct.toFixed(1)}%"></span></div>
+    <div class="leg"><span>Vendido ${fmt(venta)}</span><span>Se fue ${fmt(x.monto)}</span></div>
+    <div class="cols">
+      <div><h5>¿Qué buscaban?</h5>${cats.map(([c,o])=>`<div class="brow"><span class="n">${esc(etqCat(c))}</span><span class="b"><i style="width:${(o.n/maxC*100).toFixed(1)}%"></i></span><span class="val">${o.n} · ${fmtK(o.v)}</span></div>`).join('')}</div>
+      <div><h5>¿Cuándo y por qué?</h5>
+        ${horas.length ? `<p class="hint" style="margin:0 0 6px">Más clientes perdidos: <b style="color:var(--text)">${horas.slice(0,2).map(([h,n])=>`${pad(h)}:00 (${n})`).join(' · ')}</b></p>` : ''}
+        ${motivos.map(([m,n])=>`<div class="brow"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)">${esc(m)}</span><span>${n}</span></div>`).join('')}</div>
+    </div></div>`;
+}
+
 /* =========================================================
    Captura de ventas
    ========================================================= */
@@ -1854,11 +1939,13 @@ async function irDia(fecha){
   const body = document.getElementById('diaBody');
   const anterior = sumarDias(fecha, -7);
   const locales = outbox.filter(i=>i.sheet==='Ventas').flatMap(i=>i.rows);
+  const perdLoc = outbox.filter(i=>i.sheet==='VentasPerdidas').flatMap(i=>i.rows);
+  const delDia = (L, f) => L.filter(r=>String(r[0]).slice(0,10)===f);
 
   if(!servicioListo()){
     const filas = locales.filter(r=>String(r[0]).slice(0,10)===fecha);
     if(!filas.length){ body.innerHTML = `<div class="msg">Configura el servicio en <svg class="icon icon--inline" aria-hidden="true"><use href="icons/icons.svg#icon-ajustes"/></svg> <b>Ajustes</b> para ver tus ventas.</div>`; return; }
-    renderDia(filas, [], filas.length);
+    renderDia(filas, [], filas.length, {P: delDia(perdLoc, fecha), Pant: null});
     return;
   }
   const miPeticion = ++diaPeticion;
@@ -1870,7 +1957,9 @@ async function irDia(fecha){
     const pendDia = locales.filter(r=>String(r[0]).slice(0,10)===fecha);
     const hoyFilas = remotas.filter(r=>String(r[0]).slice(0,10)===fecha).concat(pendDia);
     const antFilas = remotas.filter(r=>String(r[0]).slice(0,10)===anterior);
-    renderDia(hoyFilas, antFilas, pendDia.length);
+    // El servicio 2.7 manda también las ventas perdidas de esas fechas
+    const perd = Array.isArray(data.perdidas) ? data.perdidas : null;
+    renderDia(hoyFilas, antFilas, pendDia.length, {P: delDia(perd||[], fecha).concat(delDia(perdLoc, fecha)), Pant: perd ? delDia(perd, anterior) : null, viejo: !perd});
   }catch(e){
     if(miPeticion !== diaPeticion) return;
     body.innerHTML = `<div class="msg">No se pudieron cargar las ventas (${esc(e.message)}).<br><button class="addbtn" style="max-width:220px" onclick="irDia('${fecha}')">Reintentar</button></div>`;
@@ -1905,7 +1994,7 @@ async function irSemana(vie){
   const body = document.getElementById('diaBody');
   const enSem = (r, a, b) => { const d = String(r[0]).slice(0,10); return d>=a && d<=b; };
   const pend = {};
-  ['Ventas','Insumos','Gastos','Sueldos'].forEach(h=>pend[h] = outbox.filter(i=>i.sheet===h).flatMap(i=>i.rows));
+  ['Ventas','Insumos','Gastos','Sueldos','VentasPerdidas'].forEach(h=>pend[h] = outbox.filter(i=>i.sheet===h).flatMap(i=>i.rows));
   if(!servicioListo()){ body.innerHTML = `<div class="msg">Configura el servicio en <svg class="icon icon--inline" aria-hidden="true"><use href="icons/icons.svg#icon-ajustes"/></svg> <b>Ajustes</b> para ver tus ventas.</div>`; return; }
   const miPeticion = ++diaPeticion;
   body.innerHTML = `<div class="msg">Cargando la semana…</div>`;
@@ -1914,8 +2003,9 @@ async function irSemana(vie){
     if(miPeticion !== diaPeticion) return;
     const D = data.datos || {};
     const tomar = (h, a, b) => (D[h]||[]).filter(r=>enSem(r,a,b)).concat(pend[h].filter(r=>enSem(r,a,b)));
-    const act = {V: tomar('Ventas', vie, jue), I: tomar('Insumos', vie, jue), G: tomar('Gastos', vie, jue), S: tomar('Sueldos', vie, jue)};
-    const ant = {V: tomar('Ventas', vieAnt, sumarDias(vie,-1)), I: tomar('Insumos', vieAnt, sumarDias(vie,-1)), G: tomar('Gastos', vieAnt, sumarDias(vie,-1)), S: tomar('Sueldos', vieAnt, sumarDias(vie,-1))};
+    const act = {V: tomar('Ventas', vie, jue), I: tomar('Insumos', vie, jue), G: tomar('Gastos', vie, jue), S: tomar('Sueldos', vie, jue), P: tomar('VentasPerdidas', vie, jue)};
+    const ant = {V: tomar('Ventas', vieAnt, sumarDias(vie,-1)), I: tomar('Insumos', vieAnt, sumarDias(vie,-1)), G: tomar('Gastos', vieAnt, sumarDias(vie,-1)), S: tomar('Sueldos', vieAnt, sumarDias(vie,-1)), P: tomar('VentasPerdidas', vieAnt, sumarDias(vie,-1))};
+    act.viejo = !D.VentasPerdidas;
     const nPend = ['Ventas','Insumos','Gastos','Sueldos'].reduce((s,h)=>s+pend[h].filter(r=>enSem(r,vie,jue)).length,0);
     renderSemana(act, ant, nPend);
   }catch(e){
@@ -1999,6 +2089,7 @@ function renderSemana(act, ant, nPend){
       <div class="kpi"><p class="l">Tickets</p><p class="v">${r.tickets}</p></div>
       <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${fmt(r.tickets ? r.total/r.tickets : 0)}</p></div>
     </div>
+    ${htmlPerdidas(act.P, r.total, act.viejo ? null : ant.P, 'semana anterior', act.viejo && !act.P.length)}
     <div class="dgrid">
       <div class="dcard"><h4>De la venta a la utilidad</h4>${cascadaSVG(r.total, c)}</div>
       <div class="dcard"><h4>${diasVenta.length>1 ? 'Sábado vs domingo' : 'Venta por día'}</h4>${barras(porDia)}
@@ -2043,11 +2134,12 @@ function resumir(filas){
   return {total, tickets, kg, porHora, porCat, porPago, tacosRegalo: regalos.reduce((s,r)=>s+num(r[5]),0)};
 }
 
-function renderDia(filasDia, filasAnt, nPend){
+function renderDia(filasDia, filasAnt, nPend, perd){
   const body = document.getElementById('diaBody');
   const r = resumir(filasDia);
+  perd = perd || {P:[]};
   if(r.total<=0){
-    body.innerHTML = `<div class="msg">Sin ventas registradas para ${esc(etiquetaFecha(diaActual))}.</div>`;
+    body.innerHTML = `<div class="msg">Sin ventas registradas para ${esc(etiquetaFecha(diaActual))}.</div>` + (perd.P.length ? htmlPerdidas(perd.P, 0, null) : '');
     return;
   }
   const a = resumir(filasAnt);
@@ -2096,6 +2188,7 @@ function renderDia(filasDia, filasAnt, nPend){
       <div class="kpi"><p class="l">Ticket promedio</p><p class="v">${fmt(ticketProm)}</p></div>
       <div class="kpi"><p class="l">Carne vendida</p><p class="v">${r.kg.toFixed(1)} kg</p></div>
     </div>
+    ${htmlPerdidas(perd.P, r.total, perd.Pant, DIAS[new Date(diaActual+'T12:00').getDay()].toLowerCase() + ' anterior', perd.viejo && !perd.P.length)}
     <div class="dgrid">
       <div class="dcard"><h4>Venta por hora</h4>${svg}</div>
       <div class="dcard"><h4>Por categoría</h4>${catsHtml}</div>
@@ -2128,7 +2221,9 @@ const ASU_EFECTOS = ['Baja','Sube','Por confirmar'];
 const ASU_FUENTES = ['Mía','Oficial LFT','SEP','San Luis','Comercial','Tradicional'];
 const ASU_REPETIR = ['No','Misma fecha','Mismo día de la semana'];
 const PRON_CFG = {semanasBase: 6, minBase: 3, previasHist: 4, minPrevias: 2, kGlobal: 2, kClave: 1, horizonte: 8,
-                  semanasCompra: 8, mermaSobrante: 1.4, diasRevision: 120, umbralRevision: 5};
+                  semanasCompra: 8, mermaSobrante: 1.4, diasRevision: 120, umbralRevision: 5,
+                  // Qué tanto de la venta perdida se suma a la demanda (1 = toda). Bájalo si sientes que se sobreestima.
+                  pesoPerdida: 1};
 let asuetos = leerJSON('carnitas_asuetos', []).map(normAsu);
 let semanal = leerJSON('carnitas_semanal', null); // {t, semanas}
 let planTab = 'plan', planSem = null, calFiltro = 'todas';
@@ -2257,7 +2352,11 @@ function asuetosDeSemana(vie, lista){
 
 function modeloPronostico(semanas, lista, hoyIso){
   const actual = semanaDe(hoyIso);
-  const todas = semanas||[];
+  // Demanda = lo que vendiste + lo que se te fue (ventas perdidas). Así el plan no repite el faltante.
+  const w = PRON_CFG.pesoPerdida;
+  const todas = (semanas||[]).map(s=>Object.assign({}, s, {
+    ventaCap: s.venta, kgCap: s.kg,
+    venta: s.venta + w*(s.perdidaMonto||0), kg: s.kg + w*(s.perdidaKg||0)}));
   const porSem = {}; todas.forEach(s=>porSem[s.semana]=s);
   const cerradas = todas.filter(s=>s.semana < actual && s.venta > 0);
   const marca = s => asuetosDeSemana(s.semana, lista);
@@ -2303,10 +2402,14 @@ function modeloPronostico(semanas, lista, hoyIso){
   const base = ok ? mediana(ult.map(s=>s.venta)) : null;
   const baseKg = ok ? mediana(ult.map(s=>s.kg)) : null;
   const disp = base ? mediana(ult.map(s=>Math.abs(s.venta - base)))/base : null;
+  // Cuánto de la base es demanda que no atendiste
+  const baseCap = ok ? mediana(ult.map(s=>s.ventaCap)) : null;
+  const baseKgCap = ok ? mediana(ult.map(s=>s.kgCap)) : null;
+  const conPerd = ult.filter(s=>(s.perdidas||0)>0).length;
 
   // Kilos crudos que realmente usas por kilo vendido (descontando lo que sobró)
-  const conCompra = cerradas.filter(s=>s.compraKg>0 && s.kg>0).slice(-PRON_CFG.semanasCompra);
-  const ratios = conCompra.map(s=>Math.max(0, s.compraKg - (s.cierres ? s.sobranteKg*PRON_CFG.mermaSobrante : 0))/s.kg);
+  const conCompra = cerradas.filter(s=>s.compraKg>0 && s.kgCap>0).slice(-PRON_CFG.semanasCompra);
+  const ratios = conCompra.map(s=>Math.max(0, s.compraKg - (s.cierres ? s.sobranteKg*PRON_CFG.mermaSobrante : 0))/s.kgCap);
   const factorCompra = mediana(ratios);
 
   function semana(vie){
@@ -2333,7 +2436,7 @@ function modeloPronostico(semanas, lista, hoyIso){
     .filter(Boolean);
 
   const futuras = []; for(let i=0; i<PRON_CFG.horizonte; i++) futuras.push(semana(sumarDias(actual, 7*i)));
-  return {base, baseKg, nBase: ult.length, disp, observados, factorCompra, nCompra: ratios.length, futuras, semana, datosDe, factorDe, revisar, normales: normales.length};
+  return {base, baseKg, baseCap, baseKgCap, conPerd, nBase: ult.length, disp, observados, factorCompra, nCompra: ratios.length, futuras, semana, datosDe, factorDe, revisar, normales: normales.length};
 }
 
 /* ---------- Datos ---------- */
@@ -2345,13 +2448,24 @@ async function cargarAsuetos(silencio){
     guardarJSON('carnitas_asuetos', asuetos);
     return true;
   }catch(e){
-    if(!silencio) toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.6' : 'No se pudieron cargar las fechas: ' + e.message, true);
+    if(!silencio) toast(/Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.7' : 'No se pudieron cargar las fechas: ' + e.message, true);
     return false;
   }
 }
 async function cargarSemanal(){
-  const d = await apiGet('semanal', {desde: sumarDias(hoy(), -800)}, 30000);
-  semanal = {t: Date.now(), semanas: d.semanas||[]};
+  const desde = sumarDias(hoy(), -800);
+  const [d, p] = await Promise.all([
+    apiGet('semanal', {desde}, 30000),
+    apiGet('perdidas', {desde}, 30000).catch(()=>null) // servicio anterior a 2.7: sin ventas perdidas
+  ]);
+  const semanas = d.semanas||[];
+  if(p && Array.isArray(p.filas)){
+    const porSem = {};
+    p.filas.forEach(r=>{ const f = String(r[0]).slice(0,10); if(!/^\d{4}-\d{2}-\d{2}$/.test(f)) return;
+      const o = porSem[semanaDe(f)] || (porSem[semanaDe(f)] = []); o.push(r); });
+    semanas.forEach(s=>{ const x = resumirPerdidas(porSem[s.semana]); s.perdidas = x.n; s.perdidaMonto = Math.round(x.monto); s.perdidaKg = Math.round(x.kg*100)/100; });
+  }
+  semanal = {t: Date.now(), semanas, conPerdidas: !!p};
   guardarJSON('carnitas_semanal', semanal);
 }
 async function guardarAsuetosSrv(lista, borrar){
@@ -2359,7 +2473,7 @@ async function guardarAsuetosSrv(lista, borrar){
   await cargarAsuetos(true);
   return r;
 }
-function msgError(e){ return /Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.6' : e.message; }
+function msgError(e){ return /Acción no reconocida/.test(e.message) ? 'Actualiza el servicio de Apps Script a la versión 2.7' : e.message; }
 
 /* ---------- Vista ---------- */
 let asuPeticion = 0;
@@ -2425,12 +2539,15 @@ function htmlPlan(M){
 
   const pasos = S.venta==null ? `<p class="hint">Faltan semanas normales con ventas (mínimo ${PRON_CFG.minBase}).</p>` : `
     <div class="why">
-      <div class="r"><span>Fin de semana normal <small>mediana de ${M.nBase} semanas</small></span><b>${fmt(M.base)} · ${kgTxt(M.baseKg)}</b></div>
+      ${M.conPerd ? `<div class="r"><span>Lo que vendiste <small>mediana de ${M.nBase} semanas</small></span><b>${fmt(M.baseCap)} · ${kgTxt(M.baseKgCap)}</b></div>
+      <div class="r"><span>+ Clientes que se te fueron <small>ventas perdidas · ${M.conPerd} de ${M.nBase} semanas con registro</small></span><b style="color:var(--bad)">+${fmt(Math.max(0,M.base-M.baseCap))} · +${kgTxt(Math.max(0,M.baseKg-M.baseKgCap))}</b></div>` : ''}
+      <div class="r"><span>${M.conPerd ? 'Demanda de un fin de semana normal' : 'Fin de semana normal'} <small>mediana de ${M.nBase} semanas</small></span><b>${fmt(M.base)} · ${kgTxt(M.baseKg)}</b></div>
       ${S.principal ? `<div class="r"><span>Ajuste por ${esc(S.principal.nombre)} <small>${esc(S.fuente)}</small></span><b>${pctTxt(S.factor)}</b></div>` : ''}
       <div class="r"><span>Carne a vender</span><b>${kgTxt(S.kg)}</b></div>
       <div class="r"><span>Kilos crudos por kilo vendido <small>${M.factorCompra ? `mediana de ${M.nCompra} semanas` : 'faltan insumos de carne'}</small></span><b>${M.factorCompra ? '× '+M.factorCompra.toFixed(2) : '—'}</b></div>
       <div class="r tot"><span>Pedido sugerido</span><span>${S.pedido!=null ? `≈ ${kgTxt(S.pedido)} crudos` : '—'}</span></div>
     </div>
+    ${M.conPerd ? `<p class="hint">La demanda suma lo vendido más las ventas perdidas (monto estimado), para no volver a quedarte corto. Como es un estimado, revisa que solo registres clientes que de verdad se fueron sin comprar.</p>` : semanal && semanal.conPerdidas===false ? `<p class="hint">Publica el servicio 2.7 para que el plan sume las ventas perdidas.</p>` : ''}
     <p class="hint">El factor sale de tus propias compras de cortes que se cocinan entre los kilos vendidos en mostrador. Incluye la merma y la carne de tacos, tortas y gorditas. Cuando capturas lo que sobró, se descuenta (× ${PRON_CFG.mermaSobrante} para pasarlo a crudo).</p>`;
 
   const otras = as.map(a=>{ const d = M.datosDe(a); return `<div class="r"><span>${esc(a.nombre)}</span><span>Tú: <b>${a.impacto==null?'—':pctNum(a.impacto)}</b> · Datos: <b>${d ? pctTxt(d.f) : '—'}</b>${d?` <small>${esc(d.fuente)}</small>`:''}</span></div>`; }).join('');
@@ -2441,11 +2558,11 @@ function htmlPlan(M){
       <button class="nav" onclick="moverPlanSem(1)" aria-label="Semana siguiente">›</button>
       <div class="dchips"><button class="dchip ${vie===semanaDe(h)?'on':''}" onclick="planSem=null;renderPlan()">Esta semana</button></div></div>
     <div class="kpis">
-      <div class="kpi main"><p class="l">${pasada && S.real ? 'Venta real (sáb + dom)' : 'Venta esperada (sáb + dom)'}</p><p class="v">${pasada && S.real ? fmt(S.real.venta) : S.venta!=null ? fmt(S.venta) : '—'}</p>
-        <p class="d">${pasada && S.real && S.venta!=null ? `Se esperaban ${fmt(S.venta)}` : S.banda ? `Rango ${fmt(S.venta-S.banda)} – ${fmt(S.venta+S.banda)}` : 'Sin datos suficientes'}</p></div>
-      <div class="kpi"><p class="l">Carne a vender</p><p class="v">${kgTxt(pasada && S.real ? S.real.kg : S.kg)}</p><p class="d">${pasada && S.real ? 'vendida' : 'cocida, en mostrador'}</p></div>
+      <div class="kpi main"><p class="l">${pasada && S.real ? 'Venta real (sáb + dom)' : M.conPerd ? 'Demanda esperada (sáb + dom)' : 'Venta esperada (sáb + dom)'}</p><p class="v">${pasada && S.real ? fmt(S.real.ventaCap) : S.venta!=null ? fmt(S.venta) : '—'}</p>
+        <p class="d">${pasada && S.real && S.venta!=null ? `Se esperaban ${fmt(S.venta)}${S.real.perdidas ? ` · se fueron ${S.real.perdidas} clientes (${fmt(S.real.perdidaMonto)})` : ''}` : S.banda ? `Rango ${fmt(S.venta-S.banda)} – ${fmt(S.venta+S.banda)}` : 'Sin datos suficientes'}</p></div>
+      <div class="kpi"><p class="l">Carne a vender</p><p class="v">${kgTxt(pasada && S.real ? S.real.kgCap : S.kg)}</p><p class="d">${pasada && S.real ? 'vendida' : M.conPerd ? 'cocida, incluye lo que se te fue' : 'cocida, en mostrador'}</p></div>
       <div class="kpi buy"><p class="l">Pedido sugerido</p><p class="v">${kgTxt(S.pedido)}</p><p class="d">${S.bandaKg ? `carne cruda · ${Math.round(S.pedido-S.bandaKg)}–${Math.round(S.pedido+S.bandaKg)} kg` : 'carne cruda'}</p></div>
-      <div class="kpi"><p class="l">Hace un año</p><p class="v">${yoy ? fmt(yoy.venta) : '—'}</p><p class="d">${yoy ? `${esc(yoy.nota)} · compraste ${kgTxt(yoy.compraKg||null)}${yoy.cierres?` · sobró ${kgTxt(yoy.sobranteKg)}`:''}` : 'Aún sin historial de hace un año'}</p></div>
+      <div class="kpi"><p class="l">Hace un año</p><p class="v">${yoy ? fmt(yoy.ventaCap) : '—'}</p><p class="d">${yoy ? `${esc(yoy.nota)} · compraste ${kgTxt(yoy.compraKg||null)}${yoy.cierres?` · sobró ${kgTxt(yoy.sobranteKg)}`:''}` : 'Aún sin historial de hace un año'}</p></div>
     </div>
     <div class="asugrid">
       <div class="dcard"><h4>Cómo se calcula</h4>${pasos}${otras ? `<h4 style="margin-top:14px">Impacto de la fecha</h4><div class="why">${otras}</div>` : ''}</div>
@@ -2495,10 +2612,10 @@ function htmlHistorico(M){
       </tbody></table></div>` : `<p class="hint">Cuando pase un fin de semana con fecha atípica, aquí verás su venta contra la mediana de las ${PRON_CFG.previasHist} semanas normales previas.</p>`}
     </div>
     <div class="dcard" style="margin-top:10px"><h4>Compra contra venta de carne · últimas 12 semanas</h4>
-      <div class="tablawrap"><table class="ptabla"><thead><tr><th>Semana</th><th class="num">Venta</th><th class="num">Vendida</th><th class="num">Comprada</th><th class="num">Sobró</th><th class="num">Crudo por kg</th></tr></thead><tbody>
-        ${sem.map(s=>`<tr class="${asuetosDeSemana(s.semana).length?'asu':''}"><td>vie ${fechaCorta(s.semana)}</td><td class="num">${fmt(s.venta)}</td><td class="num">${kgTxt(s.kg)}</td><td class="num">${s.compraKg?kgTxt(s.compraKg):'—'}</td><td class="num">${s.cierres?kgTxt(s.sobranteKg):'—'}</td><td class="num">${s.kg>0&&s.compraKg>0?(s.compraKg/s.kg).toFixed(2):'—'}</td></tr>`).join('')}
+      <div class="tablawrap"><table class="ptabla"><thead><tr><th>Semana</th><th class="num">Venta</th><th class="num">Perdida</th><th class="num">Vendida</th><th class="num">Comprada</th><th class="num">Sobró</th><th class="num">Crudo por kg</th></tr></thead><tbody>
+        ${sem.map(s=>`<tr class="${asuetosDeSemana(s.semana).length?'asu':''}"><td>vie ${fechaCorta(s.semana)}</td><td class="num">${fmt(s.venta)}</td><td class="num">${s.perdidas ? `${fmt(s.perdidaMonto)}<small style="display:block;color:var(--muted)">${s.perdidas} clientes</small>` : '—'}</td><td class="num">${kgTxt(s.kg)}</td><td class="num">${s.compraKg?kgTxt(s.compraKg):'—'}</td><td class="num">${s.cierres?kgTxt(s.sobranteKg):'—'}</td><td class="num">${s.kg>0&&s.compraKg>0?(s.compraKg/s.kg).toFixed(2):'—'}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="hint">Comprada = kilos crudos de cortes que se cocinan (sin manteca, pellet ni cuero). Si “crudo por kg” sube mucho una semana, probablemente pediste de más.</p></div>`;
+      <p class="hint">Comprada = kilos crudos de cortes que se cocinan (sin manteca, pellet ni cuero). Si “crudo por kg” sube mucho una semana, probablemente pediste de más. Perdida = clientes que se fueron sin comprar (monto estimado).</p></div>`;
 }
 
 /* ---------- Acciones ---------- */
