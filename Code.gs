@@ -1,6 +1,6 @@
 /**
  * Carnitas App — servicio web (Google Apps Script)
- * Versión: 2.6.0
+ * Versión: 2.7.0
  *
  * Vive pegado a la hoja "Carnitas Ventas" (Extensiones → Apps Script).
  * La app y el tablero le mandan y le piden datos con una clave; así la app
@@ -19,7 +19,7 @@
  *   - consolidarSurtido()   hace un respaldo de la hoja y junta cada Surtido repartido en un solo renglón.
  */
 
-const SCRIPT_VERSION = '2.6.0';
+const SCRIPT_VERSION = '2.7.0';
 const TZ = 'America/Mexico_City'; // respaldo si la hoja no tiene zona horaria
 
 // Las fechas se leen y escriben SIEMPRE con la zona horaria de la propia hoja
@@ -96,7 +96,8 @@ function doGet(e) {
       case 'asuetos':  return responder({ ok: true, columnas: HOJAS.Asuetos, filas: leerAsuetos_() });
       case 'semanal':  return responder({ ok: true, semanas: ventasSemanales(p.desde) });
       case 'rango':    return responder({ ok: true, datos: porRango(p.desde, p.hasta) });
-      case 'ventas':   return responder({ ok: true, filas: ventasPorFechas(p.fechas) });
+      case 'ventas':   return responder({ ok: true, filas: ventasPorFechas(p.fechas), perdidas: ventasPorFechas(p.fechas, 'VentasPerdidas') });
+      case 'perdidas': return responder({ ok: true, filas: perdidasDesde_(p.desde) });
       case 'todo':     return responder({ ok: true, version: SCRIPT_VERSION, tz: tzHoja(), datos: leerTodo() });
       default:         return responder({ ok: false, error: 'Acción no reconocida' });
     }
@@ -499,20 +500,26 @@ function fechaTexto(v) {
   return t;
 }
 
-function ventasPorFechas(fechasTxt) {
+function ventasPorFechas(fechasTxt, hoja) {
   const fechas = String(fechasTxt || '').split(',').map(s => s.trim()).filter(Boolean);
   if (!fechas.length) return [];
   const set = {};
   fechas.forEach(f => set[f] = true);
-  return leer('Ventas').filter(r => set[String(r[0]).slice(0, 10)]);
+  return leer(hoja || 'Ventas').filter(r => set[String(r[0]).slice(0, 10)]);
 }
 
-/** Ventas, insumos, gastos y sueldos entre dos fechas (aaaa-mm-dd, ambas incluidas). */
+/** Ventas perdidas desde una fecha (aaaa-mm-dd). La app calcula el monto estimado con sus precios. */
+function perdidasDesde_(desde) {
+  const filtro = /^\d{4}-\d{2}-\d{2}$/.test(String(desde || '')) ? String(desde) : '';
+  return leer('VentasPerdidas').filter(r => { const d = String(r[0]).slice(0, 10); return /^\d{4}-\d{2}-\d{2}$/.test(d) && (!filtro || d >= filtro); });
+}
+
+/** Ventas, insumos, gastos, sueldos y ventas perdidas entre dos fechas (aaaa-mm-dd, ambas incluidas). */
 function porRango(desde, hasta) {
   const ok = /^\d{4}-\d{2}-\d{2}$/;
   if (!ok.test(String(desde)) || !ok.test(String(hasta))) throw new Error('Fechas inválidas');
   const out = {};
-  ['Ventas', 'Insumos', 'Gastos', 'Sueldos'].forEach(n => {
+  ['Ventas', 'Insumos', 'Gastos', 'Sueldos', 'VentasPerdidas'].forEach(n => {
     out[n] = leer(n).filter(r => { const d = String(r[0]).slice(0, 10); return d >= desde && d <= hasta; });
   });
   return out;

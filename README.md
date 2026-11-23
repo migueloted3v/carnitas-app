@@ -6,7 +6,7 @@
 
 Captura ventas, insumos, gastos y sueldos desde el celular, sin servidor ni costos de hosting, sincronizado directo a Google Sheets.
 
-[![Versión](https://img.shields.io/badge/versión-2.6.0-E36414)]()
+[![Versión](https://img.shields.io/badge/versión-2.7.0-E36414)]()
 [![Static Site](https://img.shields.io/badge/hosting-GitHub%20Pages-24292e?logo=github)](https://pages.github.com/)
 [![No Build](https://img.shields.io/badge/build-none-brightgreen)]()
 [![Backend](https://img.shields.io/badge/backend-Google%20Sheets%20%2B%20Apps%20Script-34A853?logo=googlesheets&logoColor=white)]()
@@ -192,6 +192,7 @@ Todo vive en **tu** Google Drive. La app no tiene servidor propio ni guarda tus 
 
 | Versión | Cambios |
 |---|---|
+| **2.7.0** | **Clientes perdidos** en el reporte de Ventas (día y semana) y en el tablero 2.4.0: número de clientes, venta perdida estimada (monto capturado o kilos/piezas valorados con tus precios), demanda real (venta + perdida) y % no atendido, qué buscaban, a qué hora y por qué · **Planear la semana** usa la demanda (venta + venta perdida) para no repetir faltantes; el factor crudo/vendido sigue con lo vendido · servicio: `ventas` devuelve `perdidas`, `rango` incluye `VentasPerdidas`, nueva acción `perdidas` |
 | **2.6.0** | **Planear la semana**: pedido sugerido de carne cruda con el factor real de compra contra venta (descuenta lo que sobró), venta esperada con rango y comparación con hace un año · fechas atípicas con efecto ▼/▲/?, impacto de tus datos contra el tuyo y aviso para revisar después del fin de semana · fechas propias que se repiten cada año · precarga ampliada (SEP 2025-2026, FENAPO, Xantolo, Día del Maestro de Primaria SLP, regreso a clases, Día de las Madres y Día del Padre) · cierre del domingo con la carne sobrante (pestaña `Cierres`) · pestaña Histórico con compra contra venta · servicio: `semanal` trae kilos comprados y sobrantes |
 | **2.5.0** | Apartado **Asuetos y pronóstico**: pestaña `Asuetos` con alta/edición/borrado y precarga de festivos de México (con su puente) · pronóstico semanal de venta y kilos de carne ajustado por asueto (impacto capturado, histórico del mismo asueto o promedio de asuetos, con encogimiento hacia 0% cuando hay pocos datos) · tabla de asuetos pasados vs. fin de semana normal · aviso de semana de asueto en la vista Semana · servicio: acciones `asuetos`, `semanal` y `guardarAsuetos` · ícono `icon-asuetos` |
 | **2.4.2** | Íconos propios estilo Clay (`icons/icons.svg`): insignia en el menú principal, ícono del módulo en el encabezado y en *Nueva cotización*; 5 íconos de apoyo (venta perdida, transferencia, efectivo, tarjeta, ajustes). Ya no quedan emojis en la app. Los colores del set toman la paleta oficial de la app |
